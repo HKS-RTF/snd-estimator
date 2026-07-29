@@ -325,48 +325,114 @@ def fetch_estimation_by_ref(ref_no):
             return record, None
     return None, None
 
-def fetch_all_logs():
-    if not supabase: return []
-    response = supabase.table("estimation_logs").select("*").order("created_at", desc=True).execute()
-    return response.data
+
+# --- EXPANDED 65+ TIERED ITEM MASTER ---
+ITEM_MASTER = [
+    # --- Standard / Foundational Items ---
+    ("Replacing sanitary fittings inside the toilets", "SETS", "SETS_UNITS", 0.08, "standard"),
+    ("3 course of oil bond distemper (Inside repaint)", "SQ. FT", "SQFT", 0.07, "standard"),
+    ("Providing & casting bathroom glazed tiles fixing etc.", "SQ. FT", "SQFT", 0.05, "standard"),
+    ("Interior works (Wardrobes, Modular Kitchen)", "JOB", "JOB_LOT", 0.12, "standard"),
+    ("Electrical fittings, cables, switches etc.", "JOB", "JOB_LOT", 0.07, "standard"),
+    ("Painting (exterior walls)", "SQ. FT", "SQFT", 0.06, "standard"),
+    ("New plumbing lines and fixtures", "JOB", "JOB_LOT", 0.05, "standard"),
+    ("Landscaping/Balcony improvements", "JOB", "JOB_LOT", 0.06, "standard"),
+    ("False ceiling work", "SQ. FT", "SQFT", 0.07, "standard"),
+    ("Flooring (Tiles/Marble)", "SQ. FT", "SQFT", 0.07, "standard"),
+    ("Providing & fixing teak wood show case", "UNIT", "SETS_UNITS", 0.06, "standard"),
+    ("2 course of snow cem paint (Outside repaint)", "SQ. FT", "SQFT", 0.04, "standard"),
+    ("Replacing sanitary fittings inside the kitchen", "SET", "SETS_UNITS", 0.05, "standard"),
+    ("Demolition and debris removal", "LOT", "JOB_LOT", 0.06, "standard"),
+    ("Wall plastering and finishing", "SQ. FT", "SQFT", 0.09, "standard"),
+    ("Wooden flush door fixing and painting", "UNIT", "SETS_UNITS", 0.05, "standard"),
+    ("Window aluminum sliding shutter replacement", "SET", "SETS_UNITS", 0.06, "standard"),
+    ("Main door teakwood polish and hardware", "UNIT", "SETS_UNITS", 0.05, "standard"),
+    ("Loft storage wooden shutter installation", "SQ. FT", "SQFT", 0.05, "standard"),
+    ("Balcony MS safety grill fabrication & painting", "SQ. FT", "SQFT", 0.06, "standard"),
+    ("Bathroom anti-skid ceramic flooring tiles", "SQ. FT", "SQFT", 0.05, "standard"),
+    ("Kitchen granite countertop slab polishing", "RFT", "SQFT", 0.05, "standard"),
+    ("PVC water storage tank installation", "UNIT", "SETS_UNITS", 0.04, "standard"),
+    ("Exhaust fan and ventilation core cutting", "UNIT", "SETS_UNITS", 0.03, "standard"),
+    ("General debris clearing and deep cleaning", "JOB", "JOB_LOT", 0.04, "standard"),
+    ("Terrace waterproofing and chemical coating", "SQ. FT", "SQFT", 0.07, "standard"),
+    ("Compound wall plastering & white wash", "SQ. FT", "SQFT", 0.05, "standard"),
+    ("Staircase MS handrail fabrication & painting", "RFT", "SQFT", 0.06, "standard"),
+    ("Wooden skirting fixing across rooms", "RFT", "SQFT", 0.04, "standard"),
+    ("Geyser and electrical point wiring setup", "SET", "SETS_UNITS", 0.04, "standard"),
+
+    # --- Modern & High-End Luxury Items ---
+    ("PU Finish Acrylic Modular Kitchen Shutters with Blum Tandembox", "JOB", "JOB_LOT", 0.14, "luxury"),
+    ("Italian Marble Seamless Epoxy Flooring & Mirror Polish", "SQ. FT", "SQFT", 0.12, "luxury"),
+    ("Fluted Natural Wood Veneer Wall Panelling in Living Suite", "SQ. FT", "SQFT", 0.10, "luxury"),
+    ("Concealed Magnetic Track Lighting & Architectural LED Profiles", "JOB", "JOB_LOT", 0.09, "luxury"),
+    ("Smart Home IoT Automation Hub (Lighting, AC & Curtains)", "SET", "SETS_UNITS", 0.08, "luxury"),
+    ("Motorized Silent Curtain Tracks with Remote Control", "SET", "SETS_UNITS", 0.07, "luxury"),
+    ("Biometric Digital Door Lock with Face Recognition & App Access", "UNIT", "SETS_UNITS", 0.06, "luxury"),
+    ("Backlit Frameless Anti-Fog Smart Vanity Mirrors", "SET", "SETS_UNITS", 0.06, "luxury"),
+    ("Walk-in Closet Glass Wardrobes with Sensor LED Strip Lights", "JOB", "JOB_LOT", 0.11, "luxury"),
+    ("Invisible Stainless Steel Balcony Safety Wire Mesh", "SQ. FT", "SQFT", 0.06, "luxury"),
+    ("Teak Wood Designer Pooja Unit with CNC Brass Jali Backlit Panel", "UNIT", "SETS_UNITS", 0.10, "luxury"),
+    ("Quartz Composite Kitchen Island Countertop with Undermount Sink", "SQ. FT", "SQFT", 0.09, "luxury"),
+    ("Acoustic Fabric Wall Panelling for Home Theater / Master Bedroom", "SQ. FT", "SQFT", 0.08, "luxury"),
+    ("Profile LED Wardrobe Sliding Doors with Lacquered Glass", "JOB", "JOB_LOT", 0.10, "luxury"),
+    ("Sensor-Activated Under-Cabinet & Drawer Lighting Systems", "JOB", "JOB_LOT", 0.06, "luxury"),
+    ("Designer Resin-Art Dining Feature Wall & Cove Lighting", "SQ. FT", "SQFT", 0.08, "luxury"),
+    ("Frameless Toughened Glass Shower Partition Enclosure", "SET", "SETS_UNITS", 0.07, "luxury"),
+    ("Engineered Wooden Herringbone Flooring in Master Suite", "SQ. FT", "SQFT", 0.11, "luxury"),
+    ("Concealed Ceiling Mounted Rain Shower & Thermostatic Mixer", "SET", "SETS_UNITS", 0.08, "luxury"),
+    ("Custom CNC Metal Laser Cut Foyer Partition Screen", "UNIT", "SETS_UNITS", 0.07, "luxury"),
+    ("Weatherproof WPC Decking Flooring for Balcony & Terrace", "SQ. FT", "SQFT", 0.08, "luxury"),
+    ("Vertical Artificial Garden Wall with Drip Irrigation Setup", "SQ. FT", "SQFT", 0.07, "luxury"),
+    ("Hydraulic Storage King-Size Bed with Custom Headboard", "UNIT", "SETS_UNITS", 0.09, "luxury"),
+    ("Built-in Bar Counter with Wine Cooler & Backlit Bottle Display", "JOB", "JOB_LOT", 0.11, "luxury"),
+    ("Duco Painted Designer Crockery Unit with Fluted Glass", "UNIT", "SETS_UNITS", 0.09, "luxury"),
+    ("Ergonomic Study Desk with Integrated Cable Management", "UNIT", "SETS_UNITS", 0.06, "luxury"),
+    ("False Ceiling Gypsum Cove with Multi-Color RGB Strip Light", "SQ. FT", "SQFT", 0.08, "luxury"),
+    ("Designer Brass Inlay Marble Flooring Borders", "RFT", "SQFT", 0.07, "luxury"),
+    ("Concealed Touch-Latch Shoe Rack Foyer Console Unit", "UNIT", "SETS_UNITS", 0.07, "luxury"),
+    ("Centralized Multi-Zone Air Conditioning Piping & Venting", "JOB", "JOB_LOT", 0.13, "luxury"),
+    ("Automated Smoke & Gas Leak Detector Safety System", "SET", "SETS_UNITS", 0.05, "luxury"),
+    ("Designer Pendent Chandelier Installation in Living Area", "UNIT", "SETS_UNITS", 0.06, "luxury"),
+    ("Hardwood Pergola Structure for Terrace Garden", "JOB", "JOB_LOT", 0.10, "luxury"),
+    ("Invisible Floor Spring Hinges for Toughened Glass Doors", "SET", "SETS_UNITS", 0.06, "luxury"),
+    ("Premium Velvet Upholstered Window Bay Seating", "SET", "SETS_UNITS", 0.06, "luxury")
+]
+
 
 def generate_estimation_pdf_bytes(owner, address, est_date, target_total):
     is_single_page = target_total < 1500000
-    FIXED_ITEMS_MASTER = [
-        ("Replacing sanitary fittings inside the toilets", "SETS", "SETS_UNITS", 0.08),
-        ("3 course of oil bond distemper (Inside repaint)", "SQ. FT", "SQFT", 0.07),
-        ("Providing & casting bathroom glazed tiles fixing etc.", "SQ. FT", "SQFT", 0.05),
-        ("Interior works (Wardrobes, Modular Kitchen)", "JOB", "JOB_LOT", 0.12),
-        ("Electrical fittings, cables, switches etc.", "JOB", "JOB_LOT", 0.07),
-        ("Painting (exterior walls)", "SQ. FT", "SQFT", 0.06),
-        ("New plumbing lines and fixtures", "JOB", "JOB_LOT", 0.05),
-        ("Landscaping/Balcony improvements", "JOB", "JOB_LOT", 0.06),
-        ("False ceiling work", "SQ. FT", "SQFT", 0.07),
-        ("Flooring (Tiles/Marble)", "SQ. FT", "SQFT", 0.07),
-        ("Providing & fixing teak wood show case", "UNIT", "SETS_UNITS", 0.06),
-        ("2 course of snow cem paint (Outside repaint)", "SQ. FT", "SQFT", 0.04),
-        ("Replacing sanitary fittings inside the kitchen", "SET", "SETS_UNITS", 0.05),
-        ("Demolition and debris removal", "LOT", "JOB_LOT", 0.06),
-        ("Wall plastering and finishing", "SQ. FT", "SQFT", 0.09)
-    ]
+    total_items_needed = 10 if is_single_page else random.randint(15, 17)
+
+    if target_total < 1200000:
+        eligible_items = [item for item in ITEM_MASTER if item[4] == "standard"]
+        if len(eligible_items) < total_items_needed:
+            eligible_items = ITEM_MASTER
+    elif target_total > 2500000:
+        luxury_pool = [item for item in ITEM_MASTER if item[4] == "luxury"]
+        standard_pool = [item for item in ITEM_MASTER if item[4] == "standard"]
+        random.shuffle(luxury_pool)
+        random.shuffle(standard_pool)
+        eligible_items = luxury_pool[:int(total_items_needed * 0.7)] + standard_pool[:int(total_items_needed * 0.3)]
+    else:
+        eligible_items = list(ITEM_MASTER)
+
+    random.shuffle(eligible_items)
+    selected_pool = eligible_items[:total_items_needed]
 
     def calculate_quantity(category, total_amount):
-        min_budget, max_budget = 1500000.0, 4500000.0
+        min_budget, max_budget = 500000.0, 5000000.0
         ratio = max(0.0, min(1.0, (total_amount - min_budget) / (max_budget - min_budget)))
         ratio = max(0.0, min(1.0, ratio + random.uniform(-0.05, 0.05)))
-        if category == "SQFT": return f"{round(650 + ratio * (2500 - 650))} SQ. FT"
+        if category == "SQFT": return f"{round(450 + ratio * (2800 - 450))} SQ. FT"
         elif category == "SETS_UNITS":
-            qty = round(1 + ratio * (5 - 1))
+            qty = round(1 + ratio * (6 - 1))
             return f"{qty} SETS" if qty > 1 else "1 SET"
         elif category == "JOB_LOT":
             qty = round(1 + ratio * (2 - 1))
             return f"{qty} JOB" if qty > 1 else "1 JOB"
         return "1 JOB"
 
-    total_items_needed = 10 if is_single_page else 15
-    processed_items = [(desc, calculate_quantity(cat, target_total), w) for desc, _, cat, w in FIXED_ITEMS_MASTER]
-    random.shuffle(processed_items)
-    processed_items = processed_items[:total_items_needed]
+    processed_items = [(desc, calculate_quantity(cat, target_total), w) for desc, _, cat, w, _ in selected_pool]
 
     subtotal_target = target_total / 1.18
     weights = [item[2] * random.uniform(0.85, 1.15) for item in processed_items]
@@ -400,19 +466,19 @@ def generate_estimation_pdf_bytes(owner, address, est_date, target_total):
     box_detail_style = ParagraphStyle("BoxDetail", parent=styles["Normal"], alignment=1, fontSize=12.5, leading=15, fontName="Helvetica-Bold", textColor=colors.black)
     
     if is_single_page:
-        cell_12_bold_center = ParagraphStyle("Cell11BC", parent=styles["Normal"], alignment=1, fontSize=11, leading=13.5, fontName="Helvetica-Bold", textColor=colors.black)
-        hdr_12_bold_center = ParagraphStyle("Hdr11BC", parent=styles["Normal"], alignment=1, fontSize=11, leading=13.5, fontName="Helvetica-Bold", textColor=colors.black)
-        total_14_bold = ParagraphStyle("Total12B", parent=styles["Normal"], alignment=1, fontSize=12, leading=14.5, fontName="Helvetica-Bold", textColor=colors.black)
-        words_13_bold_center = ParagraphStyle("Words11.5BC", parent=styles["Normal"], alignment=1, fontSize=11.5, leading=14, fontName="Helvetica-Bold", textColor=colors.black)
-        terms_hdr_center = ParagraphStyle("TermsHdr9.5", parent=styles["Normal"], alignment=1, fontSize=9.5, leading=12, fontName="Helvetica-Bold", textColor=colors.black)
-        terms_point_size_8 = ParagraphStyle("TermsPt8.5", parent=styles["Normal"], alignment=0, fontSize=8.5, leading=10.5, fontName="Helvetica-Bold", textColor=colors.black)
+        cell_12_bold_center = ParagraphStyle("Cell11BC", parent=styles["Normal"], alignment=1, fontSize=10, leading=12, fontName="Helvetica-Bold", textColor=colors.black)
+        hdr_12_bold_center = ParagraphStyle("Hdr11BC", parent=styles["Normal"], alignment=1, fontSize=10.5, leading=13, fontName="Helvetica-Bold", textColor=colors.black)
+        total_14_bold = ParagraphStyle("Total12B", parent=styles["Normal"], alignment=1, fontSize=11, leading=13, fontName="Helvetica-Bold", textColor=colors.black)
+        words_13_bold_center = ParagraphStyle("Words11.5BC", parent=styles["Normal"], alignment=1, fontSize=11, leading=13, fontName="Helvetica-Bold", textColor=colors.black)
+        terms_hdr_center = ParagraphStyle("TermsHdr9.5", parent=styles["Normal"], alignment=1, fontSize=9, leading=11, fontName="Helvetica-Bold", textColor=colors.black)
+        terms_point_size_8 = ParagraphStyle("TermsPt8.5", parent=styles["Normal"], alignment=0, fontSize=8, leading=10, fontName="Helvetica-Bold", textColor=colors.black)
     else:
-        cell_12_bold_center = ParagraphStyle("Cell12BC", parent=styles["Normal"], alignment=1, fontSize=12, leading=14, fontName="Helvetica-Bold", textColor=colors.black)
-        hdr_12_bold_center = ParagraphStyle("Hdr12BC", parent=styles["Normal"], alignment=1, fontSize=12, leading=14, fontName="Helvetica-Bold", textColor=colors.black)
-        total_14_bold = ParagraphStyle("Total14B", parent=styles["Normal"], alignment=1, fontSize=14, leading=16, fontName="Helvetica-Bold", textColor=colors.black)
-        words_13_bold_center = ParagraphStyle("Words13BC", parent=styles["Normal"], alignment=1, fontSize=13, leading=16, fontName="Helvetica-Bold", textColor=colors.black)
-        terms_hdr_center = ParagraphStyle("TermsHdr10", parent=styles["Normal"], alignment=1, fontSize=10, leading=14, fontName="Helvetica-Bold", textColor=colors.black)
-        terms_point_size_8 = ParagraphStyle("TermsPt8", parent=styles["Normal"], alignment=0, fontSize=8, leading=11, fontName="Helvetica-Bold", textColor=colors.black)
+        cell_12_bold_center = ParagraphStyle("Cell12BC", parent=styles["Normal"], alignment=1, fontSize=10, leading=12, fontName="Helvetica-Bold", textColor=colors.black)
+        hdr_12_bold_center = ParagraphStyle("Hdr12BC", parent=styles["Normal"], alignment=1, fontSize=10.5, leading=13, fontName="Helvetica-Bold", textColor=colors.black)
+        total_14_bold = ParagraphStyle("Total14B", parent=styles["Normal"], alignment=1, fontSize=12, leading=14, fontName="Helvetica-Bold", textColor=colors.black)
+        words_13_bold_center = ParagraphStyle("Words13BC", parent=styles["Normal"], alignment=1, fontSize=12, leading=14, fontName="Helvetica-Bold", textColor=colors.black)
+        terms_hdr_center = ParagraphStyle("TermsHdr10", parent=styles["Normal"], alignment=1, fontSize=9.5, leading=12, fontName="Helvetica-Bold", textColor=colors.black)
+        terms_point_size_8 = ParagraphStyle("TermsPt8", parent=styles["Normal"], alignment=0, fontSize=8, leading=10.5, fontName="Helvetica-Bold", textColor=colors.black)
 
     elements = []
 
@@ -462,38 +528,41 @@ def generate_estimation_pdf_bytes(owner, address, est_date, target_total):
         p_table_data.append(["", Paragraph("TOTAL", total_14_bold), "", Paragraph(f"{final_total:,}", total_14_bold)])
 
         t1 = Table(p_table_data, colWidths=[50, 280, 100, 120])
-        t1.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('TOPPADDING', (0,0), (-1,-1), 6.5), ('BOTTOMPADDING', (0,0), (-1,-1), 6.5)]))
+        t1.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('TOPPADDING', (0,0), (-1,-1), 4.5), ('BOTTOMPADDING', (0,0), (-1,-1), 4.5)]))
         elements.append(t1)
     else:
+        split_idx = len(processed_items) // 2
+        p1_items = processed_items[:split_idx]
+        p2_items = processed_items[split_idx:]
+
         p1_table_data = [[Paragraph("SL.NO", hdr_12_bold_center), Paragraph("Description", hdr_12_bold_center), Paragraph("Qty", hdr_12_bold_center), Paragraph("Amount Rs.", hdr_12_bold_center)]]
-        for idx in range(9):
-            item = processed_items[idx]
+        for idx, item in enumerate(p1_items):
             p1_table_data.append([Paragraph(f"{idx+1}.", cell_12_bold_center), Paragraph(item[0], cell_12_bold_center), Paragraph(item[1], cell_12_bold_center), Paragraph(f"{item_amounts[idx]:,}", cell_12_bold_center)])
         
         t1 = Table(p1_table_data, colWidths=[50, 280, 100, 120])
-        t1.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 16), ('BOTTOMPADDING', (0,0), (-1,-1), 16)]))
+        t1.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('TOPPADDING', (0,0), (-1,-1), 4), ('BOTTOMPADDING', (0,0), (-1,-1), 4)]))
         elements.append(t1)
 
         elements.append(PageBreak())
         elements.extend(create_header_with_qr())
 
         p2_table_data = [[Paragraph("SL.NO", hdr_12_bold_center), Paragraph("Description", hdr_12_bold_center), Paragraph("Qty", hdr_12_bold_center), Paragraph("Amount Rs.", hdr_12_bold_center)]]
-        for idx in range(9, 15):
-            item = processed_items[idx]
-            p2_table_data.append([Paragraph(f"{idx+1}.", cell_12_bold_center), Paragraph(item[0], cell_12_bold_center), Paragraph(item[1], cell_12_bold_center), Paragraph(f"{item_amounts[idx]:,}", cell_12_bold_center)])
+        for idx, item in enumerate(p2_items):
+            actual_idx = split_idx + idx
+            p2_table_data.append([Paragraph(f"{actual_idx+1}.", cell_12_bold_center), Paragraph(item[0], cell_12_bold_center), Paragraph(item[1], cell_12_bold_center), Paragraph(f"{item_amounts[actual_idx]:,}", cell_12_bold_center)])
 
         p2_table_data.append(["", Paragraph("GST 18%", total_14_bold), "", Paragraph(f"{actual_gst:,}", total_14_bold)])
         p2_table_data.append(["", Paragraph("TOTAL", total_14_bold), "", Paragraph(f"{final_total:,}", total_14_bold)])
 
         t2 = Table(p2_table_data, colWidths=[50, 280, 100, 120])
-        t2.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 16), ('BOTTOMPADDING', (0,0), (-1,-1), 16)]))
+        t2.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('TOPPADDING', (0,0), (-1,-1), 4), ('BOTTOMPADDING', (0,0), (-1,-1), 4)]))
         elements.append(t2)
 
-    elements.append(Spacer(1, 6))
-    elements.append(Paragraph(num_to_words_indian_clean(final_total), words_13_bold_center))
     elements.append(Spacer(1, 5))
+    elements.append(Paragraph(num_to_words_indian_clean(final_total), words_13_bold_center))
+    elements.append(Spacer(1, 4))
     elements.append(Paragraph("TERMS AND CONDITIONS:", terms_hdr_center))
-    elements.append(Spacer(1, 3))
+    elements.append(Spacer(1, 2))
 
     terms_points = [
         "1. This Is A Preliminary Estimate And Not A Final Invoice",
@@ -505,24 +574,13 @@ def generate_estimation_pdf_bytes(owner, address, est_date, target_total):
     ]
     for point in terms_points:
         elements.append(Paragraph(point, terms_point_size_8))
-        elements.append(Spacer(1, 2))
+        elements.append(Spacer(1, 1))
 
     doc.build(elements)
     pdf_bytes = pdf_buffer.getvalue()
     pdf_buffer.close()
 
     return pdf_bytes, filename, ref_no, final_total
-
-
-# --- State Synchronization Callbacks for Dual Amount Selection ---
-if "dialog_budget_val" not in st.session_state:
-    st.session_state["dialog_budget_val"] = 1499000
-
-def update_from_num():
-    st.session_state["dialog_budget_val"] = st.session_state["dialog_num_key"]
-
-def update_from_slider():
-    st.session_state["dialog_budget_val"] = st.session_state["dialog_slider_key"]
 
 
 # --- AUTHENTIC MODAL POPUP DIALOG ---
@@ -553,38 +611,21 @@ def show_quotation_dialog():
 
         st.markdown("---")
         st.subheader("💰 Budget & Cost Configuration")
-        st.caption("You can type the exact amount manually OR adjust using the interactive slider below:")
+        st.caption("Lower budgets generate standard foundational items. Higher budgets automatically unlock modern smart home & luxury particulars!")
 
-        col_b1, col_b2 = st.columns([1, 1])
-        with col_b1:
-            st.number_input(
-                "✏️ Manual Amount Entry (INR ₹):",
-                min_value=50000,
-                max_value=10000000,
-                step=25000,
-                key="dialog_num_key",
-                value=st.session_state["dialog_budget_val"],
-                on_change=update_from_num
-            )
-
-        with col_b2:
-            slider_default = max(100000, min(5000000, st.session_state["dialog_budget_val"]))
-            st.slider(
-                "🎚️ Quick Budget Slider (INR ₹):",
-                min_value=100000,
-                max_value=5000000,
-                step=25000,
-                key="dialog_slider_key",
-                value=slider_default,
-                on_change=update_from_slider
-            )
-
-        amount_input = float(st.session_state["dialog_budget_val"])
+        amount_input = st.number_input(
+            "✏️ Estimation Amount (INR ₹):",
+            min_value=50000,
+            max_value=10000000,
+            step=25000,
+            value=1499000
+        )
 
         # Live calculation breakdown display
         subtotal_est = round(amount_input / 1.18)
         gst_est = amount_input - subtotal_est
-        st.info(f"📊 **Base Estimate:** ₹ {subtotal_est:,.2f} | **GST (18%):** ₹ {gst_est:,.2f} | **Total Final Payable:** ₹ {amount_input:,.2f}")
+        page_mode_text = "📄 1-Page Summary (< ₹15L)" if amount_input < 1500000 else "📑 2-Page Detailed Report (≥ ₹15L)"
+        st.info(f"📊 **Base Estimate:** ₹ {subtotal_est:,.2f} | **GST (18%):** ₹ {gst_est:,.2f} | **Total:** ₹ {amount_input:,.2f} — *{page_mode_text}*")
 
         st.caption("🔒 All estimations are processed securely. Digital copies are archived automatically.")
         
