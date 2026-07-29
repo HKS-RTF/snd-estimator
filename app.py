@@ -14,120 +14,177 @@ from reportlab.graphics.barcode.qr import QrCodeWidget
 
 # --- Page Configuration ---
 st.set_page_config(
-    page_title="SND Interior & Designs | Studio Portal",
-    page_icon="🏛️",
+    page_title="SND Interior & Designs | Luxury Home Interiors Bangalore",
+    page_icon="🏠",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
-# --- Custom Grand UI Styling & CSS Animations ---
+# --- DLIFE Inspired Luxury CSS & Animations ---
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
     html, body, [class*="css"] {
         font-family: 'Plus Jakarta Sans', sans-serif;
+        background-color: #F8FAFC;
+        color: #0F172A;
     }
 
     /* Keyframe Animations */
-    @keyframes fadeInDown {
-        0% { opacity: 0; transform: translateY(-20px); }
+    @keyframes fadeIn {
+        0% { opacity: 0; transform: translateY(12px); }
         100% { opacity: 1; transform: translateY(0); }
     }
 
-    @keyframes fadeInUp {
-        0% { opacity: 0; transform: translateY(20px); }
-        100% { opacity: 1; transform: translateY(0); }
+    /* Top Utility Bar */
+    .top-nav {
+        background-color: #0F172A;
+        color: #94A3B8;
+        padding: 8px 24px;
+        font-size: 0.8rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 2px solid #D97706;
     }
 
-    @keyframes pulseGlow {
-        0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4); }
-        70% { box-shadow: 0 0 0 12px rgba(37, 99, 235, 0); }
-        100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
-    }
-
-    /* Grand Hero Banner */
-    .hero-container {
-        background: linear-gradient(135deg, #0F172A 0%, #1E3A8A 50%, #2563EB 100%);
-        border-radius: 20px;
-        padding: 2.5rem 2rem;
+    /* Luxury Header Banner */
+    .dlife-hero {
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.92) 0%, rgba(15, 23, 42, 0.85) 100%), 
+                    url('https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1600&q=80');
+        background-size: cover;
+        background-position: center;
+        border-radius: 18px;
+        padding: 3.5rem 2.5rem;
         color: white;
         text-align: center;
-        box-shadow: 0 15px 30px -10px rgba(30, 58, 138, 0.4);
+        box-shadow: 0 20px 35px -10px rgba(15, 23, 42, 0.5);
         margin-bottom: 2rem;
-        animation: fadeInDown 0.8s ease-out;
+        animation: fadeIn 0.8s ease-out;
     }
 
-    .hero-title {
-        font-size: 2.5rem;
+    .hero-badge {
+        background: linear-gradient(90deg, #D97706 0%, #F59E0B 100%);
+        color: #FFFFFF;
+        padding: 6px 16px;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        display: inline-block;
+        margin-bottom: 1rem;
+    }
+
+    .dlife-hero h1 {
+        font-size: 2.8rem;
         font-weight: 800;
         letter-spacing: -1px;
+        color: #FFFFFF;
         margin-bottom: 0.5rem;
-        background: linear-gradient(90deg, #FFFFFF 0%, #E2E8F0 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
     }
 
-    .hero-subtitle {
+    .dlife-hero p {
         font-size: 1.1rem;
-        color: #93C5FD;
-        font-weight: 500;
+        color: #CBD5E1;
+        max-width: 750px;
+        margin: 0 auto;
     }
 
-    /* Styled Metric Cards */
-    .metric-card {
+    /* Horizontal Sliding Gallery Container */
+    .slider-container {
+        display: flex;
+        gap: 18px;
+        overflow-x: auto;
+        padding: 10px 5px 25px 5px;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .slider-container::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    .slider-container::-webkit-scrollbar-track {
+        background: #E2E8F0;
+        border-radius: 10px;
+    }
+
+    .slider-container::-webkit-scrollbar-thumb {
+        background: #D97706;
+        border-radius: 10px;
+    }
+
+    /* Portfolio Cards inside Slider */
+    .portfolio-card {
+        flex: 0 0 320px;
+        scroll-snap-align: start;
         background: #FFFFFF;
-        border: 1px solid #E2E8F0;
         border-radius: 16px;
-        padding: 1.25rem 1.5rem;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-        transition: all 0.3s ease;
-        animation: fadeInUp 0.6s ease-out;
+        overflow: hidden;
+        border: 1px solid #E2E8F0;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.04);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .metric-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 12px 20px rgba(0,0,0,0.08);
-        border-color: #3B82F6;
+    .portfolio-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 30px rgba(217, 119, 6, 0.15);
+        border-color: #F59E0B;
     }
 
-    .metric-label {
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: #64748B;
+    .portfolio-img {
+        width: 100%;
+        height: 210px;
+        object-fit: cover;
+    }
+
+    .portfolio-body {
+        padding: 1.25rem;
+    }
+
+    .portfolio-tag {
+        color: #D97706;
+        font-size: 0.75rem;
+        font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.8px;
     }
 
-    .metric-value {
-        font-size: 1.75rem;
-        font-weight: 800;
+    .portfolio-title {
+        font-size: 1.1rem;
+        font-weight: 700;
         color: #0F172A;
-        margin-top: 0.25rem;
+        margin: 4px 0 8px 0;
     }
 
-    /* Content Cards */
+    .portfolio-desc {
+        font-size: 0.85rem;
+        color: #64748B;
+        line-height: 1.4;
+    }
+
+    /* Styled Form & Content Glass Cards */
     .glass-card {
         background: #FFFFFF;
         border-radius: 18px;
         border: 1px solid #E2E8F0;
-        padding: 2rem;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.04);
+        padding: 2.2rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.03);
         margin-top: 1rem;
-        animation: fadeInUp 0.7s ease-out;
+        animation: fadeIn 0.6s ease-out;
     }
 
-    /* Result Card for Lookup */
     .result-card {
-        background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
-        border: 1px solid #7DD3FC;
+        background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+        border: 1px solid #FCD34D;
         border-radius: 16px;
         padding: 1.5rem;
         margin-top: 1rem;
-        animation: fadeInUp 0.5s ease-out;
     }
 
-    /* Hide Default Streamlit Style Elements for Clean Look */
+    /* Hide Default Streamlit Style Elements */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
 </style>
@@ -400,74 +457,116 @@ def generate_estimation_pdf_bytes(owner, address, est_date, target_total):
     return pdf_bytes, filename, ref_no, final_total
 
 
-# --- App Header / Hero Section ---
+# --- Top Utility Header ---
 st.markdown("""
-<div class="hero-container">
-    <div class="hero-title">🏛️ SND INTERIOR & DESIGNS</div>
-    <div class="hero-subtitle">Cloud Estimation Portal & Digital Blueprint Archive</div>
+<div class="top-nav">
+    <div>📍 <b>BANGALORE SHOWROOMS:</b> Sahakarnagar | HSR Layout | Whitefield | Yelahanka</div>
+    <div>📞 <b>CLIENT SUPPORT:</b> +91 98765 43210 &nbsp;|&nbsp; ✉️ contact@sndinteriors.com</div>
 </div>
 """, unsafe_allow_html=True)
 
-# --- Top Live Dashboard Stats ---
-all_logs = fetch_all_logs() if supabase else []
-total_count = len(all_logs)
-total_valuation = sum(item.get('amount', 0) for item in all_logs)
+# --- Hero Section (DLIFE Style) ---
+st.markdown("""
+<div class="dlife-hero">
+    <div class="hero-badge">✨ BANGALORE'S PREMIUM HOME INTERIOR BRAND</div>
+    <h1>Customized Home Interiors & Modern Living</h1>
+    <p>100% Customized Modular Kitchens, Sliding Wardrobes, Premium Lighting & Contemporary Living Spaces for Apartments and Villas in Bengaluru.</p>
+</div>
+""", unsafe_allow_html=True)
 
-m1, m2, m3 = st.columns(3)
-with m1:
-    st.markdown(f"""
-    <div class="metric-card">
-        <div class="metric-label">Cloud Records</div>
-        <div class="metric-value">📁 {total_count}</div>
-    </div>
-    """, unsafe_allow_html=True)
 
-with m2:
-    st.markdown(f"""
-    <div class="metric-card">
-        <div class="metric-label">Total Valuation Tracked</div>
-        <div class="metric-value">₹ {total_valuation:,.0f}</div>
-    </div>
-    """, unsafe_allow_html=True)
+# --- SECTION 1: SLIDING PHOTO SHOWCASE (KITCHEN, SLIDING WARDROBES, TILES, BATHROOMS, LIGHTS, BALCONY) ---
+st.markdown("### 🎨 Design Portfolio Showcase")
+st.caption("👈 Swipe / Scroll horizontally to explore our signature modern designs for Bengaluru homes 👉")
 
-with m3:
-    status_text = "🟢 Connected" if supabase else "🔴 Offline Mode"
-    st.markdown(f"""
-    <div class="metric-card">
-        <div class="metric-label">Cloud Sync Status</div>
-        <div class="metric-value">{status_text}</div>
+st.markdown("""
+<div class="slider-container">
+    <!-- Card 1: Modern Kitchen -->
+    <div class="portfolio-card">
+        <img class="portfolio-img" src="https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=800&q=80" alt="Modern Kitchen">
+        <div class="portfolio-body">
+            <div class="portfolio-tag">MODERN KITCHEN</div>
+            <div class="portfolio-title">Acrylic Island Kitchen</div>
+            <div class="portfolio-desc">German hinges, tandem drawers, quartz countertop & integrated profile LEDs.</div>
+        </div>
     </div>
-    """, unsafe_allow_html=True)
+    <!-- Card 2: Sliding Wardrobes -->
+    <div class="portfolio-card">
+        <img class="portfolio-img" src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=800&q=80" alt="Sliding Wardrobes">
+        <div class="portfolio-body">
+            <div class="portfolio-tag">SLIDING STORAGE</div>
+            <div class="portfolio-title">Lacquered Glass Wardrobe</div>
+            <div class="portfolio-desc">Floor-to-ceiling soft-close sliding doors with sensor-activated interior strip lights.</div>
+        </div>
+    </div>
+    <!-- Card 3: Designer Tiles & Flooring -->
+    <div class="portfolio-card">
+        <img class="portfolio-img" src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80" alt="Tiles & Flooring">
+        <div class="portfolio-body">
+            <div class="portfolio-tag">TILES & FLOORING</div>
+            <div class="portfolio-title">Italian Marble Finish Tiles</div>
+            <div class="portfolio-desc">Large format vitrified tiles with seamless grout lines and anti-skid bathroom finishes.</div>
+        </div>
+    </div>
+    <!-- Card 4: Luxury Bathrooms -->
+    <div class="portfolio-card">
+        <img class="portfolio-img" src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=800&q=80" alt="Luxury Bathrooms">
+        <div class="portfolio-body">
+            <div class="portfolio-tag">BATHROOM VANITY</div>
+            <div class="portfolio-title">Contemporary En-Suite</div>
+            <div class="portfolio-desc">Floating vanity units, rainfall shower enclosures, and backlit LED vanity mirrors.</div>
+        </div>
+    </div>
+    <!-- Card 5: Lights & Ceilings -->
+    <div class="portfolio-card">
+        <img class="portfolio-img" src="https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=800&q=80" alt="Lights & Ceilings">
+        <div class="portfolio-body">
+            <div class="portfolio-tag">LIGHTS & CEILINGS</div>
+            <div class="portfolio-title">Ambient False Ceilings</div>
+            <div class="portfolio-desc">Gypsum drop ceilings, warm cove illumination, magnetic track lights & chandeliers.</div>
+        </div>
+    </div>
+    <!-- Card 6: Balcony & Outdoors -->
+    <div class="portfolio-card">
+        <img class="portfolio-img" src="https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=800&q=80" alt="Balcony & Outdoors">
+        <div class="portfolio-body">
+            <div class="portfolio-tag">BALCONY RETREAT</div>
+            <div class="portfolio-title">Aesthetic Garden Balcony</div>
+            <div class="portfolio-desc">WPC teak deck flooring, vertical green walls, weatherproof ambient sconce lights.</div>
+        </div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# --- Navigation Tabs ---
-tab1, tab2 = st.tabs(["✨ Generate New Estimation", "🔍 Smart Cloud Lookup"])
+# --- SECTION 2: INTERACTIVE PORTAL TABS ---
+tab1, tab2 = st.tabs(["⚡ Instant Project Estimator", "🔍 Client Portal & Cloud Lookup"])
 
-# --- TAB 1: GENERATE NEW ESTIMATION ---
+# --- TAB 1: ESTIMATION GENERATOR ---
 with tab1:
     st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-    st.subheader("📝 Project Details")
-    st.caption("Fill out client details to automatically compute quantities, generate QR-verifiable PDF, and archive to cloud.")
+    st.subheader("📋 Generate Official Design Estimate")
+    st.caption("Select your target project budget to auto-calculate itemised interior scope, generate a QR-coded PDF, and save to cloud.")
 
     with st.form("estimation_form", clear_on_submit=False):
         col_a, col_b = st.columns(2)
         with col_a:
-            owner_input = st.text_input("👤 Owner / Client Name", value="KUSHAL ANAND & HKS")
-            date_input = st.text_input("📅 Estimation Date", value=datetime.now().strftime("%d-%m-%Y"))
+            owner_input = st.text_input("👤 Client / Property Owner Name:", value="KUSHAL ANAND & HKS")
+            date_input = st.text_input("📅 Date of Issue:", value=datetime.now().strftime("%d-%m-%Y"))
         
         with col_b:
-            amount_input = st.number_input("💰 Target Budget (Rs.)", min_value=50000, max_value=10000000, value=1499000, step=25000)
+            amount_input = st.number_input("💰 Target Estimated Budget (Rs.):", min_value=50000, max_value=10000000, value=1499000, step=25000)
             
-        address_input = st.text_area("📍 Site Address", value="BIRLA TRIMAYA PHASE 4 FLAT-1205, T-6, F-12, DEVANAHALLI CHIKKAJALA, BENGALURU")
+        address_input = st.text_area("📍 Site Address / Apartment Details:", value="BIRLA TRIMAYA PHASE 4 FLAT-1205, T-6, F-12, DEVANAHALLI CHIKKAJALA, BENGALURU")
 
         st.markdown("<br>", unsafe_allow_html=True)
-        submitted = st.form_submit_button("⚡ Generate & Save to Cloud", type="primary", use_container_width=True)
+        submitted = st.form_submit_button("⚡ Compute Estimation & Sync to Cloud", type="primary", use_container_width=True)
 
     st.markdown('</div>', unsafe_allow_html=True)
 
     if submitted:
-        with st.spinner('🚀 Processing item calculations and syncing PDF to cloud...'):
+        with st.spinner('Calculating modular quantities & building QR-verified document...'):
             try:
                 pdf_bytes, filename, generated_ref, final_total = generate_estimation_pdf_bytes(
                     owner_input, address_input, date_input, float(amount_input)
@@ -476,12 +575,12 @@ with tab1:
                 if supabase:
                     cloud_url = upload_to_cloud(generated_ref, pdf_bytes, filename, owner_input, date_input, final_total)
                     st.balloons()
-                    st.success(f"🎉 **Estimation Successfully Created & Archived!** (Reference Number: `{generated_ref}`)")
+                    st.success(f"🎉 **Estimation Generated & Synced to Cloud!** (Ref No: `{generated_ref}`)")
                 else:
-                    st.success(f"✅ **Estimation Generated Locally!** (Reference Number: `{generated_ref}`)")
+                    st.success(f"✅ **Estimation Generated Locally!** (Ref No: `{generated_ref}`)")
 
                 st.download_button(
-                    label="📄 Download Official Estimation PDF",
+                    label="📄 Download Official PDF Estimation",
                     data=pdf_bytes,
                     file_name=filename,
                     mime="application/pdf",
@@ -490,30 +589,30 @@ with tab1:
                 )
 
             except Exception as e:
-                st.error(f"An error occurred during generation: {e}")
+                st.error(f"An error occurred: {e}")
 
-# --- TAB 2: LOOKUP & DOWNLOAD BY REF NO ---
+# --- TAB 2: CLOUD LOOKUP ---
 with tab2:
     st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-    st.subheader("🔍 Search Archived Estimations")
-    st.caption("Retrieve original estimation documents instantly from cloud storage using the unique Reference Number.")
+    st.subheader("🔍 Retrieve Existing Estimation")
+    st.caption("Enter your Reference Number (`REF NO`) to download original estimation PDFs directly from cloud storage anytime.")
 
     search_ref = st.text_input("Enter Reference Number (REF NO):", placeholder="e.g. 152329072026")
     
     if search_ref:
         if supabase:
-            with st.spinner('Searching cloud database...'):
+            with st.spinner('Fetching document from cloud archive...'):
                 record, pdf_data = fetch_estimation_by_ref(search_ref)
                 
                 if record:
                     st.markdown(f"""
                     <div class="result-card">
-                        <h4 style="color:#0369A1; margin:0;">🎯 Match Found!</h4>
-                        <p style="margin-top:8px; color:#334155;">
+                        <h4 style="color:#B45309; margin:0;">🎯 Estimation Located!</h4>
+                        <p style="margin-top:8px; color:#1F2937;">
                             <b>REF NO:</b> {record['ref_no']}<br>
-                            <b>Customer:</b> {record['customer_name']}<br>
+                            <b>Customer Name:</b> {record['customer_name']}<br>
                             <b>Date:</b> {record['est_date']}<br>
-                            <b>Valuation:</b> ₹ {record['amount']:,.2f}
+                            <b>Total Amount:</b> ₹ {record['amount']:,.2f}
                         </p>
                     </div>
                     """, unsafe_allow_html=True)
@@ -529,17 +628,18 @@ with tab2:
                             use_container_width=True
                         )
                     elif record.get('pdf_url'):
-                        st.markdown(f"[🔗 Direct Cloud Link to Document]({record['pdf_url']})")
+                        st.markdown(f"[🔗 Direct Download Link]({record['pdf_url']})")
                 else:
-                    st.error(f"❌ No cloud record found matching Reference Number: `{search_ref.strip()}`")
+                    st.error(f"❌ No record found in cloud storage matching REF NO: `{search_ref.strip()}`")
         else:
-            st.error("Supabase cloud storage is not connected.")
+            st.error("Supabase cloud storage connection is missing.")
 
     st.markdown("---")
-    st.subheader("📋 Cloud Archive Database")
+    st.subheader("📋 Cloud Estimation History")
     if supabase:
+        all_logs = fetch_all_logs()
         if all_logs:
             st.dataframe(all_logs, use_container_width=True)
         else:
-            st.caption("No records stored in cloud database yet.")
+            st.caption("No historical estimations found in database.")
     st.markdown('</div>', unsafe_allow_html=True)
