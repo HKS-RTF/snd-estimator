@@ -190,14 +190,6 @@ st.markdown("""
         color: #94A3B8;
     }
 
-    /* Grid Layout for Specialty Showcase */
-    .specialty-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 20px;
-        margin-top: 1.5rem;
-    }
-
     /* Authentic Security Header inside Form */
     .auth-banner {
         background: linear-gradient(135deg, #1E1B4B 0%, #0F172A 100%);
@@ -328,9 +320,7 @@ def fetch_estimation_by_ref(ref_no):
 
 def generate_estimation_pdf_bytes(owner, address, est_date, target_total):
     # --- 50 MASTER PARTICULAR ITEMS (Description, Unit, Category, Weight, Tier) ---
-    # Tier 1: Standard/Core (1-15) | Tier 2: Modern/Mid-Range (16-33) | Tier 3: Ultra Luxury/High-Tech (34-50)
     MASTER_ITEMS_50 = [
-        # --- TIER 1: STANDARD / BUDGET ITEMS (15 Items) ---
         ("3 course of oil bond distemper (Inside repaint)", "SQ. FT", "SQFT", 0.05, 1),
         ("2 course of snow cem paint (Outside repaint)", "SQ. FT", "SQFT", 0.04, 1),
         ("Replacing sanitary fittings inside the toilets", "SETS", "SETS_UNITS", 0.06, 1),
@@ -347,7 +337,6 @@ def generate_estimation_pdf_bytes(owner, address, est_date, target_total):
         ("Flush door polish and mortise lock replacement", "NOS", "SETS_UNITS", 0.04, 1),
         ("Aluminum powder-coated window frame grills & mesh", "SQ. FT", "SQFT", 0.05, 1),
 
-        # --- TIER 2: MODERN & CREATIVE INTERIORS (18 Items) ---
         ("Asian Paints Royale Luxury Emulsion wall painting", "SQ. FT", "SQFT", 0.07, 2),
         ("Acrylic modular kitchen with Blum soft-close fittings", "JOB", "JOB_LOT", 0.12, 2),
         ("Sliding glass wardrobes with concealed sensor LED strips", "SQ. FT", "SQFT", 0.10, 2),
@@ -367,7 +356,6 @@ def generate_estimation_pdf_bytes(owner, address, est_date, target_total):
         ("Digital biometric smart door lock with RFID & app access", "UNIT", "SETS_UNITS", 0.04, 2),
         ("Acoustic fabric cushioned headboard wall panelling", "SQ. FT", "SQFT", 0.06, 2),
 
-        # --- TIER 3: ULTRA LUXURY & HIGH-TECH MODERN (17 Items) ---
         ("Imported Italian Botticino marble flooring with epoxy polish", "SQ. FT", "SQFT", 0.14, 3),
         ("High-gloss lacquered glass sliding wardrobe (Hafele fittings)", "SQ. FT", "SQFT", 0.12, 3),
         ("Smart motorized IoT curtain tracks with home automation", "JOB", "JOB_LOT", 0.08, 3),
@@ -391,23 +379,19 @@ def generate_estimation_pdf_bytes(owner, address, est_date, target_total):
     if target_total < 1500000:
         is_single_page = True
         total_items_needed = 10
-        # Lower budget: Focus on Tier 1 & Tier 2 items
         candidate_pool = [item for item in MASTER_ITEMS_50 if item[4] in (1, 2)]
         weights_pool = [0.7 if item[4] == 1 else 0.3 for item in candidate_pool]
     elif target_total < 3500000:
         is_single_page = False
         total_items_needed = 15
-        # Mid budget: Balanced across Tier 1, Tier 2, and Tier 3
         candidate_pool = MASTER_ITEMS_50
         weights_pool = [0.2 if item[4] == 1 else (0.5 if item[4] == 2 else 0.3) for item in candidate_pool]
     else:
         is_single_page = False
         total_items_needed = 17
-        # High budget: Focus heavily on Tier 2 & Tier 3 Luxury/Modern items
         candidate_pool = [item for item in MASTER_ITEMS_50 if item[4] in (2, 3)]
         weights_pool = [0.3 if item[4] == 2 else 0.7 for item in candidate_pool]
 
-    # Weighted random sampling without replacement
     selected_items = []
     pool_copy = list(candidate_pool)
     weights_copy = list(weights_pool)
@@ -418,7 +402,6 @@ def generate_estimation_pdf_bytes(owner, address, est_date, target_total):
         selected_items.append(pool_copy.pop(chosen_idx))
         weights_copy.pop(chosen_idx)
 
-    # Randomize the item order completely for each generated estimation
     random.shuffle(selected_items)
 
     def calculate_quantity(unit_label, category, total_amount):
@@ -539,7 +522,6 @@ def generate_estimation_pdf_bytes(owner, address, est_date, target_total):
         t1.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('TOPPADDING', (0,0), (-1,-1), 6.0), ('BOTTOMPADDING', (0,0), (-1,-1), 6.0)]))
         elements.append(t1)
     else:
-        # Page 1 Table (Fixed 9 items)
         p1_table_data = [[Paragraph("SL.NO", hdr_12_bold_center), Paragraph("Description", hdr_12_bold_center), Paragraph("Qty", hdr_12_bold_center), Paragraph("Amount Rs.", hdr_12_bold_center)]]
         for idx in range(9):
             item = processed_items[idx]
@@ -552,7 +534,6 @@ def generate_estimation_pdf_bytes(owner, address, est_date, target_total):
         elements.append(PageBreak())
         elements.extend(create_header_with_qr())
 
-        # Page 2 Table (Remaining items: index 9 to total_items_needed)
         p2_table_data = [[Paragraph("SL.NO", hdr_12_bold_center), Paragraph("Description", hdr_12_bold_center), Paragraph("Qty", hdr_12_bold_center), Paragraph("Amount Rs.", hdr_12_bold_center)]]
         for idx in range(9, len(processed_items)):
             item = processed_items[idx]
@@ -681,226 +662,118 @@ def show_quotation_dialog():
                     st.success(f"✅ **Estimation Generated Locally!** Ref NO: `{generated_ref}`")
 
                 st.download_button(
-                    label="📄 DOWNLOAD OFFICIAL PDF ESTIMATION",
+                    label="📥 DOWNLOAD OFFICIAL PDF ESTIMATION",
                     data=pdf_bytes,
                     file_name=filename,
                     mime="application/pdf",
-                    type="primary",
                     use_container_width=True
                 )
-
             except Exception as e:
-                st.error(f"An error occurred: {e}")
+                st.error(f"Failed to generate PDF: {str(e)}")
 
 
-# --- TOP NAVIGATION BAR ---
+# --- MAIN PAGE LAYOUT ---
+
+# Top Bar
 st.markdown("""
 <div class="top-nav">
-    <div>📍 <b>BANGALORE SHOWROOMS:</b> Sahakarnagar | HSR Layout | Whitefield | Yelahanka</div>
-    <div>📞 <b>CLIENT SUPPORT:</b> +91 98765 43210 &nbsp;|&nbsp; ✉️ contact@sndinteriors.com</div>
+    <div>📍 <b>SND INTERIOR & DESIGNS</b> — Sahakhar Nagar, Bangalore</div>
+    <div>📞 +91 98800 00000 | ✉️ contact@sndinteriors.com</div>
 </div>
 """, unsafe_allow_html=True)
 
-
-# --- GRAND HERO SECTION ---
+# Hero Section
 st.markdown("""
 <div class="grand-hero">
-    <div class="hero-badge">👑 BENGALURU'S MOST TRUSTED LUXURY INTERIORS</div>
+    <div class="hero-badge">BENGALURU'S PREMIER LUXURY INTERIOR STUDIO</div>
     <div class="brand-title">SND INTERIOR & DESIGNS</div>
-    <p style="color:#CBD5E1; font-size:1.15rem; max-width:800px; margin:0 auto;">
-        Crafting customized 100% factory-finished Modular Kitchens, Designer Wardrobes, False Ceilings, and Turnkey Home Interiors for Apartments and Villas.
+    <p style="font-size: 1.15rem; color: #CBD5E1; max-width: 750px; margin: 0 auto;">
+        Transforming residential spaces into architectural masterpieces. Experience bespoke interior craftsmanship, 3D modular kitchens, and turnkey luxury living.
     </p>
     <div class="trust-stats">
-        <div class="stat-item">
-            <div class="stat-number">500+</div>
-            <div class="stat-label">Homes Completed</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-number">10 YEARS</div>
-            <div class="stat-label">Material Warranty</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-number">45 DAYS</div>
-            <div class="stat-label">Delivery Guarantee</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-number">100%</div>
-            <div class="stat-label">Transparent Pricing</div>
-        </div>
+        <div class="stat-item"><div class="stat-number">450+</div><div class="stat-label">Homes Delivered</div></div>
+        <div class="stat-item"><div class="stat-number">100%</div><div class="stat-label">GST Compliant</div></div>
+        <div class="stat-item"><div class="stat-number">10 YRS</div><div class="stat-label">Material Warranty</div></div>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
 
-# --- MAIN HORIZONTAL SLIDING PORTFOLIO ---
-st.markdown("### 🎨 Signature Luxury Home Showcase")
-st.caption("👈 Scroll horizontally to explore full apartment & villa interior execution concepts 👉")
+# Main Tabs Navigation
+tab1, tab2, tab3 = st.tabs(["🏛️ Instant Quotation", "🔍 Search & Verify Estimation", "✨ Luxury Portfolio"])
 
-st.markdown("""
-<div class="slider-container">
-    <div class="portfolio-card">
-        <div class="card-badge">GERMAN FITTINGS</div>
-        <img class="portfolio-img" src="https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=800&q=80" alt="Modern Kitchen">
-        <div class="portfolio-body">
-            <div class="portfolio-tag">MODERN KITCHEN</div>
-            <div class="portfolio-title">Acrylic Island Kitchen</div>
-            <div class="portfolio-desc">Soft-close Blum hinges, quartz counter & concealed LED profiles.</div>
-        </div>
-    </div>
-    <div class="portfolio-card">
-        <div class="card-badge">POPULAR</div>
-        <img class="portfolio-img" src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=800&q=80" alt="Luxury Living Room">
-        <div class="portfolio-body">
-            <div class="portfolio-tag">LIVING & LOUNGE</div>
-            <div class="portfolio-title">Grand Marble Living Suite</div>
-            <div class="portfolio-desc">Custom TV console, fluted panelling & warm cove ambient lighting.</div>
-        </div>
-    </div>
-    <div class="portfolio-card">
-        <div class="card-badge">AUTO LIGHTING</div>
-        <img class="portfolio-img" src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=800&q=80" alt="Sliding Wardrobes">
-        <div class="portfolio-body">
-            <div class="portfolio-tag">SLIDING STORAGE</div>
-            <div class="portfolio-title">Lacquered Glass Wardrobe</div>
-            <div class="portfolio-desc">Floor-to-ceiling sliding panels with integrated wardrobe lighting.</div>
-        </div>
-    </div>
-    <div class="portfolio-card">
-        <div class="card-badge">MASTER BEDROOM</div>
-        <img class="portfolio-img" src="https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=800&q=80" alt="Master Suite">
-        <div class="portfolio-body">
-            <div class="portfolio-tag">BEDROOM SUITES</div>
-            <div class="portfolio-title">Contemporary Master Suite</div>
-            <div class="portfolio-desc">Upholstered headboard, veneer side tables & acoustic wall panels.</div>
-        </div>
-    </div>
-    <div class="portfolio-card">
-        <div class="card-badge">ROYAL FINISH</div>
-        <img class="portfolio-img" src="https://images.unsplash.com/photo-1617806118233-18e1de247200?auto=format&fit=crop&w=800&q=80" alt="Dining Room">
-        <div class="portfolio-body">
-            <div class="portfolio-tag">DINING SPACES</div>
-            <div class="portfolio-title">6-Seater Onyx Dining Area</div>
-            <div class="portfolio-desc">Translucent stone table top with custom pendant accent lights.</div>
-        </div>
-    </div>
-    <div class="portfolio-card">
-        <div class="card-badge">ITALIAN MARBLE</div>
-        <img class="portfolio-img" src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80" alt="Tiles & Flooring">
-        <div class="portfolio-body">
-            <div class="portfolio-tag">MARBLE & TILES</div>
-            <div class="portfolio-title">Seamless Epoxy Flooring</div>
-            <div class="portfolio-desc">Vitrified large-format slabs with mirror polish sealant finish.</div>
-        </div>
-    </div>
-    <div class="portfolio-card">
-        <div class="card-badge">GYPSUM CEILING</div>
-        <img class="portfolio-img" src="https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=800&q=80" alt="Lights & Ceilings">
-        <div class="portfolio-body">
-            <div class="portfolio-tag">LIGHTING & CEILINGS</div>
-            <div class="portfolio-title">Ambient Drop False Ceiling</div>
-            <div class="portfolio-desc">Saint-Gobain plasterboard, magnetic track lights & spotlights.</div>
-        </div>
-    </div>
-    <div class="portfolio-card">
-        <div class="card-badge">SPA EXPERIENCE</div>
-        <img class="portfolio-img" src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=800&q=80" alt="Luxury Bathroom">
-        <div class="portfolio-body">
-            <div class="portfolio-tag">BATHROOM & VANITY</div>
-            <div class="portfolio-title">Minimalist Resort Bathroom</div>
-            <div class="portfolio-desc">Floating vanity, backlit anti-fog mirrors & thermostatic showers.</div>
-        </div>
-    </div>
-</div>
-""", unsafe_allow_html=True)
+with tab1:
+    st.markdown("### Generate Instant Official PDF Quotation")
+    st.write("Click the button below to launch our verified quotation generator. Specify budget, site details, and generate instant QR-verified estimations.")
+    
+    col_cta1, col_cta2, col_cta3 = st.columns([1, 2, 1])
+    with col_cta2:
+        if st.button("🚀 LAUNCH ESTIMATION GENERATOR", type="primary", use_container_width=True):
+            show_quotation_dialog()
 
-
-# --- SECONDARY SHOWCASE: SPECIALTY SPACES GRID ---
-st.markdown("<br>", unsafe_allow_html=True)
-st.markdown("### 🏆 Specialty Zones & Custom Joinery")
-st.caption("Bespoke architectural concepts tailored specifically for high-end Bengaluru properties")
-
-st.markdown("""
-<div class="specialty-grid">
-    <div class="portfolio-card" style="flex:auto;">
-        <div class="card-badge">WORK FROM HOME</div>
-        <img class="portfolio-img" src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=800&q=80" alt="Home Office">
-        <div class="portfolio-body">
-            <div class="portfolio-tag">HOME OFFICE & STUDY</div>
-            <div class="portfolio-title">Ergonomic Executive Desk</div>
-            <div class="portfolio-desc">Cable management, floating bookshelf & built-in warm LED strips.</div>
-        </div>
-    </div>
-    <div class="portfolio-card" style="flex:auto;">
-        <div class="card-badge">OUTDOOR LIVING</div>
-        <img class="portfolio-img" src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80" alt="Balcony Garden">
-        <div class="portfolio-body">
-            <div class="portfolio-tag">BALCONY DECKING</div>
-            <div class="portfolio-title">Zen Garden & Deck Nook</div>
-            <div class="portfolio-desc">Weatherproof WPC flooring, vertical garden walls & ambient seating.</div>
-        </div>
-    </div>
-    <div class="portfolio-card" style="flex:auto;">
-        <div class="card-badge">ROYAL COLLECTION</div>
-        <img class="portfolio-img" src="https://images.unsplash.com/photo-1600565193348-f74bd3c7ccdf?auto=format&fit=crop&w=800&q=80" alt="Foyer Entryway">
-        <div class="portfolio-body">
-            <div class="portfolio-tag">FOYER & CONSOLE</div>
-            <div class="portfolio-title">Grand Entry Foyer</div>
-            <div class="portfolio-desc">Stone feature wall, CNC brass inlay partition & shoe storage console.</div>
-        </div>
-    </div>
-</div>
-""", unsafe_allow_html=True)
-
-
-# --- PORTAL TABS & CLOUD SEARCH ---
-st.markdown("<br><br>", unsafe_allow_html=True)
-st.markdown("### 🔍 Client Services & Cloud Search")
-
-col_cloud1, col_cloud2 = st.columns([2, 1])
-
-with col_cloud1:
-    search_ref = st.text_input("Enter Reference Number (REF NO) to lookup archived estimation:", placeholder="e.g. 152329072026")
-    if search_ref and supabase:
-        with st.spinner('Fetching archived document...'):
-            record, pdf_data = fetch_estimation_by_ref(search_ref)
+with tab2:
+    st.markdown("### 🔍 Verification & Retrieval Portal")
+    st.write("Retrieve official PDF estimates previously generated using reference numbers.")
+    ref_search = st.text_input("Enter 10-Digit Reference Number (e.g., 143026072026)", placeholder="Reference Number")
+    
+    if st.button("Search Cloud Record", use_container_width=True):
+        if ref_search:
+            record, pdf_data = fetch_estimation_by_ref(ref_search)
             if record:
-                st.success(f"🎯 Document Found for **{record['customer_name']}**! Amount: ₹ {record['amount']:,.2f}")
+                st.success(f"Match Found for **{record['customer_name']}**! Amount: ₹{record['amount']:,.2f}")
                 if pdf_data:
                     st.download_button(
-                        label=f"📥 Download PDF ({record['ref_no']})",
+                        label="📥 Download Saved PDF",
                         data=pdf_data,
-                        file_name=f"Estimation_{record['ref_no']}_{record['customer_name']}.pdf",
+                        file_name=f"Estimation_{record['ref_no']}.pdf",
                         mime="application/pdf",
-                        type="primary"
+                        use_container_width=True
                     )
+                else:
+                    st.warning("Record found, but PDF binary stream couldn't be retrieved from cloud storage.")
             else:
                 st.error("No record found matching this Reference Number.")
+        else:
+            st.info("Please enter a valid Reference Number.")
 
-with col_cloud2:
+with tab3:
+    st.markdown("### 📸 Portfolio Showcase")
     st.markdown("""
-    <div style="background:#0F172A; border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:1.2rem;">
-        <div style="font-weight:700; color:#F59E0B; margin-bottom:6px;">✉️ DIRECT EMAIL SUPPORT</div>
-        <div style="color:#CBD5E1; font-size:0.85rem;">Have architectural drawings or custom floor plans? Mail us directly at:</div>
-        <div style="font-weight:800; color:#FFFFFF; margin-top:8px;">contact@sndinteriors.com</div>
+    <div class="slider-container">
+        <div class="portfolio-card">
+            <span class="card-badge">COMPLETED</span>
+            <img class="portfolio-img" src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80"/>
+            <div class="portfolio-body">
+                <div class="portfolio-tag">DEVANAHALLI • VILLA</div>
+                <div class="portfolio-title">Birla Trimaya Luxury Suite</div>
+                <div class="portfolio-desc">Italian marble flooring, fluted charcoal paneling, and smart IoT lighting.</div>
+            </div>
+        </div>
+        <div class="portfolio-card">
+            <span class="card-badge">COMPLETED</span>
+            <img class="portfolio-img" src="https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=600&q=80"/>
+            <div class="portfolio-body">
+                <div class="portfolio-tag">SAHAKHAR NAGAR • PENTHOUSE</div>
+                <div class="portfolio-title">Contemporary Acrylic Kitchen</div>
+                <div class="portfolio-desc">High-gloss PU lacquer cabinets, Blum hardware, and Calacatta quartz island.</div>
+            </div>
+        </div>
+        <div class="portfolio-card">
+            <span class="card-badge">COMPLETED</span>
+            <img class="portfolio-img" src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=600&q=80"/>
+            <div class="portfolio-body">
+                <div class="portfolio-tag">YELAHANKA • 3BHK</div>
+                <div class="portfolio-title">Master Glass Suite</div>
+                <div class="portfolio-desc">Lacquered glass sliding wardrobes with integrated sensor LEDs.</div>
+            </div>
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
-
-# --- GRAND BOTTOM CALL-TO-ACTION (CTA) ---
+# Bottom Call To Action Banner
 st.markdown("""
 <div class="bottom-cta-container">
-    <div style="display:inline-block; background:rgba(217, 119, 6, 0.2); border:1px solid #D97706; padding:4px 16px; border-radius:50px; font-size:0.8rem; color:#FBBF24; font-weight:700; margin-bottom:1rem;">
-        ✨ INSTANT DESIGN ESTIMATE
-    </div>
-    <div class="bottom-cta-title">LOOKING FOR QUOTATION FOR YOUR HOME?</div>
-    <div class="bottom-cta-subtitle">
-        Get an itemized, QR-verified PDF estimate tailored to your apartment or villa budget in under 30 seconds.
-    </div>
+    <div class="bottom-cta-title">Ready to Design Your Dream Home?</div>
+    <div class="bottom-cta-subtitle">Visit our Sahakhar Nagar studio or generate a custom estimation today to kickstart your home transformation.</div>
 </div>
 """, unsafe_allow_html=True)
-
-# Main Popup Trigger Button
-cta_col1, cta_col2, cta_col3 = st.columns([1, 2, 1])
-with cta_col2:
-    if st.button("👉 CLICK HERE TO GENERATE QUOTATION 👈", type="primary", use_container_width=True):
-        show_quotation_dialog()
