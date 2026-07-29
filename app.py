@@ -514,13 +514,15 @@ def show_quotation_dialog():
         )
 
         st.markdown("---")
-        st.subheader("💰 Scope & Budget Configuration")
+        st.subheader("💰 Scope & Manual Budget Entry")
         
-        amount_input = st.select_slider(
-            "Select Estimated Budget Level (INR):",
-            options=[750000, 1000000, 1250000, 1499000, 2000000, 2500000, 3500000, 5000000],
-            value=1499000,
-            format_func=lambda x: f"₹ {x:,.0f}"
+        amount_input = st.number_input(
+            "✏️ Enter Total Estimated Budget (INR ₹):",
+            min_value=50000.0,
+            max_value=10000000.0,
+            value=1499000.0,
+            step=25000.0,
+            format="%.2f"
         )
 
         # Live breakdown preview
