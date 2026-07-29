@@ -31,7 +31,6 @@ st.markdown("""
         color: #0F172A;
     }
 
-    /* Keyframe Animations */
     @keyframes fadeIn {
         0% { opacity: 0; transform: translateY(12px); }
         100% { opacity: 1; transform: translateY(0); }
@@ -165,7 +164,7 @@ st.markdown("""
         line-height: 1.4;
     }
 
-    /* Styled Form & Content Glass Cards */
+    /* Glass Card Layout */
     .glass-card {
         background: #FFFFFF;
         border-radius: 18px;
@@ -184,7 +183,6 @@ st.markdown("""
         margin-top: 1rem;
     }
 
-    /* Hide Default Streamlit Style Elements */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
 </style>
@@ -338,6 +336,7 @@ def generate_estimation_pdf_bytes(owner, address, est_date, target_total):
 
     title_style = ParagraphStyle("Title", parent=styles["Heading1"], alignment=1, fontSize=28, leading=32, fontName="Helvetica-Bold", textColor=RED_COLOR)
     sub_style = ParagraphStyle("Sub", parent=styles["Normal"], alignment=1, fontSize=9, leading=12, fontName="Helvetica-Bold", textColor=BLUE_COLOR)
+    contact_style = ParagraphStyle("Contact", parent=styles["Normal"], alignment=1, fontSize=8.5, leading=11, fontName="Helvetica-Bold", textColor=BLUE_COLOR)
     gstin_style = ParagraphStyle("GSTIN", parent=styles["Normal"], alignment=1, fontSize=9, leading=12, fontName="Helvetica-Bold", textColor=LIGHT_PINK)
     ref_left_style = ParagraphStyle("RefLeft", parent=styles["Normal"], alignment=0, fontSize=10, leading=12, fontName="Helvetica")
     ref_right_style = ParagraphStyle("RefRight", parent=styles["Normal"], alignment=2, fontSize=10, leading=12, fontName="Helvetica")
@@ -362,16 +361,19 @@ def generate_estimation_pdf_bytes(owner, address, est_date, target_total):
     elements = []
 
     def create_header_with_qr():
-        qr_data = f"CUSTOMER NAME: {owner.upper()}\nADDRESS: {address.upper()}\nREF NO: {ref_no}\nDATE: {est_date}\nESTIMATION AMOUNT: Rs. {final_total:,}"
+        qr_data = f"CUSTOMER NAME: {owner.upper()}\nADDRESS: {address.upper()}\nREF NO: {ref_no}\nDATE: {est_date}\nESTIMATION AMOUNT: Rs. {final_total:,}\nEMAIL: contact@sndinteriors.com"
         qr = QrCodeWidget(qr_data)
         qr_bounds = qr.getBounds()
         w, h = qr_bounds[2] - qr_bounds[0], qr_bounds[3] - qr_bounds[1]
         d = Drawing(60, 60, transform=[60.0/w, 0, 0, 60.0/h, 0, 0])
         d.add(qr)
+        
+        # Header text block featuring email
         header_text_flowables = [
             Paragraph("SND INTERIOR & DESIGNS", title_style), Spacer(1, 2),
             Paragraph("INTERIOR WORKS, DESIGN ESTIMATE, FLOOR VALUATIONS, BUILDING PLANS", sub_style),
             Paragraph("#15, E BLOCK, SAHAKHAR NAGAR, BANGALORE-560092", sub_style),
+            Paragraph("EMAIL: contact@sndinteriors.com", contact_style),
             Paragraph("GSTIN: 29ABCDE1234F1Z5", gstin_style),
         ]
         header_table = Table([["", header_text_flowables, d]], colWidths=[75, 400, 75])
@@ -475,13 +477,12 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# --- SECTION 1: SLIDING PHOTO SHOWCASE (KITCHEN, SLIDING WARDROBES, TILES, BATHROOMS, LIGHTS, BALCONY) ---
+# --- SECTION 1: SLIDING PHOTO SHOWCASE ---
 st.markdown("### 🎨 Design Portfolio Showcase")
 st.caption("👈 Swipe / Scroll horizontally to explore our signature modern designs for Bengaluru homes 👉")
 
 st.markdown("""
 <div class="slider-container">
-    <!-- Card 1: Modern Kitchen -->
     <div class="portfolio-card">
         <img class="portfolio-img" src="https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=800&q=80" alt="Modern Kitchen">
         <div class="portfolio-body">
@@ -490,7 +491,6 @@ st.markdown("""
             <div class="portfolio-desc">German hinges, tandem drawers, quartz countertop & integrated profile LEDs.</div>
         </div>
     </div>
-    <!-- Card 2: Sliding Wardrobes -->
     <div class="portfolio-card">
         <img class="portfolio-img" src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=800&q=80" alt="Sliding Wardrobes">
         <div class="portfolio-body">
@@ -499,7 +499,6 @@ st.markdown("""
             <div class="portfolio-desc">Floor-to-ceiling soft-close sliding doors with sensor-activated interior strip lights.</div>
         </div>
     </div>
-    <!-- Card 3: Designer Tiles & Flooring -->
     <div class="portfolio-card">
         <img class="portfolio-img" src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80" alt="Tiles & Flooring">
         <div class="portfolio-body">
@@ -508,7 +507,6 @@ st.markdown("""
             <div class="portfolio-desc">Large format vitrified tiles with seamless grout lines and anti-skid bathroom finishes.</div>
         </div>
     </div>
-    <!-- Card 4: Luxury Bathrooms -->
     <div class="portfolio-card">
         <img class="portfolio-img" src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=800&q=80" alt="Luxury Bathrooms">
         <div class="portfolio-body">
@@ -517,7 +515,6 @@ st.markdown("""
             <div class="portfolio-desc">Floating vanity units, rainfall shower enclosures, and backlit LED vanity mirrors.</div>
         </div>
     </div>
-    <!-- Card 5: Lights & Ceilings -->
     <div class="portfolio-card">
         <img class="portfolio-img" src="https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=800&q=80" alt="Lights & Ceilings">
         <div class="portfolio-body">
@@ -526,7 +523,6 @@ st.markdown("""
             <div class="portfolio-desc">Gypsum drop ceilings, warm cove illumination, magnetic track lights & chandeliers.</div>
         </div>
     </div>
-    <!-- Card 6: Balcony & Outdoors -->
     <div class="portfolio-card">
         <img class="portfolio-img" src="https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=800&q=80" alt="Balcony & Outdoors">
         <div class="portfolio-body">
