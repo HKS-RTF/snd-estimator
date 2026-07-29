@@ -119,10 +119,14 @@ st.markdown("""
     }
 
     .slider-container::-webkit-scrollbar {
-        height: 6px;
+        height: 8px;
+    }
+    .slider-container::-webkit-scrollbar-track {
+        background: #0F172A;
+        border-radius: 10px;
     }
     .slider-container::-webkit-scrollbar-thumb {
-        background: #D97706;
+        background: linear-gradient(90deg, #D97706, #F59E0B);
         border-radius: 10px;
     }
 
@@ -134,18 +138,33 @@ st.markdown("""
         overflow: hidden;
         border: 1px solid rgba(255, 255, 255, 0.08);
         transition: all 0.4s ease;
+        position: relative;
     }
 
     .portfolio-card:hover {
         transform: translateY(-8px);
         border-color: #D97706;
-        box-shadow: 0 15px 30px rgba(217, 119, 6, 0.2);
+        box-shadow: 0 15px 30px rgba(217, 119, 6, 0.25);
     }
 
     .portfolio-img {
         width: 100%;
         height: 220px;
         object-fit: cover;
+    }
+
+    .card-badge {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        background: rgba(15, 23, 42, 0.85);
+        border: 1px solid #D97706;
+        color: #FBBF24;
+        font-size: 0.65rem;
+        font-weight: 800;
+        padding: 4px 10px;
+        border-radius: 12px;
+        backdrop-filter: blur(4px);
     }
 
     .portfolio-body {
@@ -171,6 +190,14 @@ st.markdown("""
         color: #94A3B8;
     }
 
+    /* Grid Layout for Specialty Showcase */
+    .specialty-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+        margin-top: 1.5rem;
+    }
+
     /* Authentic Security Header inside Form */
     .auth-banner {
         background: linear-gradient(135deg, #1E1B4B 0%, #0F172A 100%);
@@ -191,7 +218,7 @@ st.markdown("""
         padding: 3rem 2rem;
         text-align: center;
         box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-        margin-top: 3rem;
+        margin-top: 3.5rem;
         margin-bottom: 2rem;
     }
 
@@ -444,7 +471,7 @@ def generate_estimation_pdf_bytes(owner, address, est_date, target_total):
             p1_table_data.append([Paragraph(f"{idx+1}.", cell_12_bold_center), Paragraph(item[0], cell_12_bold_center), Paragraph(item[1], cell_12_bold_center), Paragraph(f"{item_amounts[idx]:,}", cell_12_bold_center)])
         
         t1 = Table(p1_table_data, colWidths=[50, 280, 100, 120])
-        t1.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('TOPPADDING', (0,0), (-1,-1), 16), ('BOTTOMPADDING', (0,0), (-1,-1), 16)]))
+        t1.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 16), ('BOTTOMPADDING', (0,0), (-1,-1), 16)]))
         elements.append(t1)
 
         elements.append(PageBreak())
@@ -459,7 +486,7 @@ def generate_estimation_pdf_bytes(owner, address, est_date, target_total):
         p2_table_data.append(["", Paragraph("TOTAL", total_14_bold), "", Paragraph(f"{final_total:,}", total_14_bold)])
 
         t2 = Table(p2_table_data, colWidths=[50, 280, 100, 120])
-        t2.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('TOPPADDING', (0,0), (-1,-1), 16), ('BOTTOMPADDING', (0,0), (-1,-1), 16)]))
+        t2.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 16), ('BOTTOMPADDING', (0,0), (-1,-1), 16)]))
         elements.append(t2)
 
     elements.append(Spacer(1, 6))
@@ -485,6 +512,17 @@ def generate_estimation_pdf_bytes(owner, address, est_date, target_total):
     pdf_buffer.close()
 
     return pdf_bytes, filename, ref_no, final_total
+
+
+# --- State Synchronization Callbacks for Dual Amount Selection ---
+if "dialog_budget_val" not in st.session_state:
+    st.session_state["dialog_budget_val"] = 1499000
+
+def update_from_num():
+    st.session_state["dialog_budget_val"] = st.session_state["dialog_num_key"]
+
+def update_from_slider():
+    st.session_state["dialog_budget_val"] = st.session_state["dialog_slider_key"]
 
 
 # --- AUTHENTIC MODAL POPUP DIALOG ---
@@ -514,16 +552,36 @@ def show_quotation_dialog():
         )
 
         st.markdown("---")
-        st.subheader("💰 Scope & Budget Configuration")
-        
-        amount_input = st.select_slider(
-            "Select Estimated Budget Level (INR):",
-            options=[750000, 1000000, 1250000, 1499000, 2000000, 2500000, 3500000, 5000000],
-            value=1499000,
-            format_func=lambda x: f"₹ {x:,.0f}"
-        )
+        st.subheader("💰 Budget & Cost Configuration")
+        st.caption("You can type the exact amount manually OR adjust using the interactive slider below:")
 
-        # Live breakdown preview
+        col_b1, col_b2 = st.columns([1, 1])
+        with col_b1:
+            st.number_input(
+                "✏️ Manual Amount Entry (INR ₹):",
+                min_value=50000,
+                max_value=10000000,
+                step=25000,
+                key="dialog_num_key",
+                value=st.session_state["dialog_budget_val"],
+                on_change=update_from_num
+            )
+
+        with col_b2:
+            slider_default = max(100000, min(5000000, st.session_state["dialog_budget_val"]))
+            st.slider(
+                "🎚️ Quick Budget Slider (INR ₹):",
+                min_value=100000,
+                max_value=5000000,
+                step=25000,
+                key="dialog_slider_key",
+                value=slider_default,
+                on_change=update_from_slider
+            )
+
+        amount_input = float(st.session_state["dialog_budget_val"])
+
+        # Live calculation breakdown display
         subtotal_est = round(amount_input / 1.18)
         gst_est = amount_input - subtotal_est
         st.info(f"📊 **Base Estimate:** ₹ {subtotal_est:,.2f} | **GST (18%):** ₹ {gst_est:,.2f} | **Total Final Payable:** ₹ {amount_input:,.2f}")
@@ -598,42 +656,120 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# --- SLIDING PORTFOLIO SHOWCASE ---
-st.markdown("### 🎨 Explore Signature Design Portfolio")
-st.caption("👈 Swipe / Scroll horizontally to preview recent projects executed across Bengaluru homes 👉")
+# --- MAIN HORIZONTAL SLIDING PORTFOLIO (8 SLIDES) ---
+st.markdown("### 🎨 Signature Luxury Home Showcase")
+st.caption("👈 Scroll horizontally to explore full apartment & villa interior execution concepts 👉")
 
 st.markdown("""
 <div class="slider-container">
     <div class="portfolio-card">
+        <div class="card-badge">GERMAN FITTINGS</div>
         <img class="portfolio-img" src="https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=800&q=80" alt="Modern Kitchen">
         <div class="portfolio-body">
             <div class="portfolio-tag">MODERN KITCHEN</div>
             <div class="portfolio-title">Acrylic Island Kitchen</div>
-            <div class="portfolio-desc">German soft-close hinges, quartz countertop & integrated LED profiles.</div>
+            <div class="portfolio-desc">Soft-close Blum hinges, quartz counter & concealed LED profiles.</div>
         </div>
     </div>
     <div class="portfolio-card">
+        <div class="card-badge">POPULAR</div>
+        <img class="portfolio-img" src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=800&q=80" alt="Luxury Living Room">
+        <div class="portfolio-body">
+            <div class="portfolio-tag">LIVING & LOUNGE</div>
+            <div class="portfolio-title">Grand Marble Living Suite</div>
+            <div class="portfolio-desc">Custom TV console, fluted panelling & warm cove ambient lighting.</div>
+        </div>
+    </div>
+    <div class="portfolio-card">
+        <div class="card-badge">AUTO LIGHTING</div>
         <img class="portfolio-img" src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=800&q=80" alt="Sliding Wardrobes">
         <div class="portfolio-body">
             <div class="portfolio-tag">SLIDING STORAGE</div>
             <div class="portfolio-title">Lacquered Glass Wardrobe</div>
-            <div class="portfolio-desc">Floor-to-ceiling sliding mechanisms with automated internal lighting.</div>
+            <div class="portfolio-desc">Floor-to-ceiling sliding panels with integrated wardrobe lighting.</div>
         </div>
     </div>
     <div class="portfolio-card">
+        <div class="card-badge">MASTER BEDROOM</div>
+        <img class="portfolio-img" src="https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=800&q=80" alt="Master Suite">
+        <div class="portfolio-body">
+            <div class="portfolio-tag">BEDROOM SUITES</div>
+            <div class="portfolio-title">Contemporary Master Suite</div>
+            <div class="portfolio-desc">Upholstered headboard, veneer side tables & acoustic wall panels.</div>
+        </div>
+    </div>
+    <div class="portfolio-card">
+        <div class="card-badge">ROYAL FINISH</div>
+        <img class="portfolio-img" src="https://images.unsplash.com/photo-1617806118233-18e1de247200?auto=format&fit=crop&w=800&q=80" alt="Dining Room">
+        <div class="portfolio-body">
+            <div class="portfolio-tag">DINING SPACES</div>
+            <div class="portfolio-title">6-Seater Onyx Dining Area</div>
+            <div class="portfolio-desc">Translucent stone table top with custom pendant accent lights.</div>
+        </div>
+    </div>
+    <div class="portfolio-card">
+        <div class="card-badge">ITALIAN MARBLE</div>
         <img class="portfolio-img" src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80" alt="Tiles & Flooring">
         <div class="portfolio-body">
             <div class="portfolio-tag">MARBLE & TILES</div>
-            <div class="portfolio-title">Italian Marble Flooring</div>
-            <div class="portfolio-desc">Vitrified large-format slabs with precision seamless epoxy grouting.</div>
+            <div class="portfolio-title">Seamless Epoxy Flooring</div>
+            <div class="portfolio-desc">Vitrified large-format slabs with mirror polish sealant finish.</div>
         </div>
     </div>
     <div class="portfolio-card">
+        <div class="card-badge">GYPSUM CEILING</div>
         <img class="portfolio-img" src="https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=800&q=80" alt="Lights & Ceilings">
         <div class="portfolio-body">
             <div class="portfolio-tag">LIGHTING & CEILINGS</div>
-            <div class="portfolio-title">Ambient Drop Ceilings</div>
-            <div class="portfolio-desc">Gypsum ceilings, warm cove illumination, magnetic track lights & spotlights.</div>
+            <div class="portfolio-title">Ambient Drop False Ceiling</div>
+            <div class="portfolio-desc">Saint-Gobain plasterboard, magnetic track lights & spotlights.</div>
+        </div>
+    </div>
+    <div class="portfolio-card">
+        <div class="card-badge">SPA EXPERIENCE</div>
+        <img class="portfolio-img" src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=800&q=80" alt="Luxury Bathroom">
+        <div class="portfolio-body">
+            <div class="portfolio-tag">BATHROOM & VANITY</div>
+            <div class="portfolio-title">Minimalist Resort Bathroom</div>
+            <div class="portfolio-desc">Floating vanity, backlit anti-fog mirrors & thermostatic showers.</div>
+        </div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+
+# --- SECONDARY SHOWCASE: SPECIALTY SPACES GRID ---
+st.markdown("<br>", unsafe_allow_html=True)
+st.markdown("### 🏆 Specialty Zones & Custom Joinery")
+st.caption("Bespoke architectural concepts tailored specifically for high-end Bengaluru properties")
+
+st.markdown("""
+<div class="specialty-grid">
+    <div class="portfolio-card" style="flex:auto;">
+        <div class="card-badge">WORK FROM HOME</div>
+        <img class="portfolio-img" src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=800&q=80" alt="Home Office">
+        <div class="portfolio-body">
+            <div class="portfolio-tag">HOME OFFICE & STUDY</div>
+            <div class="portfolio-title">Ergonomic Executive Desk</div>
+            <div class="portfolio-desc">Cable management, floating bookshelf & built-in warm LED strips.</div>
+        </div>
+    </div>
+    <div class="portfolio-card" style="flex:auto;">
+        <div class="card-badge">OUTDOOR LIVING</div>
+        <img class="portfolio-img" src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80" alt="Balcony Garden">
+        <div class="portfolio-body">
+            <div class="portfolio-tag">BALCONY DECKING</div>
+            <div class="portfolio-title">Zen Garden & Deck Nook</div>
+            <div class="portfolio-desc">Weatherproof WPC flooring, vertical garden walls & ambient seating.</div>
+        </div>
+    </div>
+    <div class="portfolio-card" style="flex:auto;">
+        <div class="card-badge">ROYAL COLLECTION</div>
+        <img class="portfolio-img" src="https://images.unsplash.com/photo-1600565193348-f74bd3c7ccdf?auto=format&fit=crop&w=800&q=80" alt="Foyer Entryway">
+        <div class="portfolio-body">
+            <div class="portfolio-tag">FOYER & CONSOLE</div>
+            <div class="portfolio-title">Grand Entry Foyer</div>
+            <div class="portfolio-desc">Stone feature wall, CNC brass inlay partition & shoe storage console.</div>
         </div>
     </div>
 </div>
