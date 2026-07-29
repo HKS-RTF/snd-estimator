@@ -302,42 +302,58 @@ def fetch_estimation_by_ref(ref_no):
     return None, None
 
 def generate_estimation_pdf_bytes(owner, address, est_date, target_total):
-    is_single_page = target_total < 1500000
-    FIXED_ITEMS_MASTER = [
-        ("Replacing sanitary fittings inside the toilets", "SETS", "SETS_UNITS", 0.08),
-        ("3 course of oil bond distemper (Inside repaint)", "SQ. FT", "SQFT", 0.07),
-        ("Providing & casting bathroom glazed tiles fixing etc.", "SQ. FT", "SQFT", 0.05),
-        ("Interior works (Wardrobes, Modular Kitchen)", "JOB", "JOB_LOT", 0.12),
-        ("Electrical fittings, cables, switches etc.", "JOB", "JOB_LOT", 0.07),
-        ("Painting (exterior walls)", "SQ. FT", "SQFT", 0.06),
-        ("New plumbing lines and fixtures", "JOB", "JOB_LOT", 0.05),
-        ("Landscaping/Balcony improvements", "JOB", "JOB_LOT", 0.06),
-        ("False ceiling work", "SQ. FT", "SQFT", 0.07),
-        ("Flooring (Tiles/Marble)", "SQ. FT", "SQFT", 0.07),
-        ("Providing & fixing teak wood show case", "UNIT", "SETS_UNITS", 0.06),
-        ("2 course of snow cem paint (Outside repaint)", "SQ. FT", "SQFT", 0.04),
-        ("Replacing sanitary fittings inside the kitchen", "SET", "SETS_UNITS", 0.05),
-        ("Demolition and debris removal", "LOT", "JOB_LOT", 0.06),
-        ("Wall plastering and finishing", "SQ. FT", "SQFT", 0.09)
+    # Master list of 30 simple, clear interior & furniture particulars
+    MASTER_30_PARTICULARS = [
+        ("Modular Kitchen Base & Wall Cabinets", "SET", "SETS_UNITS", 0.05),
+        ("Kitchen Quartz Countertop & Sink Installation", "JOB", "JOB_LOT", 0.04),
+        ("Master Bedroom Sliding Wardrobe with Mirror", "UNIT", "SETS_UNITS", 0.06),
+        ("Guest Bedroom Swing-Door Wardrobe", "UNIT", "SETS_UNITS", 0.04),
+        ("Living Room TV Entertainment Wall Unit", "UNIT", "SETS_UNITS", 0.05),
+        ("Foyer Shoe Rack with Seating Bench", "UNIT", "SETS_UNITS", 0.03),
+        ("Crockery Unit with Glass Shutters & Lighting", "UNIT", "SETS_UNITS", 0.04),
+        ("False Ceiling with Cove Lighting (Living & Dining)", "SQ. FT", "SQFT", 0.05),
+        ("False Ceiling with LED Spotlights (Bedrooms)", "SQ. FT", "SQFT", 0.04),
+        ("Interior Wall Painting (Premium Emulsion)", "SQ. FT", "SQFT", 0.04),
+        ("Wooden Flooring for Master Bedroom", "SQ. FT", "SQFT", 0.04),
+        ("Vitrified Tile Flooring Upgrade", "SQ. FT", "SQFT", 0.05),
+        ("Main Door Designer Teak Wood Panelling", "UNIT", "SETS_UNITS", 0.03),
+        ("Internal Flush Doors with Laminate Finish", "SET", "SETS_UNITS", 0.03),
+        ("Bathroom Vanity Counter & Basin Unit", "SET", "SETS_UNITS", 0.03),
+        ("Bathroom Glass Shower Partition", "SET", "SETS_UNITS", 0.03),
+        ("Complete Electrical Wiring & Modular Switches", "JOB", "JOB_LOT", 0.05),
+        ("Designer Chandelier & Hanging Pendant Lights", "SET", "SETS_UNITS", 0.03),
+        ("Window Curtains & Motorized Blinds", "SET", "SETS_UNITS", 0.03),
+        ("Study Table with Overhead Bookshelf", "UNIT", "SETS_UNITS", 0.03),
+        ("Upholstered Storage Bed Frame (Queen/King)", "UNIT", "SETS_UNITS", 0.04),
+        ("Balcony Deck Wooden Flooring & Seating", "JOB", "JOB_LOT", 0.03),
+        ("AC Piping Concealment & Drainage Installation", "JOB", "JOB_LOT", 0.03),
+        ("Main Door Digital Biometric Smart Lock", "UNIT", "SETS_UNITS", 0.02),
+        ("Kitchen Chimney & Built-in Hob Installation", "SET", "SETS_UNITS", 0.03),
+        ("PU Polish Finish for Wooden Panelling", "JOB", "JOB_LOT", 0.03),
+        ("Decorative Wall Panelling & Fluted Panels", "SQ. FT", "SQFT", 0.04),
+        ("Pooja Unit with Backlit CNC Jali Panel", "UNIT", "SETS_UNITS", 0.04),
+        ("Anti-Fog Backlit LED Bathroom Mirrors", "SET", "SETS_UNITS", 0.02),
+        ("Deep Post-Construction Cleaning & Handover", "JOB", "JOB_LOT", 0.02)
     ]
 
     def calculate_quantity(category, total_amount):
         min_budget, max_budget = 1500000.0, 4500000.0
         ratio = max(0.0, min(1.0, (total_amount - min_budget) / (max_budget - min_budget)))
         ratio = max(0.0, min(1.0, ratio + random.uniform(-0.05, 0.05)))
-        if category == "SQFT": return f"{round(650 + ratio * (2500 - 650))} SQ. FT"
+        if category == "SQFT": return f"{round(150 + ratio * (850 - 150))} SQ. FT"
         elif category == "SETS_UNITS":
-            qty = round(1 + ratio * (5 - 1))
+            qty = round(1 + ratio * (3 - 1))
             return f"{qty} SETS" if qty > 1 else "1 SET"
         elif category == "JOB_LOT":
-            qty = round(1 + ratio * (2 - 1))
-            return f"{qty} JOB" if qty > 1 else "1 JOB"
+            return "1 JOB"
         return "1 JOB"
 
-    total_items_needed = 10 if is_single_page else 15
-    processed_items = [(desc, calculate_quantity(cat, target_total), w) for desc, _, cat, w in FIXED_ITEMS_MASTER]
-    random.shuffle(processed_items)
-    processed_items = processed_items[:total_items_needed]
+    # Randomly select between 10 to 14 particulars every time
+    num_items_to_pick = random.randint(10, 14)
+    selected_master_items = random.sample(MASTER_30_PARTICULARS, num_items_to_pick)
+    is_single_page = num_items_to_pick <= 11
+
+    processed_items = [(desc, calculate_quantity(cat, target_total), w) for desc, _, cat, w in selected_master_items]
 
     subtotal_target = target_total / 1.18
     weights = [item[2] * random.uniform(0.85, 1.15) for item in processed_items]
@@ -371,19 +387,19 @@ def generate_estimation_pdf_bytes(owner, address, est_date, target_total):
     box_detail_style = ParagraphStyle("BoxDetail", parent=styles["Normal"], alignment=1, fontSize=12.5, leading=15, fontName="Helvetica-Bold", textColor=colors.black)
     
     if is_single_page:
-        cell_12_bold_center = ParagraphStyle("Cell11BC", parent=styles["Normal"], alignment=1, fontSize=11, leading=13.5, fontName="Helvetica-Bold", textColor=colors.black)
-        hdr_12_bold_center = ParagraphStyle("Hdr11BC", parent=styles["Normal"], alignment=1, fontSize=11, leading=13.5, fontName="Helvetica-Bold", textColor=colors.black)
-        total_14_bold = ParagraphStyle("Total12B", parent=styles["Normal"], alignment=1, fontSize=12, leading=14.5, fontName="Helvetica-Bold", textColor=colors.black)
-        words_13_bold_center = ParagraphStyle("Words11.5BC", parent=styles["Normal"], alignment=1, fontSize=11.5, leading=14, fontName="Helvetica-Bold", textColor=colors.black)
-        terms_hdr_center = ParagraphStyle("TermsHdr9.5", parent=styles["Normal"], alignment=1, fontSize=9.5, leading=12, fontName="Helvetica-Bold", textColor=colors.black)
-        terms_point_size_8 = ParagraphStyle("TermsPt8.5", parent=styles["Normal"], alignment=0, fontSize=8.5, leading=10.5, fontName="Helvetica-Bold", textColor=colors.black)
+        cell_12_bold_center = ParagraphStyle("Cell11BC", parent=styles["Normal"], alignment=1, fontSize=10.5, leading=13, fontName="Helvetica-Bold", textColor=colors.black)
+        hdr_12_bold_center = ParagraphStyle("Hdr11BC", parent=styles["Normal"], alignment=1, fontSize=10.5, leading=13, fontName="Helvetica-Bold", textColor=colors.black)
+        total_14_bold = ParagraphStyle("Total12B", parent=styles["Normal"], alignment=1, fontSize=11.5, leading=14, fontName="Helvetica-Bold", textColor=colors.black)
+        words_13_bold_center = ParagraphStyle("Words11.5BC", parent=styles["Normal"], alignment=1, fontSize=11, leading=13.5, fontName="Helvetica-Bold", textColor=colors.black)
+        terms_hdr_center = ParagraphStyle("TermsHdr9.5", parent=styles["Normal"], alignment=1, fontSize=9, leading=11.5, fontName="Helvetica-Bold", textColor=colors.black)
+        terms_point_size_8 = ParagraphStyle("TermsPt8.5", parent=styles["Normal"], alignment=0, fontSize=8, leading=10, fontName="Helvetica-Bold", textColor=colors.black)
     else:
-        cell_12_bold_center = ParagraphStyle("Cell12BC", parent=styles["Normal"], alignment=1, fontSize=12, leading=14, fontName="Helvetica-Bold", textColor=colors.black)
-        hdr_12_bold_center = ParagraphStyle("Hdr12BC", parent=styles["Normal"], alignment=1, fontSize=12, leading=14, fontName="Helvetica-Bold", textColor=colors.black)
-        total_14_bold = ParagraphStyle("Total14B", parent=styles["Normal"], alignment=1, fontSize=14, leading=16, fontName="Helvetica-Bold", textColor=colors.black)
-        words_13_bold_center = ParagraphStyle("Words13BC", parent=styles["Normal"], alignment=1, fontSize=13, leading=16, fontName="Helvetica-Bold", textColor=colors.black)
-        terms_hdr_center = ParagraphStyle("TermsHdr10", parent=styles["Normal"], alignment=1, fontSize=10, leading=14, fontName="Helvetica-Bold", textColor=colors.black)
-        terms_point_size_8 = ParagraphStyle("TermsPt8", parent=styles["Normal"], alignment=0, fontSize=8, leading=11, fontName="Helvetica-Bold", textColor=colors.black)
+        cell_12_bold_center = ParagraphStyle("Cell12BC", parent=styles["Normal"], alignment=1, fontSize=11, leading=13, fontName="Helvetica-Bold", textColor=colors.black)
+        hdr_12_bold_center = ParagraphStyle("Hdr12BC", parent=styles["Normal"], alignment=1, fontSize=11, leading=13, fontName="Helvetica-Bold", textColor=colors.black)
+        total_14_bold = ParagraphStyle("Total14B", parent=styles["Normal"], alignment=1, fontSize=12.5, leading=15, fontName="Helvetica-Bold", textColor=colors.black)
+        words_13_bold_center = ParagraphStyle("Words13BC", parent=styles["Normal"], alignment=1, fontSize=12, leading=14.5, fontName="Helvetica-Bold", textColor=colors.black)
+        terms_hdr_center = ParagraphStyle("TermsHdr10", parent=styles["Normal"], alignment=1, fontSize=9.5, leading=12, fontName="Helvetica-Bold", textColor=colors.black)
+        terms_point_size_8 = ParagraphStyle("TermsPt8", parent=styles["Normal"], alignment=0, fontSize=8, leading=10.5, fontName="Helvetica-Bold", textColor=colors.black)
 
     elements = []
 
@@ -425,31 +441,32 @@ def generate_estimation_pdf_bytes(owner, address, est_date, target_total):
     elements.append(Spacer(1, 6))
 
     if is_single_page:
-        p_table_data = [[Paragraph("SL.NO", hdr_12_bold_center), Paragraph("Description", hdr_12_bold_center), Paragraph("Qty", hdr_12_bold_center), Paragraph("Amount Rs.", hdr_12_bold_center)]]
-        for idx in range(10):
+        p_table_data = [[Paragraph("SL.NO", hdr_12_bold_center), Paragraph("Description of Particulars", hdr_12_bold_center), Paragraph("Qty", hdr_12_bold_center), Paragraph("Amount Rs.", hdr_12_bold_center)]]
+        for idx in range(num_items_to_pick):
             item = processed_items[idx]
             p_table_data.append([Paragraph(f"{idx+1}.", cell_12_bold_center), Paragraph(item[0], cell_12_bold_center), Paragraph(item[1], cell_12_bold_center), Paragraph(f"{item_amounts[idx]:,}", cell_12_bold_center)])
         p_table_data.append(["", Paragraph("GST 18%", total_14_bold), "", Paragraph(f"{actual_gst:,}", total_14_bold)])
         p_table_data.append(["", Paragraph("TOTAL", total_14_bold), "", Paragraph(f"{final_total:,}", total_14_bold)])
 
         t1 = Table(p_table_data, colWidths=[50, 280, 100, 120])
-        t1.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('TOPPADDING', (0,0), (-1,-1), 6.5), ('BOTTOMPADDING', (0,0), (-1,-1), 6.5)]))
+        t1.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('TOPPADDING', (0,0), (-1,-1), 5), ('BOTTOMPADDING', (0,0), (-1,-1), 5)]))
         elements.append(t1)
     else:
-        p1_table_data = [[Paragraph("SL.NO", hdr_12_bold_center), Paragraph("Description", hdr_12_bold_center), Paragraph("Qty", hdr_12_bold_center), Paragraph("Amount Rs.", hdr_12_bold_center)]]
-        for idx in range(9):
+        split_idx = num_items_to_pick // 2
+        p1_table_data = [[Paragraph("SL.NO", hdr_12_bold_center), Paragraph("Description of Particulars", hdr_12_bold_center), Paragraph("Qty", hdr_12_bold_center), Paragraph("Amount Rs.", hdr_12_bold_center)]]
+        for idx in range(split_idx):
             item = processed_items[idx]
             p1_table_data.append([Paragraph(f"{idx+1}.", cell_12_bold_center), Paragraph(item[0], cell_12_bold_center), Paragraph(item[1], cell_12_bold_center), Paragraph(f"{item_amounts[idx]:,}", cell_12_bold_center)])
         
         t1 = Table(p1_table_data, colWidths=[50, 280, 100, 120])
-        t1.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('TOPPADDING', (0,0), (-1,-1), 16), ('BOTTOMPADDING', (0,0), (-1,-1), 16)]))
+        t1.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('TOPPADDING', (0,0), (-1,-1), 8), ('BOTTOMPADDING', (0,0), (-1,-1), 8)]))
         elements.append(t1)
 
         elements.append(PageBreak())
         elements.extend(create_header_with_qr())
 
-        p2_table_data = [[Paragraph("SL.NO", hdr_12_bold_center), Paragraph("Description", hdr_12_bold_center), Paragraph("Qty", hdr_12_bold_center), Paragraph("Amount Rs.", hdr_12_bold_center)]]
-        for idx in range(9, 15):
+        p2_table_data = [[Paragraph("SL.NO", hdr_12_bold_center), Paragraph("Description of Particulars", hdr_12_bold_center), Paragraph("Qty", hdr_12_bold_center), Paragraph("Amount Rs.", hdr_12_bold_center)]]
+        for idx in range(split_idx, num_items_to_pick):
             item = processed_items[idx]
             p2_table_data.append([Paragraph(f"{idx+1}.", cell_12_bold_center), Paragraph(item[0], cell_12_bold_center), Paragraph(item[1], cell_12_bold_center), Paragraph(f"{item_amounts[idx]:,}", cell_12_bold_center)])
 
@@ -457,7 +474,7 @@ def generate_estimation_pdf_bytes(owner, address, est_date, target_total):
         p2_table_data.append(["", Paragraph("TOTAL", total_14_bold), "", Paragraph(f"{final_total:,}", total_14_bold)])
 
         t2 = Table(p2_table_data, colWidths=[50, 280, 100, 120])
-        t2.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('TOPPADDING', (0,0), (-1,-1), 16), ('BOTTOMPADDING', (0,0), (-1,-1), 16)]))
+        t2.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('TOPPADDING', (0,0), (-1,-1), 8), ('BOTTOMPADDING', (0,0), (-1,-1), 8)]))
         elements.append(t2)
 
     elements.append(Spacer(1, 6))
@@ -598,7 +615,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# --- SLIDING PORTFOLIO SHOWCASE (EXPANDED TO 8 LUXURY SPACES) ---
+# --- SLIDING PORTFOLIO SHOWCASE ---
 st.markdown("### 🎨 Explore Signature Design Portfolio")
 st.caption("👈 Swipe / Scroll horizontally to preview our recent grand interior executions across Bengaluru homes 👉")
 
