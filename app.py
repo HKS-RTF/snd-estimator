@@ -190,6 +190,14 @@ st.markdown("""
         color: #94A3B8;
     }
 
+    /* Grid Layout for Specialty Showcase */
+    .specialty-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+        margin-top: 1.5rem;
+    }
+
     /* Authentic Security Header inside Form */
     .auth-banner {
         background: linear-gradient(135deg, #1E1B4B 0%, #0F172A 100%);
@@ -317,113 +325,124 @@ def fetch_estimation_by_ref(ref_no):
             return record, None
     return None, None
 
+def fetch_all_logs():
+    if not supabase: return []
+    response = supabase.table("estimation_logs").select("*").order("created_at", desc=True).execute()
+    return response.data
+
+
+# --- EXPANDED 65+ TIERED ITEM MASTER (Budget vs Modern/Luxury) ---
+ITEM_MASTER = [
+    # --- Standard / Foundational Items (Ideal for lower budgets) ---
+    ("Replacing sanitary fittings inside the toilets", "SETS", "SETS_UNITS", 0.08, "standard"),
+    ("3 course of oil bond distemper (Inside repaint)", "SQ. FT", "SQFT", 0.07, "standard"),
+    ("Providing & casting bathroom glazed tiles fixing etc.", "SQ. FT", "SQFT", 0.05, "standard"),
+    ("Interior works (Wardrobes, Modular Kitchen)", "JOB", "JOB_LOT", 0.12, "standard"),
+    ("Electrical fittings, cables, switches etc.", "JOB", "JOB_LOT", 0.07, "standard"),
+    ("Painting (exterior walls)", "SQ. FT", "SQFT", 0.06, "standard"),
+    ("New plumbing lines and fixtures", "JOB", "JOB_LOT", 0.05, "standard"),
+    ("Landscaping/Balcony improvements", "JOB", "JOB_LOT", 0.06, "standard"),
+    ("False ceiling work", "SQ. FT", "SQFT", 0.07, "standard"),
+    ("Flooring (Tiles/Marble)", "SQ. FT", "SQFT", 0.07, "standard"),
+    ("Providing & fixing teak wood show case", "UNIT", "SETS_UNITS", 0.06, "standard"),
+    ("2 course of snow cem paint (Outside repaint)", "SQ. FT", "SQFT", 0.04, "standard"),
+    ("Replacing sanitary fittings inside the kitchen", "SET", "SETS_UNITS", 0.05, "standard"),
+    ("Demolition and debris removal", "LOT", "JOB_LOT", 0.06, "standard"),
+    ("Wall plastering and finishing", "SQ. FT", "SQFT", 0.09, "standard"),
+    ("Wooden flush door fixing and painting", "UNIT", "SETS_UNITS", 0.05, "standard"),
+    ("Window aluminum sliding shutter replacement", "SET", "SETS_UNITS", 0.06, "standard"),
+    ("Main door teakwood polish and hardware", "UNIT", "SETS_UNITS", 0.05, "standard"),
+    ("Loft storage wooden shutter installation", "SQ. FT", "SQFT", 0.05, "standard"),
+    ("Balcony MS safety grill fabrication & painting", "SQ. FT", "SQFT", 0.06, "standard"),
+    ("Bathroom anti-skid ceramic flooring tiles", "SQ. FT", "SQFT", 0.05, "standard"),
+    ("Kitchen granite countertop slab polishing", "RFT", "SQFT", 0.05, "standard"),
+    ("PVC water storage tank installation", "UNIT", "SETS_UNITS", 0.04, "standard"),
+    ("Exhaust fan and ventilation core cutting", "UNIT", "SETS_UNITS", 0.03, "standard"),
+    ("General debris clearing and deep cleaning", "JOB", "JOB_LOT", 0.04, "standard"),
+    ("Terrace waterproofing and chemical coating", "SQ. FT", "SQFT", 0.07, "standard"),
+    ("Compound wall plastering & white wash", "SQ. FT", "SQFT", 0.05, "standard"),
+    ("Staircase MS handrail fabrication & painting", "RFT", "SQFT", 0.06, "standard"),
+    ("Wooden skirting fixing across rooms", "RFT", "SQFT", 0.04, "standard"),
+    ("Geyser and electrical point wiring setup", "SET", "SETS_UNITS", 0.04, "standard"),
+
+    # --- Modern & High-End Luxury Items (Unlocked for higher budgets) ---
+    ("PU Finish Acrylic Modular Kitchen Shutters with Blum Tandembox", "JOB", "JOB_LOT", 0.14, "luxury"),
+    ("Italian Marble Seamless Epoxy Flooring & Mirror Polish", "SQ. FT", "SQFT", 0.12, "luxury"),
+    ("Fluted Natural Wood Veneer Wall Panelling in Living Suite", "SQ. FT", "SQFT", 0.10, "luxury"),
+    ("Concealed Magnetic Track Lighting & Architectural LED Profiles", "JOB", "JOB_LOT", 0.09, "luxury"),
+    ("Smart Home IoT Automation Hub (Lighting, AC & Curtains)", "SET", "SETS_UNITS", 0.08, "luxury"),
+    ("Motorized Silent Curtain Tracks with Remote Control", "SET", "SETS_UNITS", 0.07, "luxury"),
+    ("Biometric Digital Door Lock with Face Recognition & App Access", "UNIT", "SETS_UNITS", 0.06, "luxury"),
+    ("Backlit Frameless Anti-Fog Smart Vanity Mirrors", "SET", "SETS_UNITS", 0.06, "luxury"),
+    ("Walk-in Closet Glass Wardrobes with Sensor LED Strip Lights", "JOB", "JOB_LOT", 0.11, "luxury"),
+    ("Invisible Stainless Steel Balcony Safety Wire Mesh", "SQ. FT", "SQFT", 0.06, "luxury"),
+    ("Teak Wood Designer Pooja Unit with CNC Brass Jali Backlit Panel", "UNIT", "SETS_UNITS", 0.10, "luxury"),
+    ("Quartz Composite Kitchen Island Countertop with Undermount Sink", "SQ. FT", "SQFT", 0.09, "luxury"),
+    ("Acoustic Fabric Wall Panelling for Home Theater / Master Bedroom", "SQ. FT", "SQFT", 0.08, "luxury"),
+    ("Profile LED Wardrobe Sliding Doors with Lacquered Glass", "JOB", "JOB_LOT", 0.10, "luxury"),
+    ("Sensor-Activated Under-Cabinet & Drawer Lighting Systems", "JOB", "JOB_LOT", 0.06, "luxury"),
+    ("Designer Resin-Art Dining Feature Wall & Cove Lighting", "SQ. FT", "SQFT", 0.08, "luxury"),
+    ("Frameless Toughened Glass Shower Partition Enclosure", "SET", "SETS_UNITS", 0.07, "luxury"),
+    ("Engineered Wooden Herringbone Flooring in Master Suite", "SQ. FT", "SQFT", 0.11, "luxury"),
+    ("Concealed Ceiling Mounted Rain Shower & Thermostatic Mixer", "SET", "SETS_UNITS", 0.08, "luxury"),
+    ("Custom CNC Metal Laser Cut Foyer Partition Screen", "UNIT", "SETS_UNITS", 0.07, "luxury"),
+    ("Weatherproof WPC Decking Flooring for Balcony & Terrace", "SQ. FT", "SQFT", 0.08, "luxury"),
+    ("Vertical Artificial Garden Wall with Drip Irrigation Setup", "SQ. FT", "SQFT", 0.07, "luxury"),
+    ("Hydraulic Storage King-Size Bed with Custom Headboard", "UNIT", "SETS_UNITS", 0.09, "luxury"),
+    ("Built-in Bar Counter with Wine Cooler & Backlit Bottle Display", "JOB", "JOB_LOT", 0.11, "luxury"),
+    ("Duco Painted Designer Crockery Unit with Fluted Glass", "UNIT", "SETS_UNITS", 0.09, "luxury"),
+    ("Ergonomic Study Desk with Integrated Cable Management", "UNIT", "SETS_UNITS", 0.06, "luxury"),
+    ("False Ceiling Gypsum Cove with Multi-Color RGB Strip Light", "SQ. FT", "SQFT", 0.08, "luxury"),
+    ("Designer Brass Inlay Marble Flooring Borders", "RFT", "SQFT", 0.07, "luxury"),
+    ("Concealed Touch-Latch Shoe Rack Foyer Console Unit", "UNIT", "SETS_UNITS", 0.07, "luxury"),
+    ("Centralized Multi-Zone Air Conditioning Piping & Venting", "JOB", "JOB_LOT", 0.13, "luxury"),
+    ("Automated Smoke & Gas Leak Detector Safety System", "SET", "SETS_UNITS", 0.05, "luxury"),
+    ("Designer Pendent Chandelier Installation in Living Area", "UNIT", "SETS_UNITS", 0.06, "luxury"),
+    ("Hardwood Pergola Structure for Terrace Garden", "JOB", "JOB_LOT", 0.10, "luxury"),
+    ("Invisible Floor Spring Hinges for Toughened Glass Doors", "SET", "SETS_UNITS", 0.06, "luxury"),
+    ("Premium Velvet Upholstered Window Bay Seating", "SET", "SETS_UNITS", 0.06, "luxury")
+]
+
 
 def generate_estimation_pdf_bytes(owner, address, est_date, target_total):
-    # --- 50 MASTER PARTICULAR ITEMS (Description, Unit, Category, Weight, Tier) ---
-    MASTER_ITEMS_50 = [
-        ("3 course of oil bond distemper (Inside repaint)", "SQ. FT", "SQFT", 0.05, 1),
-        ("2 course of snow cem paint (Outside repaint)", "SQ. FT", "SQFT", 0.04, 1),
-        ("Replacing sanitary fittings inside the toilets", "SETS", "SETS_UNITS", 0.06, 1),
-        ("Replacing sanitary fittings inside the kitchen", "SET", "SETS_UNITS", 0.05, 1),
-        ("Providing & casting bathroom glazed tiles fixing etc.", "SQ. FT", "SQFT", 0.05, 1),
-        ("Wall plastering and surface levelling finishing", "SQ. FT", "SQFT", 0.06, 1),
-        ("Demolition and debris clearance removal", "LOT", "JOB_LOT", 0.04, 1),
-        ("Basic false ceiling work with gypsum board", "SQ. FT", "SQFT", 0.06, 1),
-        ("Standard matte laminate modular wardrobe shutters", "SQ. FT", "SQFT", 0.08, 1),
-        ("Basic electrical switchboards, wiring & point points", "JOB", "JOB_LOT", 0.06, 1),
-        ("Standard ceramic floor tiling and grout filling", "SQ. FT", "SQFT", 0.07, 1),
-        ("Polished granite counter slab fixing for kitchen", "SQ. FT", "SQFT", 0.06, 1),
-        ("Commercial ply loft framing with shutter doors", "JOB", "JOB_LOT", 0.05, 1),
-        ("Flush door polish and mortise lock replacement", "NOS", "SETS_UNITS", 0.04, 1),
-        ("Aluminum powder-coated window frame grills & mesh", "SQ. FT", "SQFT", 0.05, 1),
+    # Determine exact page count & item count based on input amount
+    # < 15,00,000 INR -> Exactly 1 page with 10 particulars
+    # >= 15,00,000 INR -> Exactly 2 pages with up to 17 particulars (e.g. 15-17 items)
+    is_single_page = target_total < 1500000
+    total_items_needed = 10 if is_single_page else random.randint(15, 17)
 
-        ("Asian Paints Royale Luxury Emulsion wall painting", "SQ. FT", "SQFT", 0.07, 2),
-        ("Acrylic modular kitchen with Blum soft-close fittings", "JOB", "JOB_LOT", 0.12, 2),
-        ("Sliding glass wardrobes with concealed sensor LED strips", "SQ. FT", "SQFT", 0.10, 2),
-        ("Gypsum false ceiling with integrated magnetic track lights", "SQ. FT", "SQFT", 0.08, 2),
-        ("Designer TV wall console unit with fluted charcoal panels", "JOB", "JOB_LOT", 0.08, 2),
-        ("Vitrified large-format slab flooring (800x1600mm)", "SQ. FT", "SQFT", 0.08, 2),
-        ("Grohe thermostatic rain showers & sanitary fixtures", "SETS", "SETS_UNITS", 0.07, 2),
-        ("Teak veneer foyer shoe console with CNC brass inlay mesh", "UNIT", "SETS_UNITS", 0.06, 2),
-        ("Floating bathroom vanity with backlit anti-fog mirror", "SETS", "SETS_UNITS", 0.06, 2),
-        ("Balcony WPC wooden decking with vertical green wall", "SQ. FT", "SQFT", 0.06, 2),
-        ("Architectural COB spotlights & magnetic profile lighting", "JOB", "JOB_LOT", 0.07, 2),
-        ("Natural teak wood veneer paneling for bed back wall", "SQ. FT", "SQFT", 0.07, 2),
-        ("Toughened glass shower cubicles with PVD black hardware", "SETS", "SETS_UNITS", 0.06, 2),
-        ("Customized motorized window roller blinds with remote", "NOS", "SETS_UNITS", 0.05, 2),
-        ("Quartz island breakfast counter with pendant hanging lights", "JOB", "JOB_LOT", 0.08, 2),
-        ("PU lacquer finish kitchen overhead cabinets with bi-fold lift", "JOB", "JOB_LOT", 0.09, 2),
-        ("Digital biometric smart door lock with RFID & app access", "UNIT", "SETS_UNITS", 0.04, 2),
-        ("Acoustic fabric cushioned headboard wall panelling", "SQ. FT", "SQFT", 0.06, 2),
-
-        ("Imported Italian Botticino marble flooring with epoxy polish", "SQ. FT", "SQFT", 0.14, 3),
-        ("High-gloss lacquered glass sliding wardrobe (Hafele fittings)", "SQ. FT", "SQFT", 0.12, 3),
-        ("Smart motorized IoT curtain tracks with home automation", "JOB", "JOB_LOT", 0.08, 3),
-        ("Imported Calacatta quartz waterfall island with induction", "JOB", "JOB_LOT", 0.14, 3),
-        ("CNC router-cut Corian mandir unit with gold leaf backlighting", "UNIT", "SETS_UNITS", 0.08, 3),
-        ("Backlit translucent onyx stone illuminated bar counter", "JOB", "JOB_LOT", 0.10, 3),
-        ("Italian stucco Venetian plaster decorative feature wall", "SQ. FT", "SQFT", 0.07, 3),
-        ("Walk-in glass closet organizer system with island drawer console", "JOB", "JOB_LOT", 0.13, 3),
-        ("Frameless panaromic sliding glass balcony enclosure systems", "SQ. FT", "SQFT", 0.09, 3),
-        ("Flush hidden secret door integrated with wood panelled wall", "UNIT", "SETS_UNITS", 0.06, 3),
-        ("Acoustic stretch ceiling with fiber optic starry night LEDs", "SQ. FT", "SQFT", 0.08, 3),
-        ("Custom curved fluted wood architectural room divider partition", "SQ. FT", "SQFT", 0.07, 3),
-        ("Built-in dual zone wine chiller & luxury coffee bar joinery", "JOB", "JOB_LOT", 0.09, 3),
-        ("Solid Burma teak main door with custom CNC carving & brass handle", "UNIT", "SETS_UNITS", 0.08, 3),
-        ("Smart vanity unit with touchscreen mirror, weather & Bluetooth", "SETS", "SETS_UNITS", 0.06, 3),
-        ("Architectural metal acoustic louvers & exterior facade fins", "SQ. FT", "SQFT", 0.08, 3),
-        ("Automated motorized pop-down projector ceiling nook setup", "JOB", "JOB_LOT", 0.07, 3)
-    ]
-
-    # --- DYNAMIC BUDGET & PAGE LOGIC ---
-    if target_total < 1500000:
-        is_single_page = True
-        total_items_needed = 10
-        candidate_pool = [item for item in MASTER_ITEMS_50 if item[4] in (1, 2)]
-        weights_pool = [0.7 if item[4] == 1 else 0.3 for item in candidate_pool]
-    elif target_total < 3500000:
-        is_single_page = False
-        total_items_needed = 15
-        candidate_pool = MASTER_ITEMS_50
-        weights_pool = [0.2 if item[4] == 1 else (0.5 if item[4] == 2 else 0.3) for item in candidate_pool]
+    # Filter items based on budget tier
+    if target_total < 1200000:
+        eligible_items = [item for item in ITEM_MASTER if item[4] == "standard"]
+        if len(eligible_items) < total_items_needed:
+            eligible_items = ITEM_MASTER # fallback
+    elif target_total > 2500000:
+        # Bias towards luxury items for high budgets
+        luxury_pool = [item for item in ITEM_MASTER if item[4] == "luxury"]
+        standard_pool = [item for item in ITEM_MASTER if item[4] == "standard"]
+        random.shuffle(luxury_pool)
+        random.shuffle(standard_pool)
+        eligible_items = luxury_pool[:int(total_items_needed * 0.7)] + standard_pool[:int(total_items_needed * 0.3)]
     else:
-        is_single_page = False
-        total_items_needed = 17
-        candidate_pool = [item for item in MASTER_ITEMS_50 if item[4] in (2, 3)]
-        weights_pool = [0.3 if item[4] == 2 else 0.7 for item in candidate_pool]
+        eligible_items = list(ITEM_MASTER)
 
-    selected_items = []
-    pool_copy = list(candidate_pool)
-    weights_copy = list(weights_pool)
+    random.shuffle(eligible_items)
+    selected_pool = eligible_items[:total_items_needed]
 
-    for _ in range(total_items_needed):
-        if not pool_copy: break
-        chosen_idx = random.choices(range(len(pool_copy)), weights=weights_copy, k=1)[0]
-        selected_items.append(pool_copy.pop(chosen_idx))
-        weights_copy.pop(chosen_idx)
-
-    random.shuffle(selected_items)
-
-    def calculate_quantity(unit_label, category, total_amount):
-        min_budget, max_budget = 1000000.0, 5000000.0
+    def calculate_quantity(category, total_amount):
+        min_budget, max_budget = 500000.0, 5000000.0
         ratio = max(0.0, min(1.0, (total_amount - min_budget) / (max_budget - min_budget)))
         ratio = max(0.0, min(1.0, ratio + random.uniform(-0.05, 0.05)))
-        
-        if category == "SQFT":
-            sqft = round(450 + ratio * (2800 - 450))
-            return f"{sqft} {unit_label}"
+        if category == "SQFT": return f"{round(450 + ratio * (2800 - 450))} SQ. FT"
         elif category == "SETS_UNITS":
             qty = round(1 + ratio * (6 - 1))
-            return f"{qty} {unit_label}"
+            return f"{qty} SETS" if qty > 1 else "1 SET"
         elif category == "JOB_LOT":
             qty = round(1 + ratio * (2 - 1))
-            return f"{qty} {unit_label}"
-        return f"1 {unit_label}"
+            return f"{qty} JOB" if qty > 1 else "1 JOB"
+        return "1 JOB"
 
-    processed_items = [
-        (desc, calculate_quantity(unit_label, cat, target_total), weight) 
-        for desc, unit_label, cat, weight, tier in selected_items
-    ]
+    processed_items = [(desc, calculate_quantity(cat, target_total), w) for desc, _, cat, w, _ in selected_pool]
 
     subtotal_target = target_total / 1.18
     weights = [item[2] * random.uniform(0.85, 1.15) for item in processed_items]
@@ -457,18 +476,18 @@ def generate_estimation_pdf_bytes(owner, address, est_date, target_total):
     box_detail_style = ParagraphStyle("BoxDetail", parent=styles["Normal"], alignment=1, fontSize=12.5, leading=15, fontName="Helvetica-Bold", textColor=colors.black)
     
     if is_single_page:
-        cell_12_bold_center = ParagraphStyle("Cell11BC", parent=styles["Normal"], alignment=1, fontSize=10.5, leading=13, fontName="Helvetica-Bold", textColor=colors.black)
-        hdr_12_bold_center = ParagraphStyle("Hdr11BC", parent=styles["Normal"], alignment=1, fontSize=11, leading=13.5, fontName="Helvetica-Bold", textColor=colors.black)
-        total_14_bold = ParagraphStyle("Total12B", parent=styles["Normal"], alignment=1, fontSize=11.5, leading=14, fontName="Helvetica-Bold", textColor=colors.black)
-        words_13_bold_center = ParagraphStyle("Words11.5BC", parent=styles["Normal"], alignment=1, fontSize=11, leading=13.5, fontName="Helvetica-Bold", textColor=colors.black)
-        terms_hdr_center = ParagraphStyle("TermsHdr9.5", parent=styles["Normal"], alignment=1, fontSize=9, leading=11.5, fontName="Helvetica-Bold", textColor=colors.black)
+        cell_12_bold_center = ParagraphStyle("Cell11BC", parent=styles["Normal"], alignment=1, fontSize=10, leading=12, fontName="Helvetica-Bold", textColor=colors.black)
+        hdr_12_bold_center = ParagraphStyle("Hdr11BC", parent=styles["Normal"], alignment=1, fontSize=10.5, leading=13, fontName="Helvetica-Bold", textColor=colors.black)
+        total_14_bold = ParagraphStyle("Total12B", parent=styles["Normal"], alignment=1, fontSize=11, leading=13, fontName="Helvetica-Bold", textColor=colors.black)
+        words_13_bold_center = ParagraphStyle("Words11.5BC", parent=styles["Normal"], alignment=1, fontSize=11, leading=13, fontName="Helvetica-Bold", textColor=colors.black)
+        terms_hdr_center = ParagraphStyle("TermsHdr9.5", parent=styles["Normal"], alignment=1, fontSize=9, leading=11, fontName="Helvetica-Bold", textColor=colors.black)
         terms_point_size_8 = ParagraphStyle("TermsPt8.5", parent=styles["Normal"], alignment=0, fontSize=8, leading=10, fontName="Helvetica-Bold", textColor=colors.black)
     else:
-        cell_12_bold_center = ParagraphStyle("Cell12BC", parent=styles["Normal"], alignment=1, fontSize=11, leading=13.5, fontName="Helvetica-Bold", textColor=colors.black)
-        hdr_12_bold_center = ParagraphStyle("Hdr12BC", parent=styles["Normal"], alignment=1, fontSize=11.5, leading=14, fontName="Helvetica-Bold", textColor=colors.black)
-        total_14_bold = ParagraphStyle("Total14B", parent=styles["Normal"], alignment=1, fontSize=13, leading=15.5, fontName="Helvetica-Bold", textColor=colors.black)
-        words_13_bold_center = ParagraphStyle("Words13BC", parent=styles["Normal"], alignment=1, fontSize=12, leading=15, fontName="Helvetica-Bold", textColor=colors.black)
-        terms_hdr_center = ParagraphStyle("TermsHdr10", parent=styles["Normal"], alignment=1, fontSize=9.5, leading=13, fontName="Helvetica-Bold", textColor=colors.black)
+        cell_12_bold_center = ParagraphStyle("Cell12BC", parent=styles["Normal"], alignment=1, fontSize=10, leading=12, fontName="Helvetica-Bold", textColor=colors.black)
+        hdr_12_bold_center = ParagraphStyle("Hdr12BC", parent=styles["Normal"], alignment=1, fontSize=10.5, leading=13, fontName="Helvetica-Bold", textColor=colors.black)
+        total_14_bold = ParagraphStyle("Total14B", parent=styles["Normal"], alignment=1, fontSize=12, leading=14, fontName="Helvetica-Bold", textColor=colors.black)
+        words_13_bold_center = ParagraphStyle("Words13BC", parent=styles["Normal"], alignment=1, fontSize=12, leading=14, fontName="Helvetica-Bold", textColor=colors.black)
+        terms_hdr_center = ParagraphStyle("TermsHdr10", parent=styles["Normal"], alignment=1, fontSize=9.5, leading=12, fontName="Helvetica-Bold", textColor=colors.black)
         terms_point_size_8 = ParagraphStyle("TermsPt8", parent=styles["Normal"], alignment=0, fontSize=8, leading=10.5, fontName="Helvetica-Bold", textColor=colors.black)
 
     elements = []
@@ -518,32 +537,35 @@ def generate_estimation_pdf_bytes(owner, address, est_date, target_total):
         p_table_data.append(["", Paragraph("GST 18%", total_14_bold), "", Paragraph(f"{actual_gst:,}", total_14_bold)])
         p_table_data.append(["", Paragraph("TOTAL", total_14_bold), "", Paragraph(f"{final_total:,}", total_14_bold)])
 
-        t1 = Table(p_table_data, colWidths=[45, 285, 100, 120])
-        t1.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('TOPPADDING', (0,0), (-1,-1), 6.0), ('BOTTOMPADDING', (0,0), (-1,-1), 6.0)]))
+        t1 = Table(p_table_data, colWidths=[50, 280, 100, 120])
+        t1.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('TOPPADDING', (0,0), (-1,-1), 4.5), ('BOTTOMPADDING', (0,0), (-1,-1), 4.5)]))
         elements.append(t1)
     else:
+        split_idx = len(processed_items) // 2
+        p1_items = processed_items[:split_idx]
+        p2_items = processed_items[split_idx:]
+
         p1_table_data = [[Paragraph("SL.NO", hdr_12_bold_center), Paragraph("Description", hdr_12_bold_center), Paragraph("Qty", hdr_12_bold_center), Paragraph("Amount Rs.", hdr_12_bold_center)]]
-        for idx in range(9):
-            item = processed_items[idx]
+        for idx, item in enumerate(p1_items):
             p1_table_data.append([Paragraph(f"{idx+1}.", cell_12_bold_center), Paragraph(item[0], cell_12_bold_center), Paragraph(item[1], cell_12_bold_center), Paragraph(f"{item_amounts[idx]:,}", cell_12_bold_center)])
         
-        t1 = Table(p1_table_data, colWidths=[45, 285, 100, 120])
-        t1.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('TOPPADDING', (0,0), (-1,-1), 12.0), ('BOTTOMPADDING', (0,0), (-1,-1), 12.0)]))
+        t1 = Table(p1_table_data, colWidths=[50, 280, 100, 120])
+        t1.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('TOPPADDING', (0,0), (-1,-1), 4), ('BOTTOMPADDING', (0,0), (-1,-1), 4)]))
         elements.append(t1)
 
         elements.append(PageBreak())
         elements.extend(create_header_with_qr())
 
         p2_table_data = [[Paragraph("SL.NO", hdr_12_bold_center), Paragraph("Description", hdr_12_bold_center), Paragraph("Qty", hdr_12_bold_center), Paragraph("Amount Rs.", hdr_12_bold_center)]]
-        for idx in range(9, len(processed_items)):
-            item = processed_items[idx]
-            p2_table_data.append([Paragraph(f"{idx+1}.", cell_12_bold_center), Paragraph(item[0], cell_12_bold_center), Paragraph(item[1], cell_12_bold_center), Paragraph(f"{item_amounts[idx]:,}", cell_12_bold_center)])
+        for idx, item in enumerate(p2_items):
+            actual_idx = split_idx + idx
+            p2_table_data.append([Paragraph(f"{actual_idx+1}.", cell_12_bold_center), Paragraph(item[0], cell_12_bold_center), Paragraph(item[1], cell_12_bold_center), Paragraph(f"{item_amounts[actual_idx]:,}", cell_12_bold_center)])
 
         p2_table_data.append(["", Paragraph("GST 18%", total_14_bold), "", Paragraph(f"{actual_gst:,}", total_14_bold)])
         p2_table_data.append(["", Paragraph("TOTAL", total_14_bold), "", Paragraph(f"{final_total:,}", total_14_bold)])
 
-        t2 = Table(p2_table_data, colWidths=[45, 285, 100, 120])
-        t2.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('TOPPADDING', (0,0), (-1,-1), 10.0), ('BOTTOMPADDING', (0,0), (-1,-1), 10.0)]))
+        t2 = Table(p2_table_data, colWidths=[50, 280, 100, 120])
+        t2.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('TOPPADDING', (0,0), (-1,-1), 4), ('BOTTOMPADDING', (0,0), (-1,-1), 4)]))
         elements.append(t2)
 
     elements.append(Spacer(1, 5))
@@ -562,7 +584,7 @@ def generate_estimation_pdf_bytes(owner, address, est_date, target_total):
     ]
     for point in terms_points:
         elements.append(Paragraph(point, terms_point_size_8))
-        elements.append(Spacer(1, 1.5))
+        elements.append(Spacer(1, 1))
 
     doc.build(elements)
     pdf_bytes = pdf_buffer.getvalue()
@@ -610,7 +632,7 @@ def show_quotation_dialog():
 
         st.markdown("---")
         st.subheader("💰 Budget & Cost Configuration")
-        st.caption("You can type the exact amount manually OR adjust using the interactive slider below:")
+        st.caption("Lower budgets generate standard foundational items. Higher budgets automatically unlock modern smart home & luxury particulars!")
 
         col_b1, col_b2 = st.columns([1, 1])
         with col_b1:
@@ -641,7 +663,8 @@ def show_quotation_dialog():
         # Live calculation breakdown display
         subtotal_est = round(amount_input / 1.18)
         gst_est = amount_input - subtotal_est
-        st.info(f"📊 **Base Estimate:** ₹ {subtotal_est:,.2f} | **GST (18%):** ₹ {gst_est:,.2f} | **Total Final Payable:** ₹ {amount_input:,.2f}")
+        page_mode_text = "📄 1-Page Summary (< ₹15L)" if amount_input < 1500000 else "📑 2-Page Detailed Report (≥ ₹15L)"
+        st.info(f"📊 **Base Estimate:** ₹ {subtotal_est:,.2f} | **GST (18%):** ₹ {gst_est:,.2f} | **Total:** ₹ {amount_input:,.2f} — *{page_mode_text}*")
 
         st.caption("🔒 All estimations are processed securely. Digital copies are archived automatically.")
         
@@ -662,118 +685,226 @@ def show_quotation_dialog():
                     st.success(f"✅ **Estimation Generated Locally!** Ref NO: `{generated_ref}`")
 
                 st.download_button(
-                    label="📥 DOWNLOAD OFFICIAL PDF ESTIMATION",
+                    label="📄 DOWNLOAD OFFICIAL PDF ESTIMATION",
                     data=pdf_bytes,
                     file_name=filename,
                     mime="application/pdf",
+                    type="primary",
                     use_container_width=True
                 )
+
             except Exception as e:
-                st.error(f"Failed to generate PDF: {str(e)}")
+                st.error(f"An error occurred: {e}")
 
 
-# --- MAIN PAGE LAYOUT ---
-
-# Top Bar
+# --- TOP NAVIGATION BAR ---
 st.markdown("""
 <div class="top-nav">
-    <div>📍 <b>SND INTERIOR & DESIGNS</b> — Sahakhar Nagar, Bangalore</div>
-    <div>📞 +91 98800 00000 | ✉️ contact@sndinteriors.com</div>
+    <div>📍 <b>BANGALORE SHOWROOMS:</b> Sahakarnagar | HSR Layout | Whitefield | Yelahanka</div>
+    <div>📞 <b>CLIENT SUPPORT:</b> +91 98765 43210 &nbsp;|&nbsp; ✉️ contact@sndinteriors.com</div>
 </div>
 """, unsafe_allow_html=True)
 
-# Hero Section
+
+# --- GRAND HERO SECTION ---
 st.markdown("""
 <div class="grand-hero">
-    <div class="hero-badge">BENGALURU'S PREMIER LUXURY INTERIOR STUDIO</div>
+    <div class="hero-badge">👑 BENGALURU'S MOST TRUSTED LUXURY INTERIORS</div>
     <div class="brand-title">SND INTERIOR & DESIGNS</div>
-    <p style="font-size: 1.15rem; color: #CBD5E1; max-width: 750px; margin: 0 auto;">
-        Transforming residential spaces into architectural masterpieces. Experience bespoke interior craftsmanship, 3D modular kitchens, and turnkey luxury living.
+    <p style="color:#CBD5E1; font-size:1.15rem; max-width:800px; margin:0 auto;">
+        Crafting customized 100% factory-finished Modular Kitchens, Designer Wardrobes, False Ceilings, and Turnkey Home Interiors for Apartments and Villas.
     </p>
     <div class="trust-stats">
-        <div class="stat-item"><div class="stat-number">450+</div><div class="stat-label">Homes Delivered</div></div>
-        <div class="stat-item"><div class="stat-number">100%</div><div class="stat-label">GST Compliant</div></div>
-        <div class="stat-item"><div class="stat-number">10 YRS</div><div class="stat-label">Material Warranty</div></div>
+        <div class="stat-item">
+            <div class="stat-number">500+</div>
+            <div class="stat-label">Homes Completed</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">10 YEARS</div>
+            <div class="stat-label">Material Warranty</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">45 DAYS</div>
+            <div class="stat-label">Delivery Guarantee</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">100%</div>
+            <div class="stat-label">Transparent Pricing</div>
+        </div>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
 
-# Main Tabs Navigation
-tab1, tab2, tab3 = st.tabs(["🏛️ Instant Quotation", "🔍 Search & Verify Estimation", "✨ Luxury Portfolio"])
+# --- MAIN HORIZONTAL SLIDING PORTFOLIO (8 SLIDES) ---
+st.markdown("### 🎨 Signature Luxury Home Showcase")
+st.caption("👈 Scroll horizontally to explore full apartment & villa interior execution concepts 👉")
 
-with tab1:
-    st.markdown("### Generate Instant Official PDF Quotation")
-    st.write("Click the button below to launch our verified quotation generator. Specify budget, site details, and generate instant QR-verified estimations.")
-    
-    col_cta1, col_cta2, col_cta3 = st.columns([1, 2, 1])
-    with col_cta2:
-        if st.button("🚀 LAUNCH ESTIMATION GENERATOR", type="primary", use_container_width=True):
-            show_quotation_dialog()
+st.markdown("""
+<div class="slider-container">
+    <div class="portfolio-card">
+        <div class="card-badge">GERMAN FITTINGS</div>
+        <img class="portfolio-img" src="https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=800&q=80" alt="Modern Kitchen">
+        <div class="portfolio-body">
+            <div class="portfolio-tag">MODERN KITCHEN</div>
+            <div class="portfolio-title">Acrylic Island Kitchen</div>
+            <div class="portfolio-desc">Soft-close Blum hinges, quartz counter & concealed LED profiles.</div>
+        </div>
+    </div>
+    <div class="portfolio-card">
+        <div class="card-badge">POPULAR</div>
+        <img class="portfolio-img" src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=800&q=80" alt="Luxury Living Room">
+        <div class="portfolio-body">
+            <div class="portfolio-tag">LIVING & LOUNGE</div>
+            <div class="portfolio-title">Grand Marble Living Suite</div>
+            <div class="portfolio-desc">Custom TV console, fluted panelling & warm cove ambient lighting.</div>
+        </div>
+    </div>
+    <div class="portfolio-card">
+        <div class="card-badge">AUTO LIGHTING</div>
+        <img class="portfolio-img" src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=800&q=80" alt="Sliding Wardrobes">
+        <div class="portfolio-body">
+            <div class="portfolio-tag">SLIDING STORAGE</div>
+            <div class="portfolio-title">Lacquered Glass Wardrobe</div>
+            <div class="portfolio-desc">Floor-to-ceiling sliding panels with integrated wardrobe lighting.</div>
+        </div>
+    </div>
+    <div class="portfolio-card">
+        <div class="card-badge">MASTER BEDROOM</div>
+        <img class="portfolio-img" src="https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=800&q=80" alt="Master Suite">
+        <div class="portfolio-body">
+            <div class="portfolio-tag">BEDROOM SUITES</div>
+            <div class="portfolio-title">Contemporary Master Suite</div>
+            <div class="portfolio-desc">Upholstered headboard, veneer side tables & acoustic wall panels.</div>
+        </div>
+    </div>
+    <div class="portfolio-card">
+        <div class="card-badge">ROYAL FINISH</div>
+        <img class="portfolio-img" src="https://images.unsplash.com/photo-1617806118233-18e1de247200?auto=format&fit=crop&w=800&q=80" alt="Dining Room">
+        <div class="portfolio-body">
+            <div class="portfolio-tag">DINING SPACES</div>
+            <div class="portfolio-title">6-Seater Onyx Dining Area</div>
+            <div class="portfolio-desc">Translucent stone table top with custom pendant accent lights.</div>
+        </div>
+    </div>
+    <div class="portfolio-card">
+        <div class="card-badge">ITALIAN MARBLE</div>
+        <img class="portfolio-img" src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80" alt="Tiles & Flooring">
+        <div class="portfolio-body">
+            <div class="portfolio-tag">MARBLE & TILES</div>
+            <div class="portfolio-title">Seamless Epoxy Flooring</div>
+            <div class="portfolio-desc">Vitrified large-format slabs with mirror polish sealant finish.</div>
+        </div>
+    </div>
+    <div class="portfolio-card">
+        <div class="card-badge">GYPSUM CEILING</div>
+        <img class="portfolio-img" src="https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=800&q=80" alt="Lights & Ceilings">
+        <div class="portfolio-body">
+            <div class="portfolio-tag">LIGHTING & CEILINGS</div>
+            <div class="portfolio-title">Ambient Drop False Ceiling</div>
+            <div class="portfolio-desc">Saint-Gobain plasterboard, magnetic track lights & spotlights.</div>
+        </div>
+    </div>
+    <div class="portfolio-card">
+        <div class="card-badge">SPA EXPERIENCE</div>
+        <img class="portfolio-img" src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=800&q=80" alt="Luxury Bathroom">
+        <div class="portfolio-body">
+            <div class="portfolio-tag">BATHROOM & VANITY</div>
+            <div class="portfolio-title">Minimalist Resort Bathroom</div>
+            <div class="portfolio-desc">Floating vanity, backlit anti-fog mirrors & thermostatic showers.</div>
+        </div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
-with tab2:
-    st.markdown("### 🔍 Verification & Retrieval Portal")
-    st.write("Retrieve official PDF estimates previously generated using reference numbers.")
-    ref_search = st.text_input("Enter 10-Digit Reference Number (e.g., 143026072026)", placeholder="Reference Number")
-    
-    if st.button("Search Cloud Record", use_container_width=True):
-        if ref_search:
-            record, pdf_data = fetch_estimation_by_ref(ref_search)
+
+# --- SECONDARY SHOWCASE: SPECIALTY SPACES GRID ---
+st.markdown("<br>", unsafe_allow_html=True)
+st.markdown("### 🏆 Specialty Zones & Custom Joinery")
+st.caption("Bespoke architectural concepts tailored specifically for high-end Bengaluru properties")
+
+st.markdown("""
+<div class="specialty-grid">
+    <div class="portfolio-card" style="flex:auto;">
+        <div class="card-badge">WORK FROM HOME</div>
+        <img class="portfolio-img" src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=800&q=80" alt="Home Office">
+        <div class="portfolio-body">
+            <div class="portfolio-tag">HOME OFFICE & STUDY</div>
+            <div class="portfolio-title">Ergonomic Executive Desk</div>
+            <div class="portfolio-desc">Cable management, floating bookshelf & built-in warm LED strips.</div>
+        </div>
+    </div>
+    <div class="portfolio-card" style="flex:auto;">
+        <div class="card-badge">OUTDOOR LIVING</div>
+        <img class="portfolio-img" src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80" alt="Balcony Garden">
+        <div class="portfolio-body">
+            <div class="portfolio-tag">BALCONY DECKING</div>
+            <div class="portfolio-title">Zen Garden & Deck Nook</div>
+            <div class="portfolio-desc">Weatherproof WPC flooring, vertical garden walls & ambient seating.</div>
+        </div>
+    </div>
+    <div class="portfolio-card" style="flex:auto;">
+        <div class="card-badge">ROYAL COLLECTION</div>
+        <img class="portfolio-img" src="https://images.unsplash.com/photo-1600565193348-f74bd3c7ccdf?auto=format&fit=crop&w=800&q=80" alt="Foyer Entryway">
+        <div class="portfolio-body">
+            <div class="portfolio-tag">FOYER & CONSOLE</div>
+            <div class="portfolio-title">Grand Entry Foyer</div>
+            <div class="portfolio-desc">Stone feature wall, CNC brass inlay partition & shoe storage console.</div>
+        </div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+
+# --- PORTAL TABS & CLOUD SEARCH ---
+st.markdown("<br><br>", unsafe_allow_html=True)
+st.markdown("### 🔍 Client Services & Cloud Search")
+
+col_cloud1, col_cloud2 = st.columns([2, 1])
+
+with col_cloud1:
+    search_ref = st.text_input("Enter Reference Number (REF NO) to lookup archived estimation:", placeholder="e.g. 152329072026")
+    if search_ref and supabase:
+        with st.spinner('Fetching archived document...'):
+            record, pdf_data = fetch_estimation_by_ref(search_ref)
             if record:
-                st.success(f"Match Found for **{record['customer_name']}**! Amount: ₹{record['amount']:,.2f}")
+                st.success(f"🎯 Document Found for **{record['customer_name']}**! Amount: ₹ {record['amount']:,.2f}")
                 if pdf_data:
                     st.download_button(
-                        label="📥 Download Saved PDF",
+                        label=f"📥 Download PDF ({record['ref_no']})",
                         data=pdf_data,
-                        file_name=f"Estimation_{record['ref_no']}.pdf",
+                        file_name=f"Estimation_{record['ref_no']}_{record['customer_name']}.pdf",
                         mime="application/pdf",
-                        use_container_width=True
+                        type="primary"
                     )
-                else:
-                    st.warning("Record found, but PDF binary stream couldn't be retrieved from cloud storage.")
             else:
                 st.error("No record found matching this Reference Number.")
-        else:
-            st.info("Please enter a valid Reference Number.")
 
-with tab3:
-    st.markdown("### 📸 Portfolio Showcase")
+with col_cloud2:
     st.markdown("""
-    <div class="slider-container">
-        <div class="portfolio-card">
-            <span class="card-badge">COMPLETED</span>
-            <img class="portfolio-img" src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80"/>
-            <div class="portfolio-body">
-                <div class="portfolio-tag">DEVANAHALLI • VILLA</div>
-                <div class="portfolio-title">Birla Trimaya Luxury Suite</div>
-                <div class="portfolio-desc">Italian marble flooring, fluted charcoal paneling, and smart IoT lighting.</div>
-            </div>
-        </div>
-        <div class="portfolio-card">
-            <span class="card-badge">COMPLETED</span>
-            <img class="portfolio-img" src="https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=600&q=80"/>
-            <div class="portfolio-body">
-                <div class="portfolio-tag">SAHAKHAR NAGAR • PENTHOUSE</div>
-                <div class="portfolio-title">Contemporary Acrylic Kitchen</div>
-                <div class="portfolio-desc">High-gloss PU lacquer cabinets, Blum hardware, and Calacatta quartz island.</div>
-            </div>
-        </div>
-        <div class="portfolio-card">
-            <span class="card-badge">COMPLETED</span>
-            <img class="portfolio-img" src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=600&q=80"/>
-            <div class="portfolio-body">
-                <div class="portfolio-tag">YELAHANKA • 3BHK</div>
-                <div class="portfolio-title">Master Glass Suite</div>
-                <div class="portfolio-desc">Lacquered glass sliding wardrobes with integrated sensor LEDs.</div>
-            </div>
-        </div>
+    <div style="background:#0F172A; border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:1.2rem;">
+        <div style="font-weight:700; color:#F59E0B; margin-bottom:6px;">✉️ DIRECT EMAIL SUPPORT</div>
+        <div style="color:#CBD5E1; font-size:0.85rem;">Have architectural drawings or custom floor plans? Mail us directly at:</div>
+        <div style="font-weight:800; color:#FFFFFF; margin-top:8px;">contact@sndinteriors.com</div>
     </div>
     """, unsafe_allow_html=True)
 
-# Bottom Call To Action Banner
+
+# --- GRAND BOTTOM CALL-TO-ACTION (CTA) ---
 st.markdown("""
 <div class="bottom-cta-container">
-    <div class="bottom-cta-title">Ready to Design Your Dream Home?</div>
-    <div class="bottom-cta-subtitle">Visit our Sahakhar Nagar studio or generate a custom estimation today to kickstart your home transformation.</div>
+    <div style="display:inline-block; background:rgba(217, 119, 6, 0.2); border:1px solid #D97706; padding:4px 16px; border-radius:50px; font-size:0.8rem; color:#FBBF24; font-weight:700; margin-bottom:1rem;">
+        ✨ INSTANT DESIGN ESTIMATE
+    </div>
+    <div class="bottom-cta-title">LOOKING FOR QUOTATION FOR YOUR HOME?</div>
+    <div class="bottom-cta-subtitle">
+        Get an itemized, QR-verified PDF estimate tailored to your apartment or villa budget in under 30 seconds.
+    </div>
 </div>
 """, unsafe_allow_html=True)
+
+# Main Popup Trigger Button
+cta_col1, cta_col2, cta_col3 = st.columns([1, 2, 1])
+with cta_col2:
+    if st.button("👉 CLICK HERE TO GENERATE QUOTATION 👈", type="primary", use_container_width=True):
+        show_quotation_dialog()
