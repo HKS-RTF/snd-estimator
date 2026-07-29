@@ -869,3 +869,107 @@ cta_col1, cta_col2, cta_col3 = st.columns([1, 2, 1])
 with cta_col2:
     if st.button("👉 CLICK HERE TO GENERATE QUOTATION 👈", type="primary", use_container_width=True):
         show_quotation_dialog()
+import streamlit as st
+
+st.set_page_config(page_title="SND Estimator Tool", layout="wide")
+
+# Initialize session state for data storage if not already present
+if "quotations" not in st.session_state:
+    st.session_state.quotations = []
+
+if "edit_index" not in st.session_state:
+    st.session_state.edit_index = None
+
+
+@st.dialog("✏️ Manual Amount Entry & Quotation Dialog")
+def show_quotation_dialog(item_index=None):
+    """Dialog for adding or editing a quotation item safely without form callback conflicts."""
+    is_edit = item_index is not None
+    current_data = (
+        st.session_state.quotations[item_index]
+        if is_edit
+        else {"description": "", "qty": 1.0, "amount": 0.0}
+    )
+
+    st.write(
+        "Modify the details below and save your entry. State changes are handled safely inside the dialog."
+    )
+
+    # Using standard widgets inside the dialog without conflicting form callback architectures
+    description = st.text_input("Item Description", value=current_data["description"])
+    qty = st.number_input("Quantity", min_value=0.1, step=1.0, value=float(current_data["qty"]))
+    amount = st.number_input("Amount (₹)", min_value=0.0, step=100.0, value=float(current_data["amount"]))
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        if st.button("💾 Save Entry", use_container_width=True):
+            if not description.strip():
+                st.warning("Please provide a valid item description.")
+            else:
+                if is_edit:
+                    st.session_state.quotations[item_index] = {
+                        "description": description,
+                        "qty": qty,
+                        "amount": amount,
+                    }
+                    st.success("Quotation item updated successfully!")
+                else:
+                    st.session_state.quotations.append({
+                        "description": description,
+                        "qty": qty,
+                        "amount": amount,
+                    })
+                    st.success("New quotation item added successfully!")
+                
+                # Reset edit index and refresh UI
+                st.session_state.edit_index = None
+                st.rerun()
+
+    with col2:
+        if st.button("❌ Cancel", use_container_width=True):
+            st.session_state.edit_index = None
+            st.rerun()
+
+
+def main():
+    st.title("🏗️ SND Interior & Designs - Estimator Tool")
+    st.markdown("Manage your project estimations, quotations, and manual entries seamlessly.")
+
+    # Sidebar actions
+    st.sidebar.header("Navigation & Actions")
+    if st.sidebar.button("➕ Add New Estimation Item", use_container_width=True):
+        show_quotation_dialog()
+
+    # Main dashboard view of current quotations
+    st.subheader("Current Quotation Summary")
+
+    if not st.session_state.quotations:
+        st.info("No items added yet. Click 'Add New Estimation Item' in the sidebar to get started.")
+    else:
+        total_amount = 0.0
+        for idx, item in enumerate(st.session_state.quotations):
+            total_amount += item["amount"]
+            with st.container():
+                col_desc, col_qty, col_amt, col_edit, col_del = st.columns([3, 1, 2, 1, 1])
+                col_desc.write(f"**{idx + 1}. {item['description']}**")
+                col_qty.write(f"Qty: {item['qty']}")
+                col_amt.write(f"₹ {item['amount']:,.2f}")
+
+                if col_edit.button("✏️", key=f"edit_{idx}"):
+                    show_quotation_dialog(item_index=idx)
+
+                if col_del.button("🗑️", key=f"del_{idx}"):
+                    st.session_state.quotations.pop(idx)
+                    st.rerun()
+
+        st.divider()
+        st.metric(label="Total Estimated Cost", value=f"₹ {total_amount:,.2f}")
+
+        if st.button("🧹 Clear All Items", type="secondary"):
+            st.session_state.quotations = []
+            st.rerun()
+
+
+if __name__ == "__main__":
+    main()
