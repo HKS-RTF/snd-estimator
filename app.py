@@ -329,7 +329,7 @@ def fetch_estimation_by_ref(ref_no):
 def generate_estimation_pdf_bytes(owner, address, est_date, target_total):
     # --- 50 MASTER PARTICULAR ITEMS (Description, Unit, Category, Weight, Tier) ---
     # Tier 1: Standard/Core (1-15) | Tier 2: Modern/Mid-Range (16-33) | Tier 3: Ultra Luxury/High-Tech (34-50)
-    50_MASTER_ITEMS = [
+    MASTER_ITEMS_50 = [
         # --- TIER 1: STANDARD / BUDGET ITEMS (15 Items) ---
         ("3 course of oil bond distemper (Inside repaint)", "SQ. FT", "SQFT", 0.05, 1),
         ("2 course of snow cem paint (Outside repaint)", "SQ. FT", "SQFT", 0.04, 1),
@@ -392,19 +392,19 @@ def generate_estimation_pdf_bytes(owner, address, est_date, target_total):
         is_single_page = True
         total_items_needed = 10
         # Lower budget: Focus on Tier 1 & Tier 2 items
-        candidate_pool = [item for item in 50_MASTER_ITEMS if item[4] in (1, 2)]
+        candidate_pool = [item for item in MASTER_ITEMS_50 if item[4] in (1, 2)]
         weights_pool = [0.7 if item[4] == 1 else 0.3 for item in candidate_pool]
     elif target_total < 3500000:
         is_single_page = False
         total_items_needed = 15
         # Mid budget: Balanced across Tier 1, Tier 2, and Tier 3
-        candidate_pool = 50_MASTER_ITEMS
+        candidate_pool = MASTER_ITEMS_50
         weights_pool = [0.2 if item[4] == 1 else (0.5 if item[4] == 2 else 0.3) for item in candidate_pool]
     else:
         is_single_page = False
         total_items_needed = 17
         # High budget: Focus heavily on Tier 2 & Tier 3 Luxury/Modern items
-        candidate_pool = [item for item in 50_MASTER_ITEMS if item[4] in (2, 3)]
+        candidate_pool = [item for item in MASTER_ITEMS_50 if item[4] in (2, 3)]
         weights_pool = [0.3 if item[4] == 2 else 0.7 for item in candidate_pool]
 
     # Weighted random sampling without replacement
