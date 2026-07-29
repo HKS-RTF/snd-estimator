@@ -20,14 +20,14 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- Grand Luxury CSS & 3D Interactive Styling ---
+# --- Grand Luxury CSS & Component Styling ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
     html, body, [class*="css"] {
         font-family: 'Plus Jakarta Sans', sans-serif;
-        background-color: #070A12;
+        background-color: #090D16;
         color: #F8FAFC;
     }
 
@@ -35,215 +35,182 @@ st.markdown("""
     .top-nav {
         background: linear-gradient(90deg, #0F172A 0%, #1E293B 100%);
         color: #94A3B8;
-        padding: 12px 32px;
+        padding: 10px 28px;
         font-size: 0.82rem;
         display: flex;
         justify-content: space-between;
         align-items: center;
         border-bottom: 2px solid #D97706;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.6);
-        border-radius: 0 0 16px 16px;
-        margin-bottom: 2rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.4);
     }
 
-    /* Grand 3D Hero Section */
-    .grand-hero-3d {
-        background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(9, 13, 22, 0.98) 100%), 
-                    url('https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=2000&q=80');
+    /* Grand Hero Banner */
+    .grand-hero {
+        background: linear-gradient(180deg, rgba(9, 13, 22, 0.95) 0%, rgba(15, 23, 42, 0.88) 100%), 
+                    url('https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1800&q=80');
         background-size: cover;
         background-position: center;
-        border-radius: 28px;
-        padding: 5rem 3rem;
+        border-radius: 24px;
+        padding: 4.5rem 3rem;
         color: white;
         text-align: center;
-        border: 1px solid rgba(217, 119, 6, 0.4);
-        box-shadow: 0 30px 60px -15px rgba(217, 119, 6, 0.2), inset 0 0 40px rgba(0,0,0,0.8);
-        margin-bottom: 3rem;
-        position: relative;
-        overflow: hidden;
+        border: 1px solid rgba(217, 119, 6, 0.3);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+        margin-bottom: 2.5rem;
     }
 
     .brand-title {
         font-family: 'Cinzel', serif;
-        font-size: 3.6rem;
+        font-size: 3.2rem;
         font-weight: 900;
-        letter-spacing: 3px;
-        background: linear-gradient(135deg, #FDE68A 0%, #F59E0B 40%, #D97706 80%, #B45309 100%);
+        letter-spacing: 2px;
+        background: linear-gradient(135deg, #FDE68A 0%, #D97706 50%, #B45309 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        margin-bottom: 0.75rem;
-        text-shadow: 0 10px 30px rgba(217, 119, 6, 0.3);
+        margin-bottom: 0.5rem;
     }
 
     .hero-badge {
-        background: rgba(217, 119, 6, 0.2);
+        background: rgba(217, 119, 6, 0.15);
         border: 1px solid #D97706;
         color: #FBBF24;
-        padding: 8px 24px;
+        padding: 6px 20px;
         border-radius: 50px;
-        font-size: 0.8rem;
+        font-size: 0.78rem;
         font-weight: 700;
-        letter-spacing: 2.5px;
+        letter-spacing: 2px;
         text-transform: uppercase;
         display: inline-block;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 4px 15px rgba(217, 119, 6, 0.3);
+        margin-bottom: 1.2rem;
     }
 
-    /* 3D Glassmorphism Cards & Containers */
-    .glass-card-3d {
-        background: linear-gradient(145deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.85) 100%);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 24px;
-        padding: 2rem;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.15);
-        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-        margin-bottom: 1.5rem;
+    /* Trust Stats Grid */
+    .trust-stats {
+        display: flex;
+        justify-content: center;
+        gap: 35px;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    .glass-card-3d:hover {
-        transform: translateY(-8px) scale(1.01);
-        border-color: #D97706;
-        box-shadow: 0 30px 60px rgba(217, 119, 6, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.3);
-    }
-
-    /* Trust Stats 3D Grid */
-    .trust-stats-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 20px;
-        margin-top: 2.5rem;
-    }
-
-    .stat-box-3d {
-        background: rgba(15, 23, 42, 0.8);
-        border: 1px solid rgba(217, 119, 6, 0.3);
-        border-radius: 18px;
-        padding: 1.5rem;
+    .stat-item {
         text-align: center;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-        transition: transform 0.3s ease;
     }
-
-    .stat-box-3d:hover {
-        transform: translateY(-5px);
-        border-color: #F59E0B;
-    }
-
     .stat-number {
-        font-size: 2rem;
-        font-weight: 900;
+        font-size: 1.6rem;
+        font-weight: 800;
         color: #F59E0B;
-        font-family: 'Cinzel', serif;
     }
-    
     .stat-label {
         font-size: 0.75rem;
         color: #94A3B8;
         text-transform: uppercase;
-        letter-spacing: 1.5px;
-        margin-top: 4px;
+        letter-spacing: 1px;
     }
 
-    /* Interactive 3D Room Visualizer Gallery */
-    .room-gallery-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 25px;
-        margin-top: 1.5rem;
-        margin-bottom: 2rem;
+    /* Horizontal Sliding Gallery */
+    .slider-container {
+        display: flex;
+        gap: 22px;
+        overflow-x: auto;
+        padding: 15px 5px 30px 5px;
+        scroll-snap-type: x mandatory;
     }
 
-    .room-card-3d {
-        background: #0F172A;
+    .slider-container::-webkit-scrollbar {
+        height: 8px;
+    }
+    .slider-container::-webkit-scrollbar-thumb {
+        background: linear-gradient(90deg, #D97706, #F59E0B);
+        border-radius: 10px;
+    }
+
+    .portfolio-card {
+        flex: 0 0 320px;
+        scroll-snap-align: start;
+        background: linear-gradient(145deg, #0F172A 0%, #1E293B 100%);
         border-radius: 20px;
         overflow: hidden;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        box-shadow: 0 15px 35px rgba(0,0,0,0.5);
-        transition: all 0.4s ease;
+        border: 1px solid rgba(217, 119, 6, 0.2);
+        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
     }
 
-    .room-card-3d:hover {
-        transform: translateY(-10px);
-        border-color: #D97706;
-        box-shadow: 0 25px 50px rgba(217, 119, 6, 0.3);
+    .portfolio-card:hover {
+        transform: translateY(-8px);
+        border-color: #F59E0B;
+        box-shadow: 0 20px 35px rgba(217, 119, 6, 0.3);
     }
 
-    .room-img {
+    .portfolio-img {
         width: 100%;
-        height: 240px;
+        height: 220px;
         object-fit: cover;
-        transition: transform 0.5s ease;
     }
 
-    .room-card-3d:hover .room-img {
-        transform: scale(1.05);
+    .portfolio-body {
+        padding: 1.25rem;
     }
 
-    .room-body {
-        padding: 1.5rem;
-    }
-
-    .room-tag {
+    .portfolio-tag {
         color: #F59E0B;
         font-size: 0.72rem;
-        font-weight: 800;
-        letter-spacing: 1.5px;
+        font-weight: 700;
+        letter-spacing: 1.2px;
         text-transform: uppercase;
     }
 
-    .room-title {
-        font-size: 1.2rem;
+    .portfolio-title {
+        font-size: 1.15rem;
         font-weight: 700;
         color: #FFFFFF;
-        margin: 6px 0 8px 0;
+        margin: 6px 0 6px 0;
     }
 
-    .room-desc {
-        font-size: 0.85rem;
+    .portfolio-desc {
+        font-size: 0.84rem;
         color: #94A3B8;
-        line-height: 1.5;
-    }
-
-    /* Grand Bottom Call-To-Action (CTA) 3D Banner */
-    .bottom-cta-3d {
-        background: linear-gradient(145deg, #1E293B 0%, #0F172A 100%);
-        border: 2px solid #D97706;
-        border-radius: 28px;
-        padding: 3.5rem 2.5rem;
-        text-align: center;
-        box-shadow: 0 25px 50px rgba(0,0,0,0.7), inset 0 0 30px rgba(217,119,6,0.15);
-        margin-top: 3.5rem;
-        margin-bottom: 2rem;
-    }
-
-    .bottom-cta-title {
-        font-family: 'Cinzel', serif;
-        font-size: 2.5rem;
-        font-weight: 900;
-        color: #FFFFFF;
-        margin-bottom: 0.75rem;
-    }
-
-    .bottom-cta-subtitle {
-        color: #CBD5E1;
-        font-size: 1.1rem;
-        max-width: 700px;
-        margin: 0 auto 2rem auto;
-        line-height: 1.6;
+        line-height: 1.4;
     }
 
     /* Authentic Security Header inside Form */
     .auth-banner {
         background: linear-gradient(135deg, #1E1B4B 0%, #0F172A 100%);
         border: 1px solid #6366F1;
-        border-radius: 16px;
-        padding: 1.25rem 1.5rem;
+        border-radius: 14px;
+        padding: 1rem 1.25rem;
         display: flex;
         align-items: center;
         gap: 15px;
         margin-bottom: 1.5rem;
-        box-shadow: 0 10px 25px rgba(99, 102, 241, 0.2);
+    }
+
+    /* Grand Bottom Call-To-Action (CTA) Banner */
+    .bottom-cta-container {
+        background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+        border: 2px solid #D97706;
+        border-radius: 24px;
+        padding: 3rem 2rem;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        margin-top: 3rem;
+        margin-bottom: 2rem;
+    }
+
+    .bottom-cta-title {
+        font-family: 'Cinzel', serif;
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: #FFFFFF;
+        margin-bottom: 0.5rem;
+    }
+
+    .bottom-cta-subtitle {
+        color: #CBD5E1;
+        font-size: 1.05rem;
+        max-width: 650px;
+        margin: 0 auto 1.8rem auto;
     }
 
     #MainMenu {visibility: hidden;}
@@ -333,7 +300,6 @@ def fetch_estimation_by_ref(ref_no):
         except Exception:
             return record, None
     return None, None
-
 
 def generate_estimation_pdf_bytes(owner, address, est_date, target_total):
     is_single_page = target_total < 1500000
@@ -519,15 +485,15 @@ def generate_estimation_pdf_bytes(owner, address, est_date, target_total):
     return pdf_bytes, filename, ref_no, final_total
 
 
-# --- AUTHENTIC MODAL POPUP DIALOG WITH MANUAL ENTRY ---
-@st.dialog("✨ OFFICIAL 3D INTERIOR DESIGN QUOTATION GENERATOR", width="large")
+# --- AUTHENTIC MODAL POPUP DIALOG ---
+@st.dialog("✨ OFFICIAL INTERIOR DESIGN QUOTATION GENERATOR", width="large")
 def show_quotation_dialog():
     st.markdown("""
     <div class="auth-banner">
-        <div style="font-size:2.2rem;">🛡️</div>
+        <div style="font-size:2rem;">🛡️</div>
         <div>
-            <div style="color:#A5B4FC; font-weight:700; font-size:0.85rem; letter-spacing:1px;">SECURE SSL PORTAL • GST REGISTERED FIRM</div>
-            <div style="color:#FFFFFF; font-size:0.8rem;">Official Quotations for Luxury Home Interiors in Bengaluru with encrypted QR verification.</div>
+            <div style="color:#A5B4FC; font-weight:700; font-size:0.85rem; letter-spacing:1px;">VERIFIED PORTAL • GST REGISTERED FIRM</div>
+            <div style="color:#FFFFFF; font-size:0.8rem;">Official Quotations for Home Interiors in Bengaluru. Document comes with encrypted QR verification.</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -546,7 +512,7 @@ def show_quotation_dialog():
         )
 
         st.markdown("---")
-        st.subheader("💰 Manual Amount Entry (INR ₹)")
+        st.subheader("💰 Scope & Manual Budget Entry")
         
         amount_input = st.number_input(
             "✏️ Enter Total Estimated Budget (INR ₹):",
@@ -557,12 +523,12 @@ def show_quotation_dialog():
             format="%.2f"
         )
 
-        # Live calculation breakdown preview
+        # Live breakdown preview
         subtotal_est = round(amount_input / 1.18)
         gst_est = amount_input - subtotal_est
         st.info(f"📊 **Base Estimate:** ₹ {subtotal_est:,.2f} | **GST (18%):** ₹ {gst_est:,.2f} | **Total Final Payable:** ₹ {amount_input:,.2f}")
 
-        st.caption("🔒 All estimations are processed securely. Digital copies are archived automatically to cloud storage.")
+        st.caption("🔒 All estimations are processed securely. Digital copies are archived automatically.")
         
         submitted = st.form_submit_button("⚡ GENERATE QR-VERIFIED OFFICIAL PDF", type="primary", use_container_width=True)
 
@@ -596,35 +562,34 @@ def show_quotation_dialog():
 # --- TOP NAVIGATION BAR ---
 st.markdown("""
 <div class="top-nav">
-    <div>📍 <b>BANGALORE EXPERIENCE CENTERS:</b> Sahakarnagar | HSR Layout | Whitefield | Yelahanka</div>
-    <div>📞 <b>VIP CLIENT DESK:</b> +91 98765 43210 &nbsp;|&nbsp; ✉️ contact@sndinteriors.com</div>
+    <div>📍 <b>BANGALORE SHOWROOMS:</b> Sahakarnagar | HSR Layout | Whitefield | Yelahanka</div>
+    <div>📞 <b>CLIENT SUPPORT:</b> +91 98765 43210 &nbsp;|&nbsp; ✉️ contact@sndinteriors.com</div>
 </div>
 """, unsafe_allow_html=True)
 
 
-# --- GRAND 3D HERO SECTION ---
+# --- GRAND HERO SECTION ---
 st.markdown("""
-<div class="grand-hero-3d">
-    <div class="hero-badge">👑 BENGALURU'S PREMIER 3D INTERIOR STUDIO</div>
+<div class="grand-hero">
+    <div class="hero-badge">👑 BENGALURU'S MOST TRUSTED LUXURY INTERIORS</div>
     <div class="brand-title">SND INTERIOR & DESIGNS</div>
-    <p style="color:#CBD5E1; font-size:1.2rem; max-width:850px; margin:0 auto; line-height:1.6;">
-        Immersive 3D Photorealistic Visualizations, 100% Factory-Finished Modular Kitchens, Designer Wardrobes, and Turnkey Luxury Home Interiors.
+    <p style="color:#CBD5E1; font-size:1.15rem; max-width:800px; margin:0 auto;">
+        Crafting customized 100% factory-finished Modular Kitchens, Designer Wardrobes, False Ceilings, and Turnkey Home Interiors for Apartments and Villas.
     </p>
-    
-    <div class="trust-stats-grid">
-        <div class="stat-box-3d">
+    <div class="trust-stats">
+        <div class="stat-item">
             <div class="stat-number">500+</div>
-            <div class="stat-label">Luxury Homes Completed</div>
+            <div class="stat-label">Homes Completed</div>
         </div>
-        <div class="stat-box-3d">
-            <div class="stat-number">10 YRS</div>
+        <div class="stat-item">
+            <div class="stat-number">10 YEARS</div>
             <div class="stat-label">Material Warranty</div>
         </div>
-        <div class="stat-box-3d">
+        <div class="stat-item">
             <div class="stat-number">45 DAYS</div>
-            <div class="stat-label">Guaranteed Delivery</div>
+            <div class="stat-label">Delivery Guarantee</div>
         </div>
-        <div class="stat-box-3d">
+        <div class="stat-item">
             <div class="stat-number">100%</div>
             <div class="stat-label">Transparent Pricing</div>
         </div>
@@ -633,172 +598,96 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# --- INTERACTIVE 3D ROOM VISUALIZER SELECTOR ---
-st.markdown("### 🥽 Explore Interactive 3D Room Visualizer Gallery")
-st.markdown("<p style='color:#94A3B8; font-size:0.95rem; margin-bottom:1.5rem;'>Select a zone below to inspect 3D spatial layouts, lighting configurations, and premium material finishes.</p>", unsafe_allow_html=True)
-
-# Interactive 3D Category State Tabs
-selected_room = st.radio(
-    "Select Zone to Visualize:",
-    ["🍳 Modular Kitchen (Island & U-Shape)", "🛋️ Luxury Living & Entertainment", "🛏️ Designer Wardrobes & Bedroom", "💡 False Ceiling & Ambient Lighting", "🪵 Italian Flooring & Wall Paneling"],
-    horizontal=True,
-    label_visibility="collapsed"
-)
-
-# Dynamic Display based on selection
-if "Kitchen" in selected_room:
-    st.markdown("""
-    <div class="glass-card-3d" style="display:flex; gap:30px; align-items:center;">
-        <div style="flex:1;">
-            <div style="color:#F59E0B; font-weight:800; font-size:0.8rem; letter-spacing:2px; text-transform:uppercase;">3D SPATIAL ZONE 01</div>
-            <h2 style="font-family:'Cinzel', serif; font-size:2rem; color:#FFF; margin:8px 0 12px 0;">German Soft-Close Acrylic Kitchen</h2>
-            <p style="color:#CBD5E1; line-height:1.6; margin-bottom:1.5rem;">
-                Featuring Blum tandem box systems, quartz stone countertops with anti-scratch coating, integrated profile LED under-cabinet illumination, and water-resistant boiling waterproof (BWP) ply cores.
-            </p>
-            <div style="display:flex; gap:15px; color:#FBBF24; font-size:0.9rem; font-weight:700;">
-                <div>✔️ Handleless Profile</div>
-                <div>✔️ Anti-Fingerprint Finish</div>
-                <div>✔️ 10-Year Warranty</div>
-            </div>
-        </div>
-        <div style="flex:1;">
-            <img src="https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1000&q=80" style="width:100%; height:320px; object-fit:cover; border-radius:18px; border:1px solid rgba(217,119,6,0.4);" alt="Kitchen 3D">
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-elif "Living" in selected_room:
-    st.markdown("""
-    <div class="glass-card-3d" style="display:flex; gap:30px; align-items:center;">
-        <div style="flex:1;">
-            <div style="color:#F59E0B; font-weight:800; font-size:0.8rem; letter-spacing:2px; text-transform:uppercase;">3D SPATIAL ZONE 02</div>
-            <h2 style="font-family:'Cinzel', serif; font-size:2rem; color:#FFF; margin:8px 0 12px 0;">Grand Living & TV Media Lounge</h2>
-            <p style="color:#CBD5E1; line-height:1.6; margin-bottom:1.5rem;">
-                Custom fluted wall paneling, Italian marble media console backdrops, concealed wiring ducts, automated smart curtains, and acoustic wall insulation for high-fidelity home theater experiences.
-            </p>
-            <div style="display:flex; gap:15px; color:#FBBF24; font-size:0.9rem; font-weight:700;">
-                <div>✔️ Fluted Wooden Panels</div>
-                <div>✔️ Acoustic Insulation</div>
-                <div>✔️ Smart Lighting Sync</div>
-            </div>
-        </div>
-        <div style="flex:1;">
-            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80" style="width:100%; height:320px; object-fit:cover; border-radius:18px; border:1px solid rgba(217,119,6,0.4);" alt="Living 3D">
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-elif "Wardrobes" in selected_room:
-    st.markdown("""
-    <div class="glass-card-3d" style="display:flex; gap:30px; align-items:center;">
-        <div style="flex:1;">
-            <div style="color:#F59E0B; font-weight:800; font-size:0.8rem; letter-spacing:2px; text-transform:uppercase;">3D SPATIAL ZONE 03</div>
-            <h2 style="font-family:'Cinzel', serif; font-size:2rem; color:#FFF; margin:8px 0 12px 0;">Floor-to-Ceiling Glass Wardrobes</h2>
-            <p style="color:#CBD5E1; line-height:1.6; margin-bottom:1.5rem;">
-                Lacquered glass sliding doors with heavy-duty German hydraulic tracks, sensor-activated interior vertical LED strip lighting, velvet-lined jewelry drawers, and pull-down pantries.
-            </p>
-            <div style="display:flex; gap:15px; color:#FBBF24; font-size:0.9rem; font-weight:700;">
-                <div>✔️ Sensor LED Lighting</div>
-                <div>✔️ Heavy Hydraulic Tracks</div>
-                <div>✔️ Velvet Accessory Trays</div>
-            </div>
-        </div>
-        <div style="flex:1;">
-            <img src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1000&q=80" style="width:100%; height:320px; object-fit:cover; border-radius:18px; border:1px solid rgba(217,119,6,0.4);" alt="Wardrobe 3D">
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-elif "Ceiling" in selected_room:
-    st.markdown("""
-    <div class="glass-card-3d" style="display:flex; gap:30px; align-items:center;">
-        <div style="flex:1;">
-            <div style="color:#F59E0B; font-weight:800; font-size:0.8rem; letter-spacing:2px; text-transform:uppercase;">3D SPATIAL ZONE 04</div>
-            <h2 style="font-family:'Cinzel', serif; font-size:2rem; color:#FFF; margin:8px 0 12px 0;">Architectural False Ceiling & Cove Lighting</h2>
-            <p style="color:#CBD5E1; line-height:1.6; margin-bottom:1.5rem;">
-                Multi-tier gypsum board false ceilings engineered with anti-crack mesh tape, magnetic track lighting fixtures, warm golden perimeter cove lighting, and smart DALI dimming integration.
-            </p>
-            <div style="display:flex; gap:15px; color:#FBBF24; font-size:0.9rem; font-weight:700;">
-                <div>✔️ Magnetic Track Lights</div>
-                <div>✔️ Anti-Crack Grid</div>
-                <div>✔️ DALI Smart Dimming</div>
-            </div>
-        </div>
-        <div style="flex:1;">
-            <img src="https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=1000&q=80" style="width:100%; height:320px; object-fit:cover; border-radius:18px; border:1px solid rgba(217,119,6,0.4);" alt="Ceiling 3D">
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-else:
-    st.markdown("""
-    <div class="glass-card-3d" style="display:flex; gap:30px; align-items:center;">
-        <div style="flex:1;">
-            <div style="color:#F59E0B; font-weight:800; font-size:0.8rem; letter-spacing:2px; text-transform:uppercase;">3D SPATIAL ZONE 05</div>
-            <h2 style="font-family:'Cinzel', serif; font-size:2rem; color:#FFF; margin:8px 0 12px 0;">Italian Marble & Seamless Flooring</h2>
-            <p style="color:#CBD5E1; line-height:1.6; margin-bottom:1.5rem;">
-                Large-format vitrified polished slabs and imported Italian marble finishes laid with zero-lip laser leveling equipment and color-matched epoxy grouting for an immaculate, seamless mirror shine.
-            </p>
-            <div style="display:flex; gap:15px; color:#FBBF24; font-size:0.9rem; font-weight:700;">
-                <div>✔️ Laser Precision Level</div>
-                <div>✔️ Epoxy Grout Seams</div>
-                <div>✔️ High Gloss Finish</div>
-            </div>
-        </div>
-        <div style="flex:1;">
-            <img src="https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1000&q=80" style="width:100%; height:320px; object-fit:cover; border-radius:18px; border:1px solid rgba(217,119,6,0.4);" alt="Flooring 3D">
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-
-# --- 3D GRAND PORTFOLIO SHOWCASE GALLERY ---
-st.markdown("<br>", unsafe_allow_html=True)
-st.markdown("### 🏆 Grand 3D Design Portfolio Showcase")
-st.markdown("<p style='color:#94A3B8; font-size:0.95rem; margin-bottom:1.5rem;'>Explore recent turnkey interior projects executed across ultra-luxury residential communities in Bangalore.</p>", unsafe_allow_html=True)
+# --- SLIDING PORTFOLIO SHOWCASE (EXPANDED TO 8 LUXURY SPACES) ---
+st.markdown("### 🎨 Explore Signature Design Portfolio")
+st.caption("👈 Swipe / Scroll horizontally to preview our recent grand interior executions across Bengaluru homes 👉")
 
 st.markdown("""
-<div class="room-gallery-grid">
-    <div class="room-card-3d">
-        <img class="room-img" src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=800&q=80" alt="Penthouse">
-        <div class="room-body">
-            <div class="room-tag">SAHAKARNAGAR VILLA</div>
-            <div class="room-title">Minimalist Neo-Classical Penthouse</div>
-            <div class="room-desc">Complete turnkey interiors featuring custom crown molding, brass accents, and Italian marble flooring.</div>
+<div class="slider-container">
+    <div class="portfolio-card">
+        <img class="portfolio-img" src="https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=800&q=80" alt="Modern Kitchen">
+        <div class="portfolio-body">
+            <div class="portfolio-tag">MODERN KITCHEN</div>
+            <div class="portfolio-title">Acrylic Island Kitchen</div>
+            <div class="portfolio-desc">German soft-close hinges, quartz countertop & integrated LED profiles.</div>
         </div>
     </div>
-    <div class="room-card-3d">
-        <img class="room-img" src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=800&q=80" alt="Apartment">
-        <div class="room-body">
-            <div class="room-tag">WHITEFIELD APARTMENT</div>
-            <div class="room-title">Scandi-Modern 4BHK Residence</div>
-            <div class="room-desc">Warm oak wood tones, handleless matte kitchen cabinets, and minimalist recessed lighting throughout.</div>
+    <div class="portfolio-card">
+        <img class="portfolio-img" src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=800&q=80" alt="Living Room">
+        <div class="portfolio-body">
+            <div class="portfolio-tag">LIVING ROOM</div>
+            <div class="portfolio-title">Contemporary TV Unit & Sofa</div>
+            <div class="portfolio-desc">Fluted wooden paneling, italian marble media wall & ambient cove lighting.</div>
         </div>
     </div>
-    <div class="room-card-3d">
-        <img class="room-img" src="https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=800&q=80" alt="Duplex">
-        <div class="room-body">
-            <div class="room-tag">HSR LAYOUT DUPLEX</div>
-            <div class="room-title">Contemporary Urban Sanctuary</div>
-            <div class="room-desc">Double-height foyer, floating wooden staircase with glass railings, and statement chandelier installation.</div>
+    <div class="portfolio-card">
+        <img class="portfolio-img" src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=800&q=80" alt="Sliding Wardrobes">
+        <div class="portfolio-body">
+            <div class="portfolio-tag">BEDROOM STORAGE</div>
+            <div class="portfolio-title">Lacquered Glass Wardrobe</div>
+            <div class="portfolio-desc">Floor-to-ceiling sliding mechanisms with automated internal sensor lights.</div>
+        </div>
+    </div>
+    <div class="portfolio-card">
+        <img class="portfolio-img" src="https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=800&q=80" alt="Master Bedroom">
+        <div class="portfolio-body">
+            <div class="portfolio-tag">MASTER SUITE</div>
+            <div class="portfolio-title">Upholstered Bed & Headboard</div>
+            <div class="portfolio-desc">Custom velvet headboard with side pendant lights and floating side tables.</div>
+        </div>
+    </div>
+    <div class="portfolio-card">
+        <img class="portfolio-img" src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=800&q=80" alt="Luxury Bathroom">
+        <div class="portfolio-body">
+            <div class="portfolio-tag">BATHROOM & VANITY</div>
+            <div class="portfolio-title">Backlit Mirror Vanity Unit</div>
+            <div class="portfolio-desc">Anti-fog smart LED mirror, wall-hung wash basin & matte black Kohler fittings.</div>
+        </div>
+    </div>
+    <div class="portfolio-card">
+        <img class="portfolio-img" src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80" alt="Tiles & Flooring">
+        <div class="portfolio-body">
+            <div class="portfolio-tag">MARBLE & FLOORING</div>
+            <div class="portfolio-title">Italian Marble Slab Flooring</div>
+            <div class="portfolio-desc">Large-format vitrified polished slabs with precision seamless epoxy grouting.</div>
+        </div>
+    </div>
+    <div class="portfolio-card">
+        <img class="portfolio-img" src="https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=800&q=80" alt="Lights & Ceilings">
+        <div class="portfolio-body">
+            <div class="portfolio-tag">LIGHTING & CEILINGS</div>
+            <div class="portfolio-title">Ambient Drop False Ceilings</div>
+            <div class="portfolio-desc">Gypsum layered ceilings, warm cove lights, magnetic track spotlights.</div>
+        </div>
+    </div>
+    <div class="portfolio-card">
+        <img class="portfolio-img" src="https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=800&q=80" alt="Dining Room">
+        <div class="portfolio-body">
+            <div class="portfolio-tag">DINING AREA</div>
+            <div class="portfolio-title">Marble Top Dining & Crockery</div>
+            <div class="portfolio-desc">Custom glass-door crockery unit with warm interior display lighting.</div>
         </div>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
 
-# --- PORTAL CLOUD SEARCH & LOOKUP ---
-st.markdown("<br>", unsafe_allow_html=True)
-st.markdown("### 🔍 Secure Client Portal & Cloud Estimation Lookup")
+# --- PORTAL TABS & CLOUD SEARCH ---
+st.markdown("<br><br>", unsafe_allow_html=True)
+st.markdown("### 🔍 Client Services & Cloud Search")
 
 col_cloud1, col_cloud2 = st.columns([2, 1])
 
 with col_cloud1:
-    search_ref = st.text_input("Enter Reference Number (REF NO) to lookup archived quotation:", placeholder="e.g. 152329072026")
+    search_ref = st.text_input("Enter Reference Number (REF NO) to lookup archived estimation:", placeholder="e.g. 152329072026")
     if search_ref and supabase:
-        with st.spinner('Fetching archived document from secure cloud...'):
+        with st.spinner('Fetching archived document...'):
             record, pdf_data = fetch_estimation_by_ref(search_ref)
             if record:
                 st.success(f"🎯 Document Found for **{record['customer_name']}**! Amount: ₹ {record['amount']:,.2f}")
                 if pdf_data:
                     st.download_button(
-                        label=f"📥 Download Official PDF ({record['ref_no']})",
+                        label=f"📥 Download PDF ({record['ref_no']})",
                         data=pdf_data,
                         file_name=f"Estimation_{record['ref_no']}_{record['customer_name']}.pdf",
                         mime="application/pdf",
@@ -809,9 +698,9 @@ with col_cloud1:
 
 with col_cloud2:
     st.markdown("""
-    <div style="background:#0F172A; border:1px solid rgba(217,119,6,0.3); border-radius:18px; padding:1.25rem;">
-        <div style="font-weight:700; color:#F59E0B; margin-bottom:6px;">✉️ ARCHITECTURAL DRAWINGS</div>
-        <div style="color:#CBD5E1; font-size:0.85rem;">Have CAD floor plans or custom blueprints? Email our design team directly:</div>
+    <div style="background:#0F172A; border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:1.2rem;">
+        <div style="font-weight:700; color:#F59E0B; margin-bottom:6px;">✉️ DIRECT EMAIL SUPPORT</div>
+        <div style="color:#CBD5E1; font-size:0.85rem;">Have architectural drawings or custom floor plans? Mail us directly at:</div>
         <div style="font-weight:800; color:#FFFFFF; margin-top:8px;">contact@sndinteriors.com</div>
     </div>
     """, unsafe_allow_html=True)
@@ -819,13 +708,13 @@ with col_cloud2:
 
 # --- GRAND BOTTOM CALL-TO-ACTION (CTA) ---
 st.markdown("""
-<div class="bottom-cta-3d">
-    <div style="display:inline-block; background:rgba(217, 119, 6, 0.2); border:1px solid #D97706; padding:6px 20px; border-radius:50px; font-size:0.8rem; color:#FBBF24; font-weight:800; margin-bottom:1.2rem; letter-spacing:2px;">
-        ✨ INSTANT 3D DESIGN ESTIMATE
+<div class="bottom-cta-container">
+    <div style="display:inline-block; background:rgba(217, 119, 6, 0.2); border:1px solid #D97706; padding:4px 16px; border-radius:50px; font-size:0.8rem; color:#FBBF24; font-weight:700; margin-bottom:1rem;">
+        ✨ INSTANT DESIGN ESTIMATE
     </div>
     <div class="bottom-cta-title">LOOKING FOR QUOTATION FOR YOUR HOME?</div>
     <div class="bottom-cta-subtitle">
-        Generate an itemized, QR-verified official PDF quotation tailored precisely to your apartment or villa floor plan and budget in seconds.
+        Get an itemized, QR-verified PDF estimate tailored to your apartment or villa budget in under 30 seconds.
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -833,5 +722,5 @@ st.markdown("""
 # Main Popup Trigger Button
 cta_col1, cta_col2, cta_col3 = st.columns([1, 2, 1])
 with cta_col2:
-    if st.button("👉 CLICK HERE TO GENERATE 3D QUOTATION 👈", type="primary", use_container_width=True):
+    if st.button("👉 CLICK HERE TO GENERATE QUOTATION 👈", type="primary", use_container_width=True):
         show_quotation_dialog()
