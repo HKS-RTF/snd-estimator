@@ -164,6 +164,11 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
+# --- Initialize Session State for Login ---
+if "is_admin_logged_in" not in st.session_state:
+    st.session_state.is_admin_logged_in = False
+
+
 # --- Initialize Supabase Client ---
 @st.cache_resource
 def init_supabase() -> Client:
@@ -213,10 +218,9 @@ def num_to_words_indian_clean(num):
     if num > 0: result += convert_below_thousand(num)
     return f"{result.strip()} RUPEES ONLY"
 
-def upload_to_cloud(ref_no, pdf_bytes_standard, pdf_bytes_no_header, filename_std, filename_no_hdr, owner, est_date, final_total):
+def upload_to_cloud(ref_no, pdf_bytes_standard, pdf_bytes_no_header, filename_std, filename_no_hdr, owner, mobile, email, est_date, final_total):
     if not supabase: return None, None
     
-    # Upload Standard Version
     path_std = f"pdf_estimations/{filename_std}"
     supabase.storage.from_("estimations").upload(
         path=path_std,
@@ -225,7 +229,6 @@ def upload_to_cloud(ref_no, pdf_bytes_standard, pdf_bytes_no_header, filename_st
     )
     url_std = supabase.storage.from_("estimations").get_public_url(path_std)
 
-    # Upload No-Header Version
     path_no_hdr = f"pdf_estimations/{filename_no_hdr}"
     supabase.storage.from_("estimations").upload(
         path=path_no_hdr,
@@ -234,10 +237,11 @@ def upload_to_cloud(ref_no, pdf_bytes_standard, pdf_bytes_no_header, filename_st
     )
     url_no_hdr = supabase.storage.from_("estimations").get_public_url(path_no_hdr)
 
-    # Log record using standard existing columns (storing both filenames/paths and URLs cleanly)
     data = {
         "ref_no": str(ref_no),
         "customer_name": str(owner.upper()),
+        "mobile": str(mobile),
+        "email": str(email),
         "est_date": str(est_date),
         "amount": float(final_total),
         "pdf_url": url_std,
@@ -247,7 +251,6 @@ def upload_to_cloud(ref_no, pdf_bytes_standard, pdf_bytes_no_header, filename_st
     try:
         supabase.table("estimation_logs").upsert(data).execute()
     except Exception:
-        # Fallback if 'pdf_url_no_header' column has not been added to Supabase table yet
         fallback_data = {
             "ref_no": str(ref_no),
             "customer_name": str(owner.upper()),
@@ -364,11 +367,7 @@ def generate_estimation_pdf_bytes(owner, address, est_date, target_total, includ
             ]
         else:
             header_text_flowables = [
-                Spacer(1, 10),
-                Spacer(1, 10),
-                Spacer(1, 10),
-                Spacer(1, 10),
-                Spacer(1, 10)
+                Spacer(1, 10), Spacer(1, 10), Spacer(1, 10), Spacer(1, 10), Spacer(1, 10)
             ]
         header_table = Table([["", header_text_flowables, d]], colWidths=[75, 400, 75])
         header_table.setStyle(TableStyle([('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('LEFTPADDING', (0,0), (-1,-1), 0), ('RIGHTPADDING', (0,0), (-1,-1), 0)]))
@@ -453,7 +452,7 @@ def generate_estimation_pdf_bytes(owner, address, est_date, target_total, includ
     return pdf_bytes, filename, ref_no, final_total
 
 
-# --- AUTHENTIC MODAL POPUP DIALOG WITH MANUAL ENTRY ---
+# --- AUTHENTIC MODAL POPUP DIALOG WITH USER DETAILS & INSTRUCTIONS ---
 @st.dialog("✨ OFFICIAL 3D INTERIOR DESIGN QUOTATION GENERATOR", width="large")
 def show_quotation_dialog():
     st.markdown("""
@@ -467,11 +466,13 @@ def show_quotation_dialog():
     """, unsafe_allow_html=True)
 
     with st.form("popup_estimation_form"):
-        st.subheader("👤 Client & Site Profile")
-        col1, col2 = st.columns(2)
-        with col1:
+        st.subheader("👤 Client & Contact Details")
+        col_c1, col_c2 = st.columns(2)
+        with col_c1:
             owner_input = st.text_input("Full Name of Property Owner *", value="KUSHAL ANAND & HKS")
-        with col2:
+            mobile_input = st.text_input("Mobile Number *", value="9876543210")
+        with col_c2:
+            email_input = st.text_input("Email ID *", value="kushal@example.com")
             date_input = st.text_input("Date of Issue", value=datetime.now().strftime("%d-%m-%Y"))
 
         address_input = st.text_area(
@@ -495,31 +496,36 @@ def show_quotation_dialog():
         gst_est = amount_input - subtotal_est
         st.info(f"📊 **Base Estimate:** ₹ {subtotal_est:,.2f} | **GST (18%):** ₹ {gst_est:,.2f} | **Total Final Payable:** ₹ {amount_input:,.2f}")
 
-        st.caption("🔒 Both Standard and No-Header copies are generated simultaneously and archived to cloud storage.")
-        
-        submitted = st.form_submit_button("⚡ GENERATE & SAVE BOTH PDF VERSIONS", type="primary", use_container_width=True)
+        submitted = st.form_submit_button("⚡ GENERATE PDF", type="primary", use_container_width=True)
 
     if submitted:
         with st.spinner('Generating both PDF copies & syncing securely with cloud storage...'):
             try:
-                # Generate Standard Version
                 pdf_bytes_std, filename_std, generated_ref, final_total = generate_estimation_pdf_bytes(
                     owner_input, address_input, date_input, float(amount_input), include_header=True
                 )
-                # Generate No-Header Version
                 pdf_bytes_no_hdr, filename_no_hdr, _, _ = generate_estimation_pdf_bytes(
                     owner_input, address_input, date_input, float(amount_input), include_header=False
                 )
                 
                 if supabase:
-                    url_std, url_no_hdr = upload_to_cloud(
+                    upload_to_cloud(
                         generated_ref, pdf_bytes_std, pdf_bytes_no_hdr, 
-                        filename_std, filename_no_hdr, owner_input, date_input, final_total
+                        filename_std, filename_no_hdr, owner_input, mobile_input, email_input, date_input, final_total
                     )
-                    st.balloons()
-                    st.success(f"🎉 **Both Versions Logged to Cloud Storage!** Reference No: `{generated_ref}`")
-                else:
-                    st.success(f"✅ **Both Versions Generated Successfully Locally!** Reference No: `{generated_ref}`")
+                
+                st.balloons()
+                st.success(f"🎉 **Quotation Generated Successfully!**")
+                
+                # Display specific messaging requested
+                st.markdown(f"""
+                <div style="background: rgba(217, 119, 6, 0.15); border: 1px solid #D97706; padding: 20px; border-radius: 14px; margin: 15px 0;">
+                    <h3 style="color: #F59E0B; margin-top: 0;">REF NO:- {generated_ref}</h3>
+                    <p style="font-size: 1.05rem; color: #F8FAFC; line-height: 1.6;">
+                        <b>HELLO YOU WILL RECEIVE QUOTATION VIA WHATS APP AND MAIL IN SOME TIME , AND COPY THIS REFRENCE NUMBER AND WHATS APP TO 7338425213 FOR INSTANT QUATION.</b>
+                    </p>
+                </div>
+                """, unsafe_allow_html=True)
 
                 st.markdown("### 📥 Instant Downloads")
                 dl_col1, dl_col2 = st.columns(2)
@@ -586,54 +592,78 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# --- CLOUD LOOKUP & REFERENCE SEARCH SECTION ---
+# --- ADMIN LOGIN & RECENT HISTORY / LOOKUP SECTION ---
 st.markdown("---")
-st.markdown("### 🔍 Cloud Document Lookup & Reference Search")
-st.markdown("<p style='color:#94A3B8; font-size:0.95rem;'>Enter a Reference Number (e.g. `104502082026`) to retrieve and download both standard and no-header versions from the cloud database.</p>", unsafe_allow_html=True)
+st.markdown("### 🔐 Admin Portal: Recent History & Cloud Lookup")
 
-lookup_col1, lookup_col2 = st.columns([3, 1])
-with lookup_col1:
-    search_ref = st.text_input("Enter Reference Number:", placeholder="e.g. 104502082026", label_visibility="collapsed")
-with lookup_col2:
-    search_triggered = st.button("🔍 Search Record", type="primary", use_container_width=True)
+if not st.session_state.is_admin_logged_in:
+    with st.form("admin_login_form"):
+        st.markdown("<p style='color:#94A3B8;'>Please enter administrator credentials to access client history and lookup tools.</p>", unsafe_allow_html=True)
+        login_user = st.text_input("Username", value="")
+        login_pass = st.text_input("Password", type="password", value="")
+        login_submit = st.form_submit_button("🔑 Login to Admin Dashboard", type="primary")
 
-if search_triggered and search_ref:
-    if not supabase:
-        st.warning("⚠️ Supabase client is not configured. Live cloud lookup is unavailable.")
-    else:
-        with st.spinner("Searching cloud records..."):
+    if login_submit:
+        if login_user == "HARI1109" and login_pass == "73384@Hks":
+            st.session_state.is_admin_logged_in = True
+            st.success("🎉 Login successful! Unlocking dashboard...")
+            st.rerun()
+        else:
+            st.error("❌ Invalid Username or Password. Please try again.")
+else:
+    st.success("🔓 Authenticated as Admin (HARI1109)")
+    if st.button("🔒 Logout"):
+        st.session_state.is_admin_logged_in = False
+        st.rerun()
+
+    st.markdown("---")
+    tab_history, tab_lookup = st.tabs(["📊 Recent Quotation History", "🔍 Cloud Document Lookup"])
+
+    with tab_history:
+        st.markdown("#### 📋 Recent Quotation Records")
+        if not supabase:
+            st.warning("⚠️ Supabase client is not configured.")
+        else:
             try:
-                response = supabase.table("estimation_logs").select("*").eq("ref_no", search_ref.strip()).execute()
-                records = response.data
-                
-                if records:
-                    rec = records[0]
-                    st.success(f"✅ **Record Found!** Client: **{rec.get('customer_name')}** | Date: {rec.get('est_date')} | Amount: ₹ {rec.get('amount'):,.2f}")
-                    
-                    url_std = rec.get('pdf_url')
-                    url_no_hdr = rec.get('pdf_url_no_header')
-                    
-                    # Handle fallback storage format if separate column isn't migrated yet
-                    if url_std and "|| NO_HEADER::" in url_std:
-                        parts = url_std.split("|| NO_HEADER::")
-                        url_std = parts[0]
-                        url_no_hdr = parts[1] if len(parts) > 1 else None
-
-                    sc1, sc2 = st.columns(2)
-                    with sc1:
-                        if url_std:
-                            st.markdown(f"[📥 Download Standard Copy (Cloud)]({url_std})")
-                        else:
-                            st.info("Standard copy URL not found in record.")
-                    with sc2:
-                        if url_no_hdr:
-                            st.markdown(f"[📥 Download No-Header Copy (Cloud)]({url_no_hdr})")
-                        else:
-                            st.info("No-header copy URL not found in record.")
+                res = supabase.table("estimation_logs").select("*").order("est_date", desc=True).limit(20).execute()
+                data = res.data
+                if data:
+                    st.dataframe(data, use_container_width=True)
                 else:
-                    st.error(f"❌ No record found matching Reference Number: `{search_ref}`")
+                    st.info("No records found in database.")
             except Exception as e:
-                st.error(f"Error executing lookup: {e}")
+                st.error(f"Error fetching history: {e}")
+
+    with tab_lookup:
+        st.markdown("#### 🔎 Search Specific Quotation Record")
+        search_ref = st.text_input("Enter Reference Number:", placeholder="e.g. 104502082026")
+        if st.button("Search Cloud Record", type="primary"):
+            if not supabase:
+                st.warning("⚠️ Supabase client is not configured.")
+            else:
+                try:
+                    response = supabase.table("estimation_logs").select("*").eq("ref_no", search_ref.strip()).execute()
+                    records = response.data
+                    if records:
+                        rec = records[0]
+                        st.success(f"✅ **Record Found!** Client: **{rec.get('customer_name')}** | Mobile: {rec.get('mobile', 'N/A')} | Date: {rec.get('est_date')} | Amount: ₹ {rec.get('amount'):,.2f}")
+                        
+                        url_std = rec.get('pdf_url')
+                        url_no_hdr = rec.get('pdf_url_no_header')
+                        if url_std and "|| NO_HEADER::" in url_std:
+                            parts = url_std.split("|| NO_HEADER::")
+                            url_std = parts[0]
+                            url_no_hdr = parts[1] if len(parts) > 1 else None
+
+                        sc1, sc2 = st.columns(2)
+                        with sc1:
+                            if url_std: st.markdown(f"[📥 Download Standard Copy (Cloud)]({url_std})")
+                        with sc2:
+                            if url_no_hdr: st.markdown(f"[📥 Download No-Header Copy (Cloud)]({url_no_hdr})")
+                    else:
+                        st.error(f"❌ No record found matching Reference Number: `{search_ref}`")
+                except Exception as e:
+                    st.error(f"Error executing lookup: {e}")
 
 
 # --- INTERACTIVE 3D ROOM VISUALIZER SELECTOR ---
@@ -753,5 +783,5 @@ else:
 st.markdown("<br>", unsafe_allow_html=True)
 col_cta1, col_cta2, col_cta3 = st.columns([1, 2, 1])
 with col_cta2:
-    if st.button("🚀 LAUNCH OFFICIAL QUOTATION & PDF GENERATOR", type="primary", use_container_width=True):
+    if st.button("🚀 GENERATE QUOTATION", type="primary", use_container_width=True):
         show_quotation_dialog()
