@@ -213,24 +213,38 @@ def num_to_words_indian_clean(num):
     if num > 0: result += convert_below_thousand(num)
     return f"{result.strip()} RUPEES ONLY"
 
-def upload_to_cloud(ref_no, pdf_bytes, filename, owner, est_date, final_total):
-    if not supabase: return None
-    storage_path = f"pdf_estimations/{filename}"
+def upload_to_cloud(ref_no, pdf_bytes_standard, pdf_bytes_no_header, filename_std, filename_no_hdr, owner, est_date, final_total):
+    if not supabase: return None, None
+    
+    # Upload Standard Version
+    path_std = f"pdf_estimations/{filename_std}"
     supabase.storage.from_("estimations").upload(
-        path=storage_path,
-        file=pdf_bytes,
+        path=path_std,
+        file=pdf_bytes_standard,
         file_options={"content-type": "application/pdf", "upsert": "true"}
     )
-    pdf_url = supabase.storage.from_("estimations").get_public_url(storage_path)
+    url_std = supabase.storage.from_("estimations").get_public_url(path_std)
+
+    # Upload No-Header Version
+    path_no_hdr = f"pdf_estimations/{filename_no_hdr}"
+    supabase.storage.from_("estimations").upload(
+        path=path_no_hdr,
+        file=pdf_bytes_no_header,
+        file_options={"content-type": "application/pdf", "upsert": "true"}
+    )
+    url_no_hdr = supabase.storage.from_("estimations").get_public_url(path_no_hdr)
+
+    # Log record in database storing both URLs
     data = {
         "ref_no": str(ref_no),
         "customer_name": str(owner.upper()),
         "est_date": str(est_date),
         "amount": float(final_total),
-        "pdf_url": pdf_url
+        "pdf_url": url_std,
+        "pdf_url_no_header": url_no_hdr
     }
     supabase.table("estimation_logs").upsert(data).execute()
-    return pdf_url
+    return url_std, url_no_hdr
 
 
 def generate_estimation_pdf_bytes(owner, address, est_date, target_total, include_header=True):
@@ -468,42 +482,52 @@ def show_quotation_dialog():
         gst_est = amount_input - subtotal_est
         st.info(f"📊 **Base Estimate:** ₹ {subtotal_est:,.2f} | **GST (18%):** ₹ {gst_est:,.2f} | **Total Final Payable:** ₹ {amount_input:,.2f}")
 
-        st.markdown("---")
-        st.subheader("📄 Document Format Selection")
-        format_choice = st.radio(
-            "Select PDF Generation Format:",
-            ["Standard Copy (With Full Header & Branding)", "Without Header Copy (Blank Header Space with QR code intact)"],
-            index=0
-        )
-
-        st.caption("🔒 All estimations are processed securely. Digital copies are archived automatically to cloud storage.")
+        st.caption("🔒 Both Standard and No-Header copies are generated simultaneously and archived to cloud storage.")
         
-        submitted = st.form_submit_button("⚡ GENERATE QR-VERIFIED OFFICIAL PDF", type="primary", use_container_width=True)
+        submitted = st.form_submit_button("⚡ GENERATE & SAVE BOTH PDF VERSIONS", type="primary", use_container_width=True)
 
     if submitted:
-        include_header_flag = True if "Standard Copy" in format_choice else False
-        
-        with st.spinner('Generating document & syncing with cloud...'):
+        with st.spinner('Generating both PDF copies & syncing securely with cloud storage...'):
             try:
-                pdf_bytes, filename, generated_ref, final_total = generate_estimation_pdf_bytes(
-                    owner_input, address_input, date_input, float(amount_input), include_header=include_header_flag
+                # Generate Standard Version
+                pdf_bytes_std, filename_std, generated_ref, final_total = generate_estimation_pdf_bytes(
+                    owner_input, address_input, date_input, float(amount_input), include_header=True
+                )
+                # Generate No-Header Version
+                pdf_bytes_no_hdr, filename_no_hdr, _, _ = generate_estimation_pdf_bytes(
+                    owner_input, address_input, date_input, float(amount_input), include_header=False
                 )
                 
                 if supabase:
-                    cloud_url = upload_to_cloud(generated_ref, pdf_bytes, filename, owner_input, date_input, final_total)
+                    url_std, url_no_hdr = upload_to_cloud(
+                        generated_ref, pdf_bytes_std, pdf_bytes_no_hdr, 
+                        filename_std, filename_no_hdr, owner_input, date_input, final_total
+                    )
                     st.balloons()
-                    st.success(f"🎉 **Estimation Logged to Cloud Storage!** Ref NO: `{generated_ref}`")
+                    st.success(f"🎉 **Both Versions Logged to Cloud Storage!** Reference No: `{generated_ref}`")
                 else:
-                    st.success(f"✅ **Estimation Generated Locally!** Ref NO: `{generated_ref}`")
+                    st.success(f"✅ **Both Versions Generated Successfully Locally!** Reference No: `{generated_ref}`")
 
-                st.download_button(
-                    label="📄 DOWNLOAD OFFICIAL PDF ESTIMATION",
-                    data=pdf_bytes,
-                    file_name=filename,
-                    mime="application/pdf",
-                    type="primary",
-                    use_container_width=True
-                )
+                st.markdown("### 📥 Instant Downloads")
+                dl_col1, dl_col2 = st.columns(2)
+                with dl_col1:
+                    st.download_button(
+                        label="📄 Download Standard PDF",
+                        data=pdf_bytes_std,
+                        file_name=filename_std,
+                        mime="application/pdf",
+                        type="primary",
+                        use_container_width=True
+                    )
+                with dl_col2:
+                    st.download_button(
+                        label="📄 Download No-Header PDF",
+                        data=pdf_bytes_no_hdr,
+                        file_name=filename_no_hdr,
+                        mime="application/pdf",
+                        type="secondary",
+                        use_container_width=True
+                    )
 
             except Exception as e:
                 st.error(f"An error occurred: {e}")
@@ -549,7 +573,49 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
+# --- CLOUD LOOKUP & REFERENCE SEARCH SECTION ---
+st.markdown("---")
+st.markdown("### 🔍 Cloud Document Lookup & Reference Search")
+st.markdown("<p style='color:#94A3B8; font-size:0.95rem;'>Enter a Reference Number (e.g. `104502082026`) to retrieve and download both standard and no-header versions from the cloud database.</p>", unsafe_allow_html=True)
+
+lookup_col1, lookup_col2 = st.columns([3, 1])
+with lookup_col1:
+    search_ref = st.text_input("Enter Reference Number:", placeholder="e.g. 104502082026", label_visibility="collapsed")
+with lookup_col2:
+    search_triggered = st.button("🔍 Search Record", type="primary", use_container_width=True)
+
+if search_triggered and search_ref:
+    if not supabase:
+        st.warning("⚠️ Supabase client is not configured. Live cloud lookup is unavailable.")
+    else:
+        with st.spinner("Searching cloud records..."):
+            try:
+                response = supabase.table("estimation_logs").select("*").eq("ref_no", search_ref.strip()).execute()
+                records = response.data
+                
+                if records:
+                    rec = records[0]
+                    st.success(f"✅ **Record Found!** Client: **{rec.get('customer_name')}** | Date: {rec.get('est_date')} | Amount: ₹ {rec.get('amount'):,.2f}")
+                    
+                    sc1, sc2 = st.columns(2)
+                    with sc1:
+                        if rec.get('pdf_url'):
+                            st.markdown(f"[📥 Download Standard Copy (Cloud)]({rec.get('pdf_url')})")
+                        else:
+                            st.info("Standard copy URL not found in record.")
+                    with sc2:
+                        if rec.get('pdf_url_no_header'):
+                            st.markdown(f"[📥 Download No-Header Copy (Cloud)]({rec.get('pdf_url_no_header')})")
+                        else:
+                            st.info("No-header copy URL not found in record.")
+                else:
+                    st.error(f"❌ No record found matching Reference Number: `{search_ref}`")
+            except Exception as e:
+                st.error(f"Error executing lookup: {e}")
+
+
 # --- INTERACTIVE 3D ROOM VISUALIZER SELECTOR ---
+st.markdown("<br>", unsafe_allow_html=True)
 st.markdown("### 🥽 Explore Interactive 3D Room Visualizer Gallery")
 st.markdown("<p style='color:#94A3B8; font-size:0.95rem; margin-bottom:1.5rem;'>Select a zone below to inspect 3D spatial layouts, lighting configurations, and premium material finishes.</p>", unsafe_allow_html=True)
 
