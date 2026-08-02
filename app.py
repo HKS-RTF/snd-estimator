@@ -507,7 +507,7 @@ with col_stat4:
 
 # --- ADMIN LOGIN & RECENT HISTORY / LOOKUP SECTION ---
 st.markdown("---")
-st.markdown("### 🔐 Admin Portal: Recent History & Cloud Lookup")
+st.markdown("### 🔐 Admin Portal")
 
 if not st.session_state.is_admin_logged_in:
     with st.form("admin_login_form"):
