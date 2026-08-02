@@ -234,7 +234,7 @@ def upload_to_cloud(ref_no, pdf_bytes_standard, pdf_bytes_no_header, filename_st
     )
     url_no_hdr = supabase.storage.from_("estimations").get_public_url(path_no_hdr)
 
-    # Log record in database storing both URLs
+    # Log record using standard existing columns (storing both filenames/paths and URLs cleanly)
     data = {
         "ref_no": str(ref_no),
         "customer_name": str(owner.upper()),
@@ -243,7 +243,20 @@ def upload_to_cloud(ref_no, pdf_bytes_standard, pdf_bytes_no_header, filename_st
         "pdf_url": url_std,
         "pdf_url_no_header": url_no_hdr
     }
-    supabase.table("estimation_logs").upsert(data).execute()
+    
+    try:
+        supabase.table("estimation_logs").upsert(data).execute()
+    except Exception:
+        # Fallback if 'pdf_url_no_header' column has not been added to Supabase table yet
+        fallback_data = {
+            "ref_no": str(ref_no),
+            "customer_name": str(owner.upper()),
+            "est_date": str(est_date),
+            "amount": float(final_total),
+            "pdf_url": f"{url_std} || NO_HEADER::{url_no_hdr}"
+        }
+        supabase.table("estimation_logs").upsert(fallback_data).execute()
+
     return url_std, url_no_hdr
 
 
@@ -597,15 +610,24 @@ if search_triggered and search_ref:
                     rec = records[0]
                     st.success(f"✅ **Record Found!** Client: **{rec.get('customer_name')}** | Date: {rec.get('est_date')} | Amount: ₹ {rec.get('amount'):,.2f}")
                     
+                    url_std = rec.get('pdf_url')
+                    url_no_hdr = rec.get('pdf_url_no_header')
+                    
+                    # Handle fallback storage format if separate column isn't migrated yet
+                    if url_std and "|| NO_HEADER::" in url_std:
+                        parts = url_std.split("|| NO_HEADER::")
+                        url_std = parts[0]
+                        url_no_hdr = parts[1] if len(parts) > 1 else None
+
                     sc1, sc2 = st.columns(2)
                     with sc1:
-                        if rec.get('pdf_url'):
-                            st.markdown(f"[📥 Download Standard Copy (Cloud)]({rec.get('pdf_url')})")
+                        if url_std:
+                            st.markdown(f"[📥 Download Standard Copy (Cloud)]({url_std})")
                         else:
                             st.info("Standard copy URL not found in record.")
                     with sc2:
-                        if rec.get('pdf_url_no_header'):
-                            st.markdown(f"[📥 Download No-Header Copy (Cloud)]({rec.get('pdf_url_no_header')})")
+                        if url_no_hdr:
+                            st.markdown(f"[📥 Download No-Header Copy (Cloud)]({url_no_hdr})")
                         else:
                             st.info("No-header copy URL not found in record.")
                 else:
