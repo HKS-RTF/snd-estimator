@@ -233,7 +233,7 @@ def upload_to_cloud(ref_no, pdf_bytes, filename, owner, est_date, final_total):
     return pdf_url
 
 
-def generate_estimation_pdf_bytes(owner, address, est_date, target_total):
+def generate_estimation_pdf_bytes(owner, address, est_date, target_total, include_header=True):
     is_single_page = target_total < 1500000
     FIXED_ITEMS_MASTER = [
         ("Replacing sanitary fittings inside the toilets", "SETS", "SETS_UNITS", 0.08),
@@ -285,7 +285,7 @@ def generate_estimation_pdf_bytes(owner, address, est_date, target_total):
     now = datetime.now()
     ref_no = now.strftime("%H%M%d%m%Y")
     clean_owner_name = owner.replace(' ', '_').replace('&', 'AND')
-    filename = f"Estimation_{ref_no}_{clean_owner_name}.pdf"
+    filename = f"Estimation_{ref_no}_{clean_owner_name}{'_NoHeader' if not include_header else ''}.pdf"
 
     pdf_buffer = io.BytesIO()
     doc = SimpleDocTemplate(pdf_buffer, pagesize=letter, rightMargin=30, leftMargin=30, topMargin=15, bottomMargin=15)
@@ -327,13 +327,22 @@ def generate_estimation_pdf_bytes(owner, address, est_date, target_total):
         d = Drawing(60, 60, transform=[60.0/w, 0, 0, 60.0/h, 0, 0])
         d.add(qr)
         
-        header_text_flowables = [
-            Paragraph("SND INTERIOR & DESIGNS", title_style), Spacer(1, 2),
-            Paragraph("INTERIOR WORKS, DESIGN ESTIMATE, FLOOR VALUATIONS, BUILDING PLANS", sub_style),
-            Paragraph("#15, E BLOCK, SAHAKHAR NAGAR, BANGALORE-560092", sub_style),
-            Paragraph("EMAIL: contact@sndinteriors.com", contact_style),
-            Paragraph("GSTIN: 29ABCDE1234F1Z5", gstin_style),
-        ]
+        if include_header:
+            header_text_flowables = [
+                Paragraph("SND INTERIOR & DESIGNS", title_style), Spacer(1, 2),
+                Paragraph("INTERIOR WORKS, DESIGN ESTIMATE, FLOOR VALUATIONS, BUILDING PLANS", sub_style),
+                Paragraph("#15, E BLOCK, SAHAKHAR NAGAR, BANGALORE-560092", sub_style),
+                Paragraph("EMAIL: contact@sndinteriors.com", contact_style),
+                Paragraph("GSTIN: 29ABCDE1234F1Z5", gstin_style),
+            ]
+        else:
+            header_text_flowables = [
+                Spacer(1, 10),
+                Spacer(1, 10),
+                Spacer(1, 10),
+                Spacer(1, 10),
+                Spacer(1, 10)
+            ]
         header_table = Table([["", header_text_flowables, d]], colWidths=[75, 400, 75])
         header_table.setStyle(TableStyle([('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('LEFTPADDING', (0,0), (-1,-1), 0), ('RIGHTPADDING', (0,0), (-1,-1), 0)]))
         return [header_table, Spacer(1, 4)]
@@ -459,15 +468,25 @@ def show_quotation_dialog():
         gst_est = amount_input - subtotal_est
         st.info(f"📊 **Base Estimate:** ₹ {subtotal_est:,.2f} | **GST (18%):** ₹ {gst_est:,.2f} | **Total Final Payable:** ₹ {amount_input:,.2f}")
 
+        st.markdown("---")
+        st.subheader("📄 Document Format Selection")
+        format_choice = st.radio(
+            "Select PDF Generation Format:",
+            ["Standard Copy (With Full Header & Branding)", "Without Header Copy (Blank Header Space with QR code intact)"],
+            index=0
+        )
+
         st.caption("🔒 All estimations are processed securely. Digital copies are archived automatically to cloud storage.")
         
         submitted = st.form_submit_button("⚡ GENERATE QR-VERIFIED OFFICIAL PDF", type="primary", use_container_width=True)
 
     if submitted:
+        include_header_flag = True if "Standard Copy" in format_choice else False
+        
         with st.spinner('Generating document & syncing with cloud...'):
             try:
                 pdf_bytes, filename, generated_ref, final_total = generate_estimation_pdf_bytes(
-                    owner_input, address_input, date_input, float(amount_input)
+                    owner_input, address_input, date_input, float(amount_input), include_header=include_header_flag
                 )
                 
                 if supabase:
