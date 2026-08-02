@@ -46,50 +46,6 @@ st.markdown("""
         margin-bottom: 2rem;
     }
 
-    /* Grand 3D Hero Section */
-    .grand-hero-3d {
-        background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(9, 13, 22, 0.98) 100%), 
-                    url('https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=2000&q=80');
-        background-size: cover;
-        background-position: center;
-        border-radius: 28px;
-        padding: 5rem 3rem;
-        color: white;
-        text-align: center;
-        border: 1px solid rgba(217, 119, 6, 0.4);
-        box-shadow: 0 30px 60px -15px rgba(217, 119, 6, 0.2), inset 0 0 40px rgba(0,0,0,0.8);
-        margin-bottom: 3rem;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .brand-title {
-        font-family: 'Cinzel', serif;
-        font-size: 3.6rem;
-        font-weight: 900;
-        letter-spacing: 3px;
-        background: linear-gradient(135deg, #FDE68A 0%, #F59E0B 40%, #D97706 80%, #B45309 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin-bottom: 0.75rem;
-        text-shadow: 0 10px 30px rgba(217, 119, 6, 0.3);
-    }
-
-    .hero-badge {
-        background: rgba(217, 119, 6, 0.2);
-        border: 1px solid #D97706;
-        color: #FBBF24;
-        padding: 8px 24px;
-        border-radius: 50px;
-        font-size: 0.8rem;
-        font-weight: 700;
-        letter-spacing: 2.5px;
-        text-transform: uppercase;
-        display: inline-block;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 4px 15px rgba(217, 119, 6, 0.3);
-    }
-
     /* 3D Glassmorphism Cards & Containers */
     .glass-card-3d {
         background: linear-gradient(145deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.85) 100%);
@@ -105,44 +61,6 @@ st.markdown("""
         transform: translateY(-8px) scale(1.01);
         border-color: #D97706;
         box-shadow: 0 30px 60px rgba(217, 119, 6, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.3);
-    }
-
-    /* Trust Stats 3D Grid */
-    .trust-stats-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 20px;
-        margin-top: 2.5rem;
-    }
-
-    .stat-box-3d {
-        background: rgba(15, 23, 42, 0.8);
-        border: 1px solid rgba(217, 119, 6, 0.3);
-        border-radius: 18px;
-        padding: 1.5rem;
-        text-align: center;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-        transition: transform 0.3s ease;
-    }
-
-    .stat-box-3d:hover {
-        transform: translateY(-5px);
-        border-color: #F59E0B;
-    }
-
-    .stat-number {
-        font-size: 2rem;
-        font-weight: 900;
-        color: #F59E0B;
-        font-family: 'Cinzel', serif;
-    }
-    
-    .stat-label {
-        font-size: 0.75rem;
-        color: #94A3B8;
-        text-transform: uppercase;
-        letter-spacing: 1.5px;
-        margin-top: 4px;
     }
 
     /* Authentic Security Header inside Form */
@@ -560,35 +478,31 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# --- GRAND 3D HERO SECTION ---
-st.markdown("""
-<div class="grand-hero-3d">
-    <div class="hero-badge">&#128081; BENGALURU'S PREMIER 3D INTERIOR STUDIO</div>
-    <div class="brand-title">SND INTERIOR & DESIGNS</div>
-    <p style="color:#CBD5E1; font-size:1.2rem; max-width:850px; margin:0 auto; line-height:1.6;">
-        Immersive 3D Photorealistic Visualizations, 100% Factory-Finished Modular Kitchens, Designer Wardrobes, and Turnkey Luxury Home Interiors.
-    </p>
-    
-    <div class="trust-stats-grid">
-        <div class="stat-box-3d">
-            <div class="stat-number">500+</div>
-            <div class="stat-label">Luxury Homes Completed</div>
-        </div>
-        <div class="stat-box-3d">
-            <div class="stat-number">10 YRS</div>
-            <div class="stat-label">Material Warranty</div>
-        </div>
-        <div class="stat-box-3d">
-            <div class="stat-number">45 DAYS</div>
-            <div class="stat-label">Guaranteed Delivery</div>
-        </div>
-        <div class="stat-box-3d">
-            <div class="stat-number">100%</div>
-            <div class="stat-label">Transparent Pricing</div>
-        </div>
-    </div>
-</div>
-""", unsafe_allow_html=True)
+# --- NATIVE STREAMLIT HERO & WELCOME BANNER ---
+st.title("👑 SND INTERIOR & DESIGNS")
+st.subheader("Bengaluru's Premier 3D Interior Studio")
+st.write(
+    "Immersive 3D Photorealistic Visualizations, 100% Factory-Finished Modular Kitchens, "
+    "Designer Wardrobes, and Turnkey Luxury Home Interiors."
+)
+
+# High-definition sliding banner image / showcase
+st.image(
+    "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=2000&q=80",
+    caption="Turnkey Luxury Home Interiors - Bengaluru",
+    use_column_width=True
+)
+
+# Trust Stats Metrics Grid using native Streamlit columns
+col_stat1, col_stat2, col_stat3, col_stat4 = st.columns(4)
+with col_stat1:
+    st.metric(label="Luxury Homes Completed", value="500+")
+with col_stat2:
+    st.metric(label="Material Warranty", value="10 YRS")
+with col_stat3:
+    st.metric(label="Guaranteed Delivery", value="45 DAYS")
+with col_stat4:
+    st.metric(label="Transparent Pricing", value="100%")
 
 
 # --- ADMIN LOGIN & RECENT HISTORY / LOOKUP SECTION ---
