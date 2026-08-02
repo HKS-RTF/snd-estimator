@@ -136,7 +136,7 @@ def num_to_words_indian_clean(num):
     if num > 0: result += convert_below_thousand(num)
     return f"{result.strip()} RUPEES ONLY"
 
-def upload_to_cloud(ref_no, pdf_bytes_standard, pdf_bytes_no_header, filename_std, filename_no_hdr, owner, mobile, email, est_date, final_total):
+def upload_to_cloud(ref_no, pdf_bytes_standard, pdf_bytes_no_header, filename_std, filename_no_hdr, user_name, user_mobile, user_email, customer_name, est_date, final_total):
     if not supabase: return None, None
     
     path_std = f"pdf_estimations/{filename_std}"
@@ -157,9 +157,10 @@ def upload_to_cloud(ref_no, pdf_bytes_standard, pdf_bytes_no_header, filename_st
 
     data = {
         "ref_no": str(ref_no),
-        "customer_name": str(owner.upper()),
-        "mobile": str(mobile),
-        "email": str(email),
+        "user_name": str(user_name.upper()),
+        "user_mobile": str(user_mobile),
+        "user_email": str(user_email),
+        "customer_name": str(customer_name.upper()),
         "est_date": str(est_date),
         "amount": float(final_total),
         "pdf_url": url_std,
@@ -171,7 +172,7 @@ def upload_to_cloud(ref_no, pdf_bytes_standard, pdf_bytes_no_header, filename_st
     except Exception:
         fallback_data = {
             "ref_no": str(ref_no),
-            "customer_name": str(owner.upper()),
+            "customer_name": str(customer_name.upper()),
             "est_date": str(est_date),
             "amount": float(final_total),
             "pdf_url": f"{url_std} || NO_HEADER::{url_no_hdr}"
@@ -181,7 +182,7 @@ def upload_to_cloud(ref_no, pdf_bytes_standard, pdf_bytes_no_header, filename_st
     return url_std, url_no_hdr
 
 
-def generate_estimation_pdf_bytes(owner, address, est_date, target_total, include_header=True):
+def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total, include_header=True):
     is_single_page = target_total < 1500000
     FIXED_ITEMS_MASTER = [
         ("Replacing sanitary fittings inside the toilets", "SETS", "SETS_UNITS", 0.08),
@@ -232,8 +233,8 @@ def generate_estimation_pdf_bytes(owner, address, est_date, target_total, includ
 
     now = datetime.now()
     ref_no = now.strftime("%H%M%d%m%Y")
-    clean_owner_name = owner.replace(' ', '_').replace('&', 'AND')
-    filename = f"Estimation_{ref_no}_{clean_owner_name}{'_NoHeader' if not include_header else ''}.pdf"
+    clean_customer_name = customer_name.replace(' ', '_').replace('&', 'AND')
+    filename = f"Estimation_{ref_no}_{clean_customer_name}{'_NoHeader' if not include_header else ''}.pdf"
 
     pdf_buffer = io.BytesIO()
     doc = SimpleDocTemplate(pdf_buffer, pagesize=letter, rightMargin=30, leftMargin=30, topMargin=15, bottomMargin=15)
@@ -268,7 +269,7 @@ def generate_estimation_pdf_bytes(owner, address, est_date, target_total, includ
     elements = []
 
     def create_header_with_qr():
-        qr_data = f"CUSTOMER NAME: {owner.upper()}\nADDRESS: {address.upper()}\nREF NO: {ref_no}\nDATE: {est_date}\nESTIMATION AMOUNT: Rs. {final_total:,}\nEMAIL: contact@sndinteriors.com"
+        qr_data = f"CUSTOMER NAME: {customer_name.upper()}\nADDRESS: {address.upper()}\nREF NO: {ref_no}\nDATE: {est_date}\nESTIMATION AMOUNT: Rs. {final_total:,}\nEMAIL: contact@sndinteriors.com"
         qr = QrCodeWidget(qr_data)
         qr_bounds = qr.getBounds()
         w, h = qr_bounds[2] - qr_bounds[0], qr_bounds[3] - qr_bounds[1]
@@ -302,7 +303,7 @@ def generate_estimation_pdf_bytes(owner, address, est_date, target_total, includ
 
     box_content = [[Paragraph("ESTIMATION FOR RENOVATION & INTERIOR DESIGN WORK AT", box_hdr_style)], [Paragraph("RESIDENTIAL FLAT AT", box_hdr_style)], [Paragraph(addr_line_1.upper(), box_detail_style)]]
     if addr_line_2: box_content.append([Paragraph(addr_line_2.upper(), box_detail_style)])
-    box_content.append([Paragraph(f"OWNER: - {owner.upper()}", box_detail_style)])
+    box_content.append([Paragraph(f"OWNER: - {customer_name.upper()}", box_detail_style)])
 
     project_box = Table(box_content, colWidths=[550])
     project_box.setStyle(TableStyle([('BOX', (0,0), (-1,-1), 2, BORDER_BLUE), ('ROUNDEDCORNERS', [8, 8, 8, 8]), ('TOPPADDING', (0,0), (-1,-1), 3), ('BOTTOMPADDING', (0,0), (-1,-1), 3)]))
@@ -370,7 +371,7 @@ def generate_estimation_pdf_bytes(owner, address, est_date, target_total, includ
     return pdf_bytes, filename, ref_no, final_total
 
 
-# --- AUTHENTIC MODAL POPUP DIALOG WITH USER DETAILS & INSTRUCTIONS ---
+# --- AUTHENTIC MODAL POPUP DIALOG WITH USER & CUSTOMER DETAILS ---
 @st.dialog("✨ OFFICIAL 3D INTERIOR DESIGN QUOTATION GENERATOR", width="large")
 def show_quotation_dialog():
     st.markdown("""
@@ -384,17 +385,25 @@ def show_quotation_dialog():
     """, unsafe_allow_html=True)
 
     with st.form("popup_estimation_form"):
-        st.subheader("👤 Client & Contact Details")
+        st.subheader("👤 User / Submitter Details")
+        col_u1, col_u2 = st.columns(2)
+        with col_u1:
+            user_name = st.text_input("User / Agent Name *", value="HARI")
+            user_mobile = st.text_input("User Mobile Number *", value="7338425213")
+        with col_u2:
+            user_email = st.text_input("User Email ID *", value="hari@sndinteriors.com")
+
+        st.markdown("---")
+        st.subheader("🏠 Customer & Property Details (Printed on Quotation)")
         col_c1, col_c2 = st.columns(2)
         with col_c1:
-            owner_input = st.text_input("Full Name of Property Owner *", value="KUSHAL ANAND & HKS")
-            mobile_input = st.text_input("Mobile Number *", value="9876543210")
+            customer_name = st.text_input("Customer Full Name *", value="KUSHAL ANAND & HKS")
+            date_input = st.text_input("Quotation Date", value=datetime.now().strftime("%d-%m-%Y"))
         with col_c2:
-            email_input = st.text_input("Email ID *", value="kushal@example.com")
-            date_input = st.text_input("Date of Issue", value=datetime.now().strftime("%d-%m-%Y"))
+            pass # Placeholder for layout alignment if needed
 
         address_input = st.text_area(
-            "Property / Site Address in Bengaluru *", 
+            "Customer Property / Site Address in Bengaluru *", 
             value="BIRLA TRIMAYA PHASE 4 FLAT-1205, T-6, F-12, DEVANAHALLI CHIKKAJALA, BENGALURU"
         )
 
@@ -420,16 +429,17 @@ def show_quotation_dialog():
         with st.spinner('Generating both PDF copies & syncing securely with cloud storage...'):
             try:
                 pdf_bytes_std, filename_std, generated_ref, final_total = generate_estimation_pdf_bytes(
-                    owner_input, address_input, date_input, float(amount_input), include_header=True
+                    customer_name, address_input, date_input, float(amount_input), include_header=True
                 )
                 pdf_bytes_no_hdr, filename_no_hdr, _, _ = generate_estimation_pdf_bytes(
-                    owner_input, address_input, date_input, float(amount_input), include_header=False
+                    customer_name, address_input, date_input, float(amount_input), include_header=False
                 )
                 
                 if supabase:
                     upload_to_cloud(
                         generated_ref, pdf_bytes_std, pdf_bytes_no_hdr, 
-                        filename_std, filename_no_hdr, owner_input, mobile_input, email_input, date_input, final_total
+                        filename_std, filename_no_hdr, user_name, user_mobile, user_email, 
+                        customer_name, date_input, final_total
                     )
                 
                 st.balloons()
@@ -507,7 +517,7 @@ with col_stat4:
 
 # --- ADMIN LOGIN & RECENT HISTORY / LOOKUP SECTION ---
 st.markdown("---")
-st.markdown("### 🔐 Admin Portal")
+st.markdown("### 🔐 Admin Portal: Recent History & Cloud Lookup")
 
 if not st.session_state.is_admin_logged_in:
     with st.form("admin_login_form"):
@@ -559,7 +569,7 @@ else:
                     records = response.data
                     if records:
                         rec = records[0]
-                        st.success(f"✅ **Record Found!** Client: **{rec.get('customer_name')}** | Mobile: {rec.get('mobile', 'N/A')} | Date: {rec.get('est_date')} | Amount: ₹ {rec.get('amount'):,.2f}")
+                        st.success(f"✅ **Record Found!** Customer: **{rec.get('customer_name')}** | User: {rec.get('user_name', 'N/A')} | Date: {rec.get('est_date')} | Amount: ₹ {rec.get('amount'):,.2f}")
                         
                         url_std = rec.get('pdf_url')
                         url_no_hdr = rec.get('pdf_url_no_header')
