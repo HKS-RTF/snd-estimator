@@ -46,35 +46,123 @@ st.markdown("""
         margin-bottom: 2rem;
     }
 
-    # --- GRAND 3D HERO SECTION ---
-st.markdown("""
-<div class="grand-hero-3d">
-    <div class="hero-badge">👑 BENGALURU'S PREMIER 3D INTERIOR STUDIO</div>
-    <div class="brand-title">SND INTERIOR & DESIGNS</div>
-    <p style="color:#CBD5E1; font-size:1.2rem; max-width:850px; margin:0 auto; line-height:1.6;">
-        Immersive 3D Photorealistic Visualizations, 100% Factory-Finished Modular Kitchens, Designer Wardrobes, and Turnkey Luxury Home Interiors.
-    </p>
+    /* Grand 3D Hero Section */
+    .grand-hero-3d {
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(9, 13, 22, 0.98) 100%), 
+                    url('https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=2000&q=80');
+        background-size: cover;
+        background-position: center;
+        border-radius: 28px;
+        padding: 5rem 3rem;
+        color: white;
+        text-align: center;
+        border: 1px solid rgba(217, 119, 6, 0.4);
+        box-shadow: 0 30px 60px -15px rgba(217, 119, 6, 0.2), inset 0 0 40px rgba(0,0,0,0.8);
+        margin-bottom: 3rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .brand-title {
+        font-family: 'Cinzel', serif;
+        font-size: 3.6rem;
+        font-weight: 900;
+        letter-spacing: 3px;
+        background: linear-gradient(135deg, #FDE68A 0%, #F59E0B 40%, #D97706 80%, #B45309 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.75rem;
+        text-shadow: 0 10px 30px rgba(217, 119, 6, 0.3);
+    }
+
+    .hero-badge {
+        background: rgba(217, 119, 6, 0.2);
+        border: 1px solid #D97706;
+        color: #FBBF24;
+        padding: 8px 24px;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        letter-spacing: 2.5px;
+        text-transform: uppercase;
+        display: inline-block;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 15px rgba(217, 119, 6, 0.3);
+    }
+
+    /* 3D Glassmorphism Cards & Containers */
+    .glass-card-3d {
+        background: linear-gradient(145deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.85) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 24px;
+        padding: 2rem;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        margin-bottom: 1.5rem;
+    }
+
+    .glass-card-3d:hover {
+        transform: translateY(-8px) scale(1.01);
+        border-color: #D97706;
+        box-shadow: 0 30px 60px rgba(217, 119, 6, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+
+    /* Trust Stats 3D Grid */
+    .trust-stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+        margin-top: 2.5rem;
+    }
+
+    .stat-box-3d {
+        background: rgba(15, 23, 42, 0.8);
+        border: 1px solid rgba(217, 119, 6, 0.3);
+        border-radius: 18px;
+        padding: 1.5rem;
+        text-align: center;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+        transition: transform 0.3s ease;
+    }
+
+    .stat-box-3d:hover {
+        transform: translateY(-5px);
+        border-color: #F59E0B;
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 900;
+        color: #F59E0B;
+        font-family: 'Cinzel', serif;
+    }
     
-    <div class="trust-stats-grid">
-        <div class="stat-box-3d">
-            <div class="stat-number">500+</div>
-            <div class="stat-label">Luxury Homes Completed</div>
-        </div>
-        <div class="stat-box-3d">
-            <div class="stat-number">10 YRS</div>
-            <div class="stat-label">Material Warranty</div>
-        </div>
-        <div class="stat-box-3d">
-            <div class="stat-number">45 DAYS</div>
-            <div class="stat-label">Guaranteed Delivery</div>
-        </div>
-        <div class="stat-box-3d">
-            <div class="stat-number">100%</div>
-            <div class="stat-label">Transparent Pricing</div>
-        </div>
-    </div>
-</div>
+    .stat-label {
+        font-size: 0.75rem;
+        color: #94A3B8;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        margin-top: 4px;
+    }
+
+    /* Authentic Security Header inside Form */
+    .auth-banner {
+        background: linear-gradient(135deg, #1E1B4B 0%, #0F172A 100%);
+        border: 1px solid #6366F1;
+        border-radius: 16px;
+        padding: 1.25rem 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 10px 25px rgba(99, 102, 241, 0.2);
+    }
+
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+</style>
 """, unsafe_allow_html=True)
+
 
 # --- Initialize Session State for Login ---
 if "is_admin_logged_in" not in st.session_state:
@@ -429,7 +517,6 @@ def show_quotation_dialog():
                 st.balloons()
                 st.success(f"🎉 **Quotation Generated Successfully!**")
                 
-                # Display specific messaging requested
                 st.markdown(f"""
                 <div style="background: rgba(217, 119, 6, 0.15); border: 1px solid #D97706; padding: 20px; border-radius: 14px; margin: 15px 0;">
                     <h3 style="color: #F59E0B; margin-top: 0;">REF NO:- {generated_ref}</h3>
@@ -476,7 +563,7 @@ st.markdown("""
 # --- GRAND 3D HERO SECTION ---
 st.markdown("""
 <div class="grand-hero-3d">
-    <div class="hero-badge">👑 BENGALURU'S PREMIER 3D INTERIOR STUDIO</div>
+    <div class="hero-badge">&#128081; BENGALURU'S PREMIER 3D INTERIOR STUDIO</div>
     <div class="brand-title">SND INTERIOR & DESIGNS</div>
     <p style="color:#CBD5E1; font-size:1.2rem; max-width:850px; margin:0 auto; line-height:1.6;">
         Immersive 3D Photorealistic Visualizations, 100% Factory-Finished Modular Kitchens, Designer Wardrobes, and Turnkey Luxury Home Interiors.
