@@ -678,7 +678,7 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
 
 
 # --- AUTHENTIC MODAL POPUP DIALOG FOR ESTIMATION ---
-@st.dialog("⚡ COMMERCIAL 3D ESTIMATION GENERATOR", width="large")
+@st.dialog("⚡ COMMERCIAL & RESIDENTIAL ESTIMATION GENERATOR", width="large")
 def show_quotation_dialog():
     st.markdown("""
     <div class="commercial-auth-banner">
