@@ -730,7 +730,7 @@ def show_quotation_dialog():
         gst_est = amount_input - subtotal_est
         st.info(f"📊 **Base Estimate:** ₹ {subtotal_est:,.2f} | **GST (18%):** ₹ {gst_est:,.2f} | **Total Final Payable:** ₹ {amount_input:,.2f}")
 
-        submitted = st.form_submit_button("⚡ GENERATE ENCRYPTED PDF", type="primary", use_container_width=True)
+        submitted = st.form_submit_button("⚡ GENERATE YOUR QUATATION", type="primary", use_container_width=True)
 
     if submitted:
         if not user_name.strip() or not user_mobile.strip() or not user_email.strip() or not customer_name.strip() or not address_input.strip():
