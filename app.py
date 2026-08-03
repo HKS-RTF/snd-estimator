@@ -858,7 +858,7 @@ with col_tick2:
 # --- TOP GET YOUR QUOTATION NOW BUTTON ---
 col_top_btn1, col_top_btn2, col_top_btn3 = st.columns([2, 2, 2])
 with col_top_btn2:
-    if st.button("⚡ GET YOUR QUOTATION NOW (TOP)", type="primary", use_container_width=True):
+    if st.button("⚡ GET YOUR QUOTATION NOW ", type="primary", use_container_width=True):
         show_quotation_dialog()
 
 st.markdown("<br>", unsafe_allow_html=True)
