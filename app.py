@@ -257,6 +257,47 @@ st.markdown("""
         letter-spacing: 0.5px;
     }
 
+    /* Static Grid Gallery Styles */
+    .static-gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 16px;
+        margin-top: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .static-gallery-item {
+        background: rgba(15, 23, 42, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        transition: all 0.3s ease;
+    }
+
+    .static-gallery-item:hover {
+        transform: translateY(-5px);
+        border-color: rgba(245, 158, 11, 0.5);
+        box-shadow: 0 15px 35px rgba(245, 158, 11, 0.2);
+    }
+
+    .static-gallery-item img {
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+        display: block;
+    }
+
+    .static-gallery-label {
+        padding: 10px 12px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #F8FAFC;
+        text-align: center;
+        font-family: 'Outfit', sans-serif;
+        background: linear-gradient(to bottom, rgba(15, 23, 42, 0.9), rgba(3, 7, 18, 0.95));
+    }
+
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
 </style>
@@ -738,7 +779,7 @@ with col_tick2:
 st.markdown("<br>", unsafe_allow_html=True)
 
 
-# --- 3D GRADIENT HERO SECTION WITH 10+ AUTO-SLIDING INTERIOR IMAGES ---
+# --- 3D GRADIENT HERO SECTION WITH CAROUSEL ---
 col_hero1, col_hero2 = st.columns([1.2, 1])
 
 with col_hero1:
@@ -755,7 +796,7 @@ with col_hero1:
     """, unsafe_allow_html=True)
 
 with col_hero2:
-    # Expanded Auto-sliding showcase slideshow using standard HTML <img> tags for reliable loading
+    # Auto-sliding showcase slideshow using standard HTML <img> tags for reliable loading
     st.markdown("""
     <div class="slider-box" id="interiorCarousel">
         <div class="carousel-slide active">
@@ -816,6 +857,57 @@ with col_hero2:
         setInterval(cycleSlides, 3500);
     </script>
     """, unsafe_allow_html=True)
+
+
+# --- STATIC & FIXED 10 IMAGES GALLERY SHOWCASE ---
+st.markdown("<br>", unsafe_allow_html=True)
+st.markdown("### 🏛️ Portfolio Master Collection (10 Fixed Showcase Galleries)")
+st.markdown("<p style='color:#94A3B8; font-size:0.95rem; margin-bottom:1rem;'>Explore our curated permanent catalog of architectural finishes, structural modules, and luxury interior spaces.</p>", unsafe_allow_html=True)
+
+st.markdown("""
+<div class="static-gallery-grid">
+    <div class="static-gallery-item">
+        <img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=600&q=80" alt="Living Room">
+        <div class="static-gallery-label">01. Living Lounge</div>
+    </div>
+    <div class="static-gallery-item">
+        <img src="https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=600&q=80" alt="Kitchen">
+        <div class="static-gallery-label">02. Modular Kitchen</div>
+    </div>
+    <div class="static-gallery-item">
+        <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80" alt="Fluted Panels">
+        <div class="static-gallery-label">03. Fluted Panels</div>
+    </div>
+    <div class="static-gallery-item">
+        <img src="https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=600&q=80" alt="Glass Wardrobes">
+        <div class="static-gallery-label">04. Glass Wardrobes</div>
+    </div>
+    <div class="static-gallery-item">
+        <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=600&q=80" alt="Italian Marble">
+        <div class="static-gallery-label">05. Italian Marble</div>
+    </div>
+    <div class="static-gallery-item">
+        <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=600&q=80" alt="Minimalist Bedroom">
+        <div class="static-gallery-label">06. Minimalist Bed</div>
+    </div>
+    <div class="static-gallery-item">
+        <img src="https://images.unsplash.com/photo-1616046229478-9901c5536a45?auto=format&fit=crop&w=600&q=80" alt="Home Office">
+        <div class="static-gallery-label">07. Study Suite</div>
+    </div>
+    <div class="static-gallery-item">
+        <img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=600&q=80" alt="Bathroom Vanity">
+        <div class="static-gallery-label">08. Luxury Vanity</div>
+    </div>
+    <div class="static-gallery-item">
+        <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=600&q=80" alt="False Ceiling">
+        <div class="static-gallery-label">09. Cove Lighting</div>
+    </div>
+    <div class="static-gallery-item">
+        <img src="https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=600&q=80" alt="Balcony Decking">
+        <div class="static-gallery-label">10. Balcony Decking</div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
 
 # --- Commercial Metrics Grid ---
