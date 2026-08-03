@@ -210,6 +210,47 @@ st.markdown("""
         box-shadow: 0 15px 35px rgba(99, 102, 241, 0.2);
     }
 
+    /* Auto Sliding Interior Showcase Slideshow CSS */
+    .slider-container {
+        position: relative;
+        width: 100%;
+        height: 380px;
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 30px rgba(99, 102, 241, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .slide {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        transition: opacity 1s ease-in-out;
+        background-size: cover;
+        background-position: center;
+    }
+
+    .slide.active {
+        opacity: 1;
+    }
+
+    .slide-caption {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(to top, rgba(3, 7, 18, 0.9), transparent);
+        padding: 25px 25px 20px 25px;
+        color: #fff;
+        font-family: 'Outfit', sans-serif;
+        font-weight: 700;
+        font-size: 1.25rem;
+        letter-spacing: 0.5px;
+    }
+
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
 </style>
@@ -222,6 +263,8 @@ st.markdown("""
 # --- Initialize Session State ---
 if "is_admin_logged_in" not in st.session_state:
     st.session_state.is_admin_logged_in = False
+if "show_admin_modal" not in st.session_state:
+    st.session_state.show_admin_modal = False
 
 
 # --- Initialize Supabase Client ---
@@ -508,7 +551,7 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
     return pdf_bytes, filename, ref_no, final_total
 
 
-# --- AUTHENTIC MODAL POPUP DIALOG ---
+# --- AUTHENTIC MODAL POPUP DIALOG FOR ESTIMATION ---
 @st.dialog("⚡ COMMERCIAL 3D ESTIMATION GENERATOR", width="large")
 def show_quotation_dialog():
     st.markdown("""
@@ -600,29 +643,144 @@ def show_quotation_dialog():
                 st.error(f"An error occurred: {e}")
 
 
-# --- COMMERCIAL TICKER STATUS BAR ---
-st.markdown("""
-<div class="commercial-ticker">
-    <div><span class="live-dot"></span>LIVE COMMERCIAL HUB: BENGALURU (SAHAKARNAGAR | HSR | WHITEFIELD)</div>
-    <div>SUPPORT HOTLINE: +91 98765 43210 &nbsp;|&nbsp; SLA: 99.9% UPTIME</div>
-</div>
-""", unsafe_allow_html=True)
+# --- ADMIN MODAL POPUP DIALOG ---
+@st.dialog("🔐 ENTERPRISE ADMIN PORTAL", width="large")
+def show_admin_dialog():
+    if not st.session_state.is_admin_logged_in:
+        with st.form("admin_login_form"):
+            st.markdown("<p style='color:#94A3B8;'>Authenticate with enterprise credentials to access live quotation databases and audit logs.</p>", unsafe_allow_html=True)
+            login_user = st.text_input("Username", value="")
+            login_pass = st.text_input("Password", type="password", value="")
+            login_submit = st.form_submit_button("🔑 Authorize Access", type="primary")
+
+        if login_submit:
+            if login_user == "HARI1109" and login_pass == "73384@Hks":
+                st.session_state.is_admin_logged_in = True
+                st.success("🎉 Authorization successful!")
+                st.rerun()
+            else:
+                st.error("❌ Invalid enterprise credentials.")
+    else:
+        st.success("🔓 Authenticated as Administrator (HARI1109)")
+        if st.button("🔒 Terminate Session"):
+            st.session_state.is_admin_logged_in = False
+            st.rerun()
+
+        st.markdown("---")
+        tab_history, tab_lookup = st.tabs(["📊 Live Estimation Records", "🔍 Document Cloud Lookup"])
+
+        with tab_history:
+            st.markdown("#### 📋 Recent Quotations Ledger")
+            if not supabase:
+                st.warning("⚠️ Supabase connection inactive.")
+            else:
+                try:
+                    res = supabase.table("estimation_logs").select("*").order("est_date", desc=True).limit(20).execute()
+                    data = res.data
+                    if data:
+                        st.dataframe(data, use_container_width=True)
+                    else:
+                        st.info("No records found.")
+                except Exception as e:
+                    st.error(f"Database error: {e}")
+
+        with tab_lookup:
+            st.markdown("#### 🔎 Reference Code Cloud Search")
+            search_ref = st.text_input("Enter Reference Number:", placeholder="e.g. 104502082026")
+            if st.button("Query Cloud Database", type="primary"):
+                if not supabase:
+                    st.warning("⚠️ Supabase connection inactive.")
+                else:
+                    try:
+                        response = supabase.table("estimation_logs").select("*").eq("ref_no", search_ref.strip()).execute()
+                        records = response.data
+                        if records:
+                            rec = records[0]
+                            st.success(f"✅ **Record Verified!** Customer: **{rec.get('customer_name')}** | Agent: {rec.get('user_name', 'N/A')} | Date: {rec.get('est_date')} | Total: ₹ {rec.get('amount'):,.2f}")
+                            
+                            url_std = rec.get('pdf_url')
+                            url_no_hdr = rec.get('pdf_url_no_header')
+                            if url_std and "|| NO_HEADER::" in url_std:
+                                parts = url_std.split("|| NO_HEADER::")
+                                url_std = parts[0]
+                                url_no_hdr = parts[1] if len(parts) > 1 else None
+
+                            sc1, sc2 = st.columns(2)
+                            with sc1:
+                                if url_std: st.markdown(f"[📥 Download Standard PDF (Cloud)]({url_std})")
+                            with sc2:
+                                if url_no_hdr: st.markdown(f"[📥 Download Clean PDF (Cloud)]({url_no_hdr})")
+                        else:
+                            st.error(f"❌ No records matched reference: `{search_ref}`")
+                    except Exception as e:
+                        st.error(f"Query execution failed: {e}")
 
 
-# --- 3D GRADIENT HERO SECTION ---
-st.markdown("""
-<div class="dashboard-card-3d" style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.85) 100%), url('https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=2000&q=80'); background-blend-mode: overlay; background-size: cover; background-position: center; padding: 4rem 3rem;">
-    <div style="max-width: 750px;">
+# --- COMMERCIAL TICKER STATUS BAR WITH LOGIN ICON BUTTON ---
+col_tick1, col_tick2 = st.columns([10, 1])
+with col_tick1:
+    st.markdown("""
+    <div class="commercial-ticker" style="margin-bottom:0;">
+        <div><span class="live-dot"></span>LIVE COMMERCIAL HUB: BENGALURU (SAHAKARNAGAR | HSR | WHITEFIELD)</div>
+        <div>SUPPORT HOTLINE: +91 98765 43210 &nbsp;|&nbsp; SLA: 99.9% UPTIME</div>
+    </div>
+    """, unsafe_allow_html=True)
+with col_tick2:
+    if st.button("🔐", help="Enterprise Admin Portal Login"):
+        show_admin_dialog()
+
+st.markdown("<br>", unsafe_allow_html=True)
+
+
+# --- 3D GRADIENT HERO SECTION WITH AUTO-SLIDING INTERIOR IMAGES ---
+col_hero1, col_hero2 = st.columns([1.2, 1])
+
+with col_hero1:
+    st.markdown("""
+    <div class="dashboard-card-3d" style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.85) 100%); padding: 3rem 2.5rem; height: 100%;">
         <div style="font-family:'Space Grotesk', sans-serif; font-weight: 800; font-size: 0.85rem; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 12px;">
             <span class="gradient-text-gold">✦ ENTERPRISE 3D INTERIOR INTELLIGENCE</span>
         </div>
-        <h1 class="hero-title-3d">SND INTERIOR & DESIGNS</h1>
-        <p style="color: #CBD5E1; font-size: 1.15rem; line-height: 1.7; margin-bottom: 2rem;">
+        <h1 class="hero-title-3d" style="font-size: 3rem;">SND INTERIOR & DESIGNS</h1>
+        <p style="color: #CBD5E1; font-size: 1.1rem; line-height: 1.7; margin-bottom: 2rem;">
             Commercial-grade photorealistic 3D spatial simulations, automated GST quotations, and turnkey interior manufacturing engineered for elite residential developments across Bengaluru.
         </p>
     </div>
-</div>
-""", unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
+
+with col_hero2:
+    # Auto-sliding showcase slideshow using HTML/CSS + Javascript snippet injected into Streamlit
+    st.markdown("""
+    <div class="slider-container" id="interiorSlider">
+        <div class="slide active" style="background-image: url('https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1000&q=80');">
+            <div class="slide-caption">Luxury Living Room & Entertainment Lounge</div>
+        </div>
+        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1000&q=80');">
+            <div class="slide-caption">Modular German Acrylic Kitchen</div>
+        </div>
+        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80');">
+            <div class="slide-caption">Acoustic Fluted Panel Wall Decor</div>
+        </div>
+        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1000&q=80');">
+            <div class="slide-caption">Floor-to-Ceiling Tinted Glass Wardrobes</div>
+        </div>
+        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1000&q=80');">
+            <div class="slide-caption">Imported Italian Marble & Wood Paneling</div>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('#interiorSlider .slide');
+        function nextSlide() {
+            if(slides.length === 0) return;
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }
+        setInterval(nextSlide, 3500);
+    </script>
+    """, unsafe_allow_html=True)
 
 
 # --- Commercial Metrics Grid ---
@@ -655,80 +813,6 @@ with col_m4:
         <div style="font-size: 0.8rem; color: #94A3B8; font-weight: 700; text-transform: uppercase; margin-top: 5px;">Encrypted Sync</div>
     </div>
     """, unsafe_allow_html=True)
-
-
-# --- ADMIN PORTAL SECTION ---
-st.markdown("<br>", unsafe_allow_html=True)
-st.markdown("### 🔐 Enterprise Admin Control & Cloud Records")
-
-if not st.session_state.is_admin_logged_in:
-    with st.form("admin_login_form"):
-        st.markdown("<p style='color:#94A3B8;'>Authenticate with enterprise credentials to access live quotation databases and audit logs.</p>", unsafe_allow_html=True)
-        login_user = st.text_input("Username", value="")
-        login_pass = st.text_input("Password", type="password", value="")
-        login_submit = st.form_submit_button("🔑 Authorize Access", type="primary")
-
-    if login_submit:
-        if login_user == "HARI1109" and login_pass == "73384@Hks":
-            st.session_state.is_admin_logged_in = True
-            st.success("🎉 Authorization successful! Loading dashboard...")
-            st.rerun()
-        else:
-            st.error("❌ Invalid enterprise credentials.")
-else:
-    st.success("🔓 Authenticated as Administrator (HARI1109)")
-    if st.button("🔒 Terminate Session"):
-        st.session_state.is_admin_logged_in = False
-        st.rerun()
-
-    st.markdown("---")
-    tab_history, tab_lookup = st.tabs(["📊 Live Estimation Records", "🔍 Document Cloud Lookup"])
-
-    with tab_history:
-        st.markdown("#### 📋 Recent Quotations Ledger")
-        if not supabase:
-            st.warning("⚠️ Supabase connection inactive.")
-        else:
-            try:
-                res = supabase.table("estimation_logs").select("*").order("est_date", desc=True).limit(20).execute()
-                data = res.data
-                if data:
-                    st.dataframe(data, use_container_width=True)
-                else:
-                    st.info("No records found.")
-            except Exception as e:
-                st.error(f"Database error: {e}")
-
-    with tab_lookup:
-        st.markdown("#### 🔎 Reference Code Cloud Search")
-        search_ref = st.text_input("Enter Reference Number:", placeholder="e.g. 104502082026")
-        if st.button("Query Cloud Database", type="primary"):
-            if not supabase:
-                st.warning("⚠️ Supabase connection inactive.")
-            else:
-                try:
-                    response = supabase.table("estimation_logs").select("*").eq("ref_no", search_ref.strip()).execute()
-                    records = response.data
-                    if records:
-                        rec = records[0]
-                        st.success(f"✅ **Record Verified!** Customer: **{rec.get('customer_name')}** | Agent: {rec.get('user_name', 'N/A')} | Date: {rec.get('est_date')} | Total: ₹ {rec.get('amount'):,.2f}")
-                        
-                        url_std = rec.get('pdf_url')
-                        url_no_hdr = rec.get('pdf_url_no_header')
-                        if url_std and "|| NO_HEADER::" in url_std:
-                            parts = url_std.split("|| NO_HEADER::")
-                            url_std = parts[0]
-                            url_no_hdr = parts[1] if len(parts) > 1 else None
-
-                        sc1, sc2 = st.columns(2)
-                        with sc1:
-                            if url_std: st.markdown(f"[📥 Download Standard PDF (Cloud)]({url_std})")
-                        with sc2:
-                            if url_no_hdr: st.markdown(f"[📥 Download Clean PDF (Cloud)]({url_no_hdr})")
-                    else:
-                        st.error(f"❌ No records matched reference: `{search_ref}`")
-                except Exception as e:
-                    st.error(f"Query execution failed: {e}")
 
 
 # --- INTERACTIVE 3D ANIMATED / GIF VISUALIZER ---
