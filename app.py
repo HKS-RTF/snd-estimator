@@ -140,7 +140,7 @@ st.markdown("""
         box-shadow: 0 40px 80px rgba(245, 158, 11, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.25);
     }
 
-    /* Interactive 3D Visualizer GIF Frame Container */
+    /* Interactive 3D Visualizer Frame Container */
     .visualizer-frame-3d {
         border-radius: 20px;
         overflow: hidden;
@@ -210,8 +210,8 @@ st.markdown("""
         box-shadow: 0 15px 35px rgba(99, 102, 241, 0.2);
     }
 
-    /* Auto Sliding Interior Showcase Slideshow CSS */
-    .slider-container {
+    /* Robust Direct IMG Carousel Styles */
+    .slider-box {
         position: relative;
         width: 100%;
         height: 380px;
@@ -219,9 +219,10 @@ st.markdown("""
         overflow: hidden;
         box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 30px rgba(99, 102, 241, 0.2);
         border: 1px solid rgba(255, 255, 255, 0.1);
+        background: #0b0f19;
     }
 
-    .slide {
+    .carousel-slide {
         position: absolute;
         top: 0;
         left: 0;
@@ -229,21 +230,26 @@ st.markdown("""
         height: 100%;
         opacity: 0;
         transition: opacity 1s ease-in-out;
-        background-size: cover;
-        background-position: center;
     }
 
-    .slide.active {
+    .carousel-slide.active {
         opacity: 1;
     }
 
-    .slide-caption {
+    .carousel-slide img {
+        width: 100%;
+        height: 380px;
+        object-fit: cover;
+        display: block;
+    }
+
+    .carousel-caption {
         position: absolute;
         bottom: 0;
         left: 0;
         right: 0;
-        background: linear-gradient(to top, rgba(3, 7, 18, 0.9), transparent);
-        padding: 25px 25px 20px 25px;
+        background: linear-gradient(to top, rgba(3, 7, 18, 0.95), transparent);
+        padding: 30px 25px 20px 25px;
         color: #fff;
         font-family: 'Outfit', sans-serif;
         font-weight: 700;
@@ -749,54 +755,65 @@ with col_hero1:
     """, unsafe_allow_html=True)
 
 with col_hero2:
-    # Expanded Auto-sliding showcase slideshow with 10+ high-end interior items
+    # Expanded Auto-sliding showcase slideshow using standard HTML <img> tags for reliable loading
     st.markdown("""
-    <div class="slider-container" id="interiorSlider">
-        <div class="slide active" style="background-image: url('https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1000&q=80');">
-            <div class="slide-caption">01 - Luxury Living Room & Entertainment Lounge</div>
+    <div class="slider-box" id="interiorCarousel">
+        <div class="carousel-slide active">
+            <img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1000&q=80" alt="Luxury Living Room">
+            <div class="carousel-caption">01 - Luxury Living Room & Entertainment Lounge</div>
         </div>
-        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1000&q=80');">
-            <div class="slide-caption">02 - Modular German Acrylic Kitchen</div>
+        <div class="carousel-slide">
+            <img src="https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1000&q=80" alt="Modular German Kitchen">
+            <div class="carousel-caption">02 - Modular German Acrylic Kitchen</div>
         </div>
-        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80');">
-            <div class="slide-caption">03 - Acoustic Fluted Panel Wall Decor</div>
+        <div class="carousel-slide">
+            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80" alt="Acoustic Fluted Panels">
+            <div class="carousel-caption">03 - Acoustic Fluted Panel Wall Decor</div>
         </div>
-        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1000&q=80');">
-            <div class="slide-caption">04 - Floor-to-Ceiling Tinted Glass Wardrobes</div>
+        <div class="carousel-slide">
+            <img src="https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1000&q=80" alt="Glass Wardrobes">
+            <div class="carousel-caption">04 - Floor-to-Ceiling Tinted Glass Wardrobes</div>
         </div>
-        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1000&q=80');">
-            <div class="slide-caption">05 - Imported Italian Marble & Wood Paneling</div>
+        <div class="carousel-slide">
+            <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1000&q=80" alt="Italian Marble">
+            <div class="carousel-caption">05 - Imported Italian Marble & Wood Paneling</div>
         </div>
-        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1000&q=80');">
-            <div class="slide-caption">06 - Contemporary Minimalist Bedroom Interior</div>
+        <div class="carousel-slide">
+            <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1000&q=80" alt="Minimalist Bedroom">
+            <div class="carousel-caption">06 - Contemporary Minimalist Bedroom Interior</div>
         </div>
-        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1616046229478-9901c5536a45?auto=format&fit=crop&w=1000&q=80');">
-            <div class="slide-caption">07 - Executive Home Office & Study Suite</div>
+        <div class="carousel-slide">
+            <img src="https://images.unsplash.com/photo-1616046229478-9901c5536a45?auto=format&fit=crop&w=1000&q=80" alt="Home Office">
+            <div class="carousel-caption">07 - Executive Home Office & Study Suite</div>
         </div>
-        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=1000&q=80');">
-            <div class="slide-caption">08 - Designer Bathroom Vanity & LED Mirrors</div>
+        <div class="carousel-slide">
+            <img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=1000&q=80" alt="Bathroom Vanity">
+            <div class="carousel-caption">08 - Designer Bathroom Vanity & LED Mirrors</div>
         </div>
-        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1000&q=80');">
-            <div class="slide-caption">09 - Multi-Tier False Ceiling & Cove Lighting</div>
+        <div class="carousel-slide">
+            <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1000&q=80" alt="False Ceiling">
+            <div class="carousel-caption">09 - Multi-Tier False Ceiling & Cove Lighting</div>
         </div>
-        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=1000&q=80');">
-            <div class="slide-caption">10 - Premium Open-Concept Dining Architecture</div>
+        <div class="carousel-slide">
+            <img src="https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=1000&q=80" alt="Open Dining">
+            <div class="carousel-caption">10 - Premium Open-Concept Dining Architecture</div>
         </div>
-        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1000&q=80');">
-            <div class="slide-caption">11 - Luxury Penthouse Balcony & Decking Design</div>
+        <div class="carousel-slide">
+            <img src="https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1000&q=80" alt="Balcony Decking">
+            <div class="carousel-caption">11 - Luxury Penthouse Balcony & Decking Design</div>
         </div>
     </div>
 
     <script>
-        let currentSlide = 0;
-        const slides = document.querySelectorAll('#interiorSlider .slide');
-        function nextSlide() {
-            if(slides.length === 0) return;
-            slides[currentSlide].classList.remove('active');
-            currentSlide = (currentSlide + 1) % slides.length;
-            slides[currentSlide].classList.add('active');
+        let slideIndex = 0;
+        const allSlides = document.querySelectorAll('#interiorCarousel .carousel-slide');
+        function cycleSlides() {
+            if(allSlides.length === 0) return;
+            allSlides[slideIndex].classList.remove('active');
+            slideIndex = (slideIndex + 1) % allSlides.length;
+            allSlides[slideIndex].classList.add('active');
         }
-        setInterval(nextSlide, 3500);
+        setInterval(cycleSlides, 3500);
     </script>
     """, unsafe_allow_html=True)
 
@@ -862,7 +879,7 @@ if "Kitchen" in selected_room:
         </div>
         <div style="flex:1;">
             <div class="visualizer-frame-3d">
-                <img src="https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1000&q=80" alt="Kitchen 3D GIF">
+                <img src="https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1000&q=80" alt="Kitchen 3D">
             </div>
         </div>
     </div>
@@ -884,7 +901,7 @@ elif "Living" in selected_room:
         </div>
         <div style="flex:1;">
             <div class="visualizer-frame-3d">
-                <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80" alt="Living 3D GIF">
+                <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80" alt="Living 3D">
             </div>
         </div>
     </div>
@@ -906,7 +923,7 @@ elif "Wardrobes" in selected_room:
         </div>
         <div style="flex:1;">
             <div class="visualizer-frame-3d">
-                <img src="https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1000&q=80" alt="Wardrobes 3D GIF">
+                <img src="https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1000&q=80" alt="Wardrobes 3D">
             </div>
         </div>
     </div>
@@ -928,7 +945,7 @@ elif "Ceiling" in selected_room:
         </div>
         <div style="flex:1;">
             <div class="visualizer-frame-3d">
-                <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1000&q=80" alt="Ceiling 3D GIF">
+                <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1000&q=80" alt="Ceiling 3D">
             </div>
         </div>
     </div>
@@ -950,7 +967,7 @@ else:
         </div>
         <div style="flex:1;">
             <div class="visualizer-frame-3d">
-                <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1000&q=80" alt="Flooring 3D GIF">
+                <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1000&q=80" alt="Flooring 3D">
             </div>
         </div>
     </div>
