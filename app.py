@@ -709,13 +709,13 @@ def show_quotation_dialog():
             pass
 
         address_input = st.text_area(
-            "Site / Flat Address in Bengaluru *", 
+            "Site / Flat Address  *", 
             value="",
-            placeholder="Enter complete address in Bengaluru"
+            placeholder="Enter complete address"
         )
 
         st.markdown("---")
-        st.subheader("💰 Financial Budget Calculation")
+        st.subheader("💰 YOUR BUDGET")
         
         amount_input = st.number_input(
             "✏️ Enter Total Estimated Budget (INR ₹):",
