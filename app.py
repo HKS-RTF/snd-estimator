@@ -817,7 +817,7 @@ with col_m4:
 
 # --- INTERACTIVE 3D ANIMATED / GIF VISUALIZER ---
 st.markdown("<br>", unsafe_allow_html=True)
-st.markdown("### 🌀 Interactive 3D Spatial Simulator & Live Renderings")
+st.markdown("### 🌀 Interactive Content")
 st.markdown("<p style='color:#94A3B8; font-size:0.95rem; margin-bottom:1.5rem;'>Select a commercial zone to inspect real-time spatial physics, lighting loops, and modular material simulations.</p>", unsafe_allow_html=True)
 
 selected_room = st.radio(
