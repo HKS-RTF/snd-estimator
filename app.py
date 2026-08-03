@@ -20,60 +20,123 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- Grand Luxury CSS & 3D Interactive Styling ---
+# --- Enhanced High-End UI/UX & Graphics Styling ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
     html, body, [class*="css"] {
         font-family: 'Plus Jakarta Sans', sans-serif;
-        background-color: #070A12;
+        background: radial-gradient(circle at 50% 0%, #111827 0%, #070A12 70%);
         color: #F8FAFC;
     }
 
-    /* Top Utility Navigation Bar */
+    /* Top Premium Glass Utility Nav */
     .top-nav {
-        background: linear-gradient(90deg, #0F172A 0%, #1E293B 100%);
-        color: #94A3B8;
-        padding: 12px 32px;
-        font-size: 0.82rem;
+        background: linear-gradient(90deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.9) 100%);
+        backdrop-filter: blur(12px);
+        color: #CBD5E1;
+        padding: 14px 32px;
+        font-size: 0.85rem;
         display: flex;
         justify-content: space-between;
         align-items: center;
         border-bottom: 2px solid #D97706;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.6);
-        border-radius: 0 0 16px 16px;
-        margin-bottom: 2rem;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.7);
+        border-radius: 0 0 20px 20px;
+        margin-bottom: 2.5rem;
     }
 
-    /* 3D Glassmorphism Cards & Containers */
+    /* Hero Section Banner Art */
+    .hero-banner-art {
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.95) 100%),
+                    url('https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=2000&q=80');
+        background-blend-mode: overlay;
+        background-size: cover;
+        background-position: center;
+        border-radius: 32px;
+        padding: 4rem 3rem;
+        border: 1px solid rgba(217, 119, 6, 0.3);
+        box-shadow: 0 25px 60px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.2);
+        margin-bottom: 3rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-banner-art::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(217,119,6,0.1) 0%, transparent 60%);
+        pointer-events: none;
+    }
+
+    /* 3D Glassmorphism Cards with Glowing Depth */
     .glass-card-3d {
-        background: linear-gradient(145deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.85) 100%);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 24px;
-        padding: 2rem;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        background: linear-gradient(145deg, rgba(30, 41, 59, 0.75) 0%, rgba(15, 23, 42, 0.9) 100%);
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 28px;
+        padding: 2.5rem;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.2);
         transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-        margin-bottom: 1.5rem;
+        margin-bottom: 2rem;
     }
 
     .glass-card-3d:hover {
         transform: translateY(-8px) scale(1.01);
         border-color: #D97706;
-        box-shadow: 0 30px 60px rgba(217, 119, 6, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        box-shadow: 0 35px 70px rgba(217, 119, 6, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    }
+
+    /* Metric & Statistic Cards */
+    .metric-card-3d {
+        background: linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.8));
+        border: 1px solid rgba(217, 119, 6, 0.25);
+        border-radius: 20px;
+        padding: 1.5rem;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        transition: transform 0.3s ease;
+    }
+
+    .metric-card-3d:hover {
+        transform: translateY(-5px);
+        border-color: #F59E0B;
+    }
+
+    /* Primary Gold Action Button Overrides */
+    .stButton > button {
+        background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+        color: #070A12;
+        font-weight: 800;
+        border-radius: 16px;
+        padding: 0.85rem 2rem;
+        border: none;
+        box-shadow: 0 10px 25px rgba(217, 119, 6, 0.4);
+        transition: all 0.3s ease;
+    }
+
+    .stButton > button:hover {
+        background: linear-gradient(135deg, #FBBF24 0%, #D97706 100%);
+        box-shadow: 0 15px 35px rgba(217, 119, 6, 0.6);
+        transform: translateY(-2px);
     }
 
     /* Authentic Security Header inside Form */
     .auth-banner {
         background: linear-gradient(135deg, #1E1B4B 0%, #0F172A 100%);
         border: 1px solid #6366F1;
-        border-radius: 16px;
-        padding: 1.25rem 1.5rem;
+        border-radius: 20px;
+        padding: 1.5rem;
         display: flex;
         align-items: center;
-        gap: 15px;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 10px 25px rgba(99, 102, 241, 0.2);
+        gap: 20px;
+        margin-bottom: 2rem;
+        box-shadow: 0 12px 30px rgba(99, 102, 241, 0.25);
     }
 
     #MainMenu {visibility: hidden;}
@@ -371,7 +434,7 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
     return pdf_bytes, filename, ref_no, final_total
 
 
-# --- AUTHENTIC MODAL POPUP DIALOG WITH USER & CUSTOMER DETAILS ---
+# --- AUTHENTIC MODAL POPUP DIALOG WITH BLANK FIELDS ---
 @st.dialog("✨ OFFICIAL 3D INTERIOR DESIGN QUOTATION GENERATOR", width="large")
 def show_quotation_dialog():
     st.markdown("""
@@ -388,22 +451,23 @@ def show_quotation_dialog():
         st.subheader("👤 User / Submitter Details")
         col_u1, col_u2 = st.columns(2)
         with col_u1:
-            user_name = st.text_input("User / Agent Name *", placeholder="Enter your name")
-            user_mobile = st.text_input("User Mobile Number *", placeholder="Enter mobile number")
+            user_name = st.text_input("User / Agent Name *", value="", placeholder="Enter your name")
+            user_mobile = st.text_input("User Mobile Number *", value="", placeholder="Enter mobile number")
         with col_u2:
-            user_email = st.text_input("User Email ID *", placeholder="Enter email address")
+            user_email = st.text_input("User Email ID *", value="", placeholder="Enter email address")
 
         st.markdown("---")
         st.subheader("🏠 Customer & Property Details (Printed on Quotation)")
         col_c1, col_c2 = st.columns(2)
         with col_c1:
-            customer_name = st.text_input("Customer Full Name *", placeholder="Enter customer name")
+            customer_name = st.text_input("Customer Full Name *", value="", placeholder="Enter customer name")
             date_input = st.text_input("Quotation Date", value=datetime.now().strftime("%d-%m-%Y"))
         with col_c2:
-            pass # Placeholder for layout alignment if needed
+            pass 
 
         address_input = st.text_area(
             "Customer Property / Site Address in Bengaluru *", 
+            value="",
             placeholder="Enter complete site or flat address in Bengaluru"
         )
 
@@ -471,31 +535,50 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# --- NATIVE STREAMLIT HERO & WELCOME BANNER ---
-st.title("👑 SND INTERIOR & DESIGNS")
-st.subheader("Bengaluru's Premier 3D Interior Studio")
-st.write(
-    "Immersive 3D Photorealistic Visualizations, 100% Factory-Finished Modular Kitchens, "
-    "Designer Wardrobes, and Turnkey Luxury Home Interiors."
-)
+# --- HIGH-END UI/UX HERO BANNER ART ---
+st.markdown("""
+<div class="hero-banner-art">
+    <div style="max-width: 700px;">
+        <div style="color: #F59E0B; font-weight: 800; font-size: 0.85rem; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 10px;">👑 BENGALURU'S PREMIER 3D INTERIOR STUDIO</div>
+        <h1 style="font-family: 'Cinzel', serif; font-size: 3rem; font-weight: 900; color: #FFFFFF; line-height: 1.1; margin-bottom: 20px;">SND INTERIOR & DESIGNS</h1>
+        <p style="color: #CBD5E1; font-size: 1.1rem; line-height: 1.6; margin-bottom: 30px;">
+            Immersive 3D Photorealistic Visualizations, 100% Factory-Finished Modular Kitchens, Designer Wardrobes, and Turnkey Luxury Home Interiors.
+        </p>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
-# High-definition sliding banner image / showcase
-st.image(
-    "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=2000&q=80",
-    caption="Turnkey Luxury Home Interiors - Bengaluru",
-    use_column_width=True
-)
 
-# Trust Stats Metrics Grid using native Streamlit columns
+# --- Trust Stats Metrics Grid in 3D Glass Cards ---
 col_stat1, col_stat2, col_stat3, col_stat4 = st.columns(4)
 with col_stat1:
-    st.metric(label="Luxury Homes Completed", value="500+")
+    st.markdown("""
+    <div class="metric-card-3d">
+        <div style="font-size: 1.8rem; font-weight: 800; color: #F59E0B; margin-bottom: 5px;">500+</div>
+        <div style="font-size: 0.85rem; color: #94A3B8; font-weight: 600; text-transform: uppercase;">Luxury Homes Completed</div>
+    </div>
+    """, unsafe_allow_html=True)
 with col_stat2:
-    st.metric(label="Material Warranty", value="10 YRS")
+    st.markdown("""
+    <div class="metric-card-3d">
+        <div style="font-size: 1.8rem; font-weight: 800; color: #F59E0B; margin-bottom: 5px;">10 YRS</div>
+        <div style="font-size: 0.85rem; color: #94A3B8; font-weight: 600; text-transform: uppercase;">Material Warranty</div>
+    </div>
+    """, unsafe_allow_html=True)
 with col_stat3:
-    st.metric(label="Guaranteed Delivery", value="45 DAYS")
+    st.markdown("""
+    <div class="metric-card-3d">
+        <div style="font-size: 1.8rem; font-weight: 800; color: #F59E0B; margin-bottom: 5px;">45 DAYS</div>
+        <div style="font-size: 0.85rem; color: #94A3B8; font-weight: 600; text-transform: uppercase;">Guaranteed Delivery</div>
+    </div>
+    """, unsafe_allow_html=True)
 with col_stat4:
-    st.metric(label="Transparent Pricing", value="100%")
+    st.markdown("""
+    <div class="metric-card-3d">
+        <div style="font-size: 1.8rem; font-weight: 800; color: #F59E0B; margin-bottom: 5px;">100%</div>
+        <div style="font-size: 0.85rem; color: #94A3B8; font-weight: 600; text-transform: uppercase;">Transparent Pricing</div>
+    </div>
+    """, unsafe_allow_html=True)
 
 
 # --- ADMIN LOGIN & RECENT HISTORY / LOOKUP SECTION ---
