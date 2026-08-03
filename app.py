@@ -732,7 +732,7 @@ with col_tick2:
 st.markdown("<br>", unsafe_allow_html=True)
 
 
-# --- 3D GRADIENT HERO SECTION WITH AUTO-SLIDING INTERIOR IMAGES ---
+# --- 3D GRADIENT HERO SECTION WITH 10+ AUTO-SLIDING INTERIOR IMAGES ---
 col_hero1, col_hero2 = st.columns([1.2, 1])
 
 with col_hero1:
@@ -743,29 +743,47 @@ with col_hero1:
         </div>
         <h1 class="hero-title-3d" style="font-size: 3rem;">SND INTERIOR & DESIGNS</h1>
         <p style="color: #CBD5E1; font-size: 1.1rem; line-height: 1.7; margin-bottom: 2rem;">
-            Commercial-grade Materials and Raw Materials,  GST quotations, and turnkey interior manufacturing engineered for elite residential developments across Bengaluru.
+            Commercial-grade Materials and Raw Materials, GST quotations, and turnkey interior manufacturing engineered for elite residential developments across Bengaluru.
         </p>
     </div>
     """, unsafe_allow_html=True)
 
 with col_hero2:
-    # Auto-sliding showcase slideshow using HTML/CSS + Javascript snippet injected into Streamlit
+    # Expanded Auto-sliding showcase slideshow with 10+ high-end interior items
     st.markdown("""
     <div class="slider-container" id="interiorSlider">
         <div class="slide active" style="background-image: url('https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1000&q=80');">
-            <div class="slide-caption">Luxury Living Room & Entertainment Lounge</div>
+            <div class="slide-caption">01 - Luxury Living Room & Entertainment Lounge</div>
         </div>
         <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1000&q=80');">
-            <div class="slide-caption">Modular German Acrylic Kitchen</div>
+            <div class="slide-caption">02 - Modular German Acrylic Kitchen</div>
         </div>
         <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80');">
-            <div class="slide-caption">Acoustic Fluted Panel Wall Decor</div>
+            <div class="slide-caption">03 - Acoustic Fluted Panel Wall Decor</div>
         </div>
         <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1000&q=80');">
-            <div class="slide-caption">Floor-to-Ceiling Tinted Glass Wardrobes</div>
+            <div class="slide-caption">04 - Floor-to-Ceiling Tinted Glass Wardrobes</div>
         </div>
         <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1000&q=80');">
-            <div class="slide-caption">Imported Italian Marble & Wood Paneling</div>
+            <div class="slide-caption">05 - Imported Italian Marble & Wood Paneling</div>
+        </div>
+        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1000&q=80');">
+            <div class="slide-caption">06 - Contemporary Minimalist Bedroom Interior</div>
+        </div>
+        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1616046229478-9901c5536a45?auto=format&fit=crop&w=1000&q=80');">
+            <div class="slide-caption">07 - Executive Home Office & Study Suite</div>
+        </div>
+        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=1000&q=80');">
+            <div class="slide-caption">08 - Designer Bathroom Vanity & LED Mirrors</div>
+        </div>
+        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1000&q=80');">
+            <div class="slide-caption">09 - Multi-Tier False Ceiling & Cove Lighting</div>
+        </div>
+        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=1000&q=80');">
+            <div class="slide-caption">10 - Premium Open-Concept Dining Architecture</div>
+        </div>
+        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1000&q=80');">
+            <div class="slide-caption">11 - Luxury Penthouse Balcony & Decking Design</div>
         </div>
     </div>
 
