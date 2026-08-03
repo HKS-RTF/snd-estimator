@@ -14,7 +14,7 @@ from reportlab.graphics.barcode.qr import QrCodeWidget
 
 # --- Page Configuration ---
 st.set_page_config(
-    page_title="SND Interior & Designs | Commercial 3D Interior Dashboard",
+    page_title="SND Interior & Designs | Commercial & Residential Interior Dashboard",
     page_icon="⚡",
     layout="wide",
     initial_sidebar_state="collapsed"
