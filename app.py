@@ -14,138 +14,212 @@ from reportlab.graphics.barcode.qr import QrCodeWidget
 
 # --- Page Configuration ---
 st.set_page_config(
-    page_title="SND Interior & Designs | Grand Luxury Home Interiors Bengaluru",
-    page_icon="👑",
+    page_title="SND Interior & Designs | Commercial 3D Interior Dashboard",
+    page_icon="⚡",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# --- Enhanced High-End UI/UX & Graphics Styling ---
+# --- Advanced Commercial 3D Glassmorphism & Gradient Dashboard Styling ---
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;800;900&family=Space+Grotesk:wght@500;700&display=swap');
 
     html, body, [class*="css"] {
         font-family: 'Plus Jakarta Sans', sans-serif;
-        background: radial-gradient(circle at 50% 0%, #111827 0%, #070A12 70%);
+        background: #030712;
         color: #F8FAFC;
     }
 
-    /* Top Premium Glass Utility Nav */
-    .top-nav {
-        background: linear-gradient(90deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.9) 100%);
-        backdrop-filter: blur(12px);
-        color: #CBD5E1;
-        padding: 14px 32px;
-        font-size: 0.85rem;
+    /* Ambient Background Glow Orbs */
+    .bg-glow-1 {
+        position: fixed;
+        top: -10%;
+        left: -10%;
+        width: 50vw;
+        height: 50vw;
+        background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+        z-index: 0;
+        pointer-events: none;
+        animation: pulseGlow 8s ease-in-out infinite alternate;
+    }
+
+    .bg-glow-2 {
+        position: fixed;
+        bottom: -10%;
+        right: -10%;
+        width: 50vw;
+        height: 50vw;
+        background: radial-gradient(circle, rgba(245, 158, 11, 0.12) 0%, transparent 70%);
+        z-index: 0;
+        pointer-events: none;
+        animation: pulseGlow 10s ease-in-out infinite alternate-reverse;
+    }
+
+    @keyframes pulseGlow {
+        0% { transform: scale(1); opacity: 0.7; }
+        100% { transform: scale(1.15); opacity: 1; }
+    }
+
+    /* Commercial Gradient Header Text with 3D Depth */
+    .hero-title-3d {
+        font-family: 'Outfit', sans-serif;
+        font-weight: 900;
+        font-size: 3.5rem;
+        background: linear-gradient(135deg, #FFFFFF 20%, #94A3B8 50%, #F59E0B 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0 20px 40px rgba(0,0,0,0.8);
+        letter-spacing: -1px;
+        margin-bottom: 10px;
+    }
+
+    .gradient-text-gold {
+        background: linear-gradient(135deg, #FDE047 0%, #F59E0B 50%, #D97706 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .gradient-text-cyan {
+        background: linear-gradient(135deg, #67E8F9 0%, #38BDF8 50%, #6366F1 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    /* Top Commercial Ticker / Status Bar */
+    .commercial-ticker {
+        background: linear-gradient(90deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.95) 100%);
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 12px 24px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        border-bottom: 2px solid #D97706;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.7);
-        border-radius: 0 0 20px 20px;
-        margin-bottom: 2.5rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        margin-bottom: 2rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #94A3B8;
     }
 
-    /* Hero Section Banner Art */
-    .hero-banner-art {
-        background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.95) 100%),
-                    url('https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=2000&q=80');
-        background-blend-mode: overlay;
-        background-size: cover;
-        background-position: center;
-        border-radius: 32px;
-        padding: 4rem 3rem;
-        border: 1px solid rgba(217, 119, 6, 0.3);
-        box-shadow: 0 25px 60px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.2);
-        margin-bottom: 3rem;
+    .live-dot {
+        height: 10px;
+        width: 10px;
+        background-color: #10B981;
+        border-radius: 50%;
+        display: inline-block;
+        box-shadow: 0 0 12px #10B981;
+        animation: liveBlink 1.5s infinite;
+        margin-right: 8px;
+    }
+
+    @keyframes liveBlink {
+        0% { transform: scale(0.95); opacity: 0.8; box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+        70% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+        100% { transform: scale(0.95); opacity: 0.8; box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
+    /* Commercial Glass Dashboard Container */
+    .dashboard-card-3d {
+        background: linear-gradient(145deg, rgba(17, 24, 39, 0.85) 0%, rgba(3, 7, 18, 0.95) 100%);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 28px;
+        padding: 2.5rem;
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        margin-bottom: 2rem;
         position: relative;
         overflow: hidden;
     }
 
-    .hero-banner-art::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(circle, rgba(217,119,6,0.1) 0%, transparent 60%);
-        pointer-events: none;
+    .dashboard-card-3d:hover {
+        transform: translateY(-6px);
+        border-color: rgba(245, 158, 11, 0.4);
+        box-shadow: 0 40px 80px rgba(245, 158, 11, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.25);
     }
 
-    /* 3D Glassmorphism Cards with Glowing Depth */
-    .glass-card-3d {
-        background: linear-gradient(145deg, rgba(30, 41, 59, 0.75) 0%, rgba(15, 23, 42, 0.9) 100%);
-        backdrop-filter: blur(16px);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        border-radius: 28px;
-        padding: 2.5rem;
-        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-        margin-bottom: 2rem;
+    /* Interactive 3D Visualizer GIF Frame Container */
+    .visualizer-frame-3d {
+        border-radius: 20px;
+        overflow: hidden;
+        border: 2px solid rgba(245, 158, 11, 0.3);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 30px rgba(245, 158, 11, 0.2);
+        position: relative;
+        background: #000;
     }
 
-    .glass-card-3d:hover {
-        transform: translateY(-8px) scale(1.01);
-        border-color: #D97706;
-        box-shadow: 0 35px 70px rgba(217, 119, 6, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    .visualizer-frame-3d img {
+        width: 100%;
+        height: 380px;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.6s ease;
     }
 
-    /* Metric & Statistic Cards */
-    .metric-card-3d {
-        background: linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.8));
-        border: 1px solid rgba(217, 119, 6, 0.25);
+    .visualizer-frame-3d:hover img {
+        transform: scale(1.04);
+    }
+
+    /* Metric Stat Card */
+    .stat-box-commercial {
+        background: linear-gradient(145deg, rgba(30, 41, 59, 0.6), rgba(15, 23, 42, 0.8));
+        border: 1px solid rgba(255, 255, 255, 0.06);
         border-radius: 20px;
         padding: 1.5rem;
         text-align: center;
         box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        transition: transform 0.3s ease;
+        transition: all 0.3s ease;
     }
 
-    .metric-card-3d:hover {
-        transform: translateY(-5px);
-        border-color: #F59E0B;
+    .stat-box-commercial:hover {
+        border-color: #38BDF8;
+        transform: translateY(-4px);
     }
 
-    /* Primary Gold Action Button Overrides */
+    /* Primary Action Buttons */
     .stButton > button {
         background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
-        color: #070A12;
-        font-weight: 800;
-        border-radius: 16px;
+        color: #030712;
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+        border-radius: 14px;
         padding: 0.85rem 2rem;
         border: none;
-        box-shadow: 0 10px 25px rgba(217, 119, 6, 0.4);
-        transition: all 0.3s ease;
+        box-shadow: 0 10px 30px rgba(217, 119, 6, 0.4);
+        transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
     }
 
     .stButton > button:hover {
         background: linear-gradient(135deg, #FBBF24 0%, #D97706 100%);
-        box-shadow: 0 15px 35px rgba(217, 119, 6, 0.6);
-        transform: translateY(-2px);
+        box-shadow: 0 15px 40px rgba(245, 158, 11, 0.6);
+        transform: translateY(-3px);
     }
 
-    /* Authentic Security Header inside Form */
-    .auth-banner {
-        background: linear-gradient(135deg, #1E1B4B 0%, #0F172A 100%);
-        border: 1px solid #6366F1;
+    /* Auth & Security Banner */
+    .commercial-auth-banner {
+        background: linear-gradient(135deg, rgba(30, 27, 75, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
+        border: 1px solid rgba(99, 102, 241, 0.4);
         border-radius: 20px;
         padding: 1.5rem;
         display: flex;
         align-items: center;
         gap: 20px;
         margin-bottom: 2rem;
-        box-shadow: 0 12px 30px rgba(99, 102, 241, 0.25);
+        box-shadow: 0 15px 35px rgba(99, 102, 241, 0.2);
     }
 
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
 </style>
+
+<div class="bg-glow-1"></div>
+<div class="bg-glow-2"></div>
 """, unsafe_allow_html=True)
 
 
-# --- Initialize Session State for Login ---
+# --- Initialize Session State ---
 if "is_admin_logged_in" not in st.session_state:
     st.session_state.is_admin_logged_in = False
 
@@ -434,45 +508,45 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
     return pdf_bytes, filename, ref_no, final_total
 
 
-# --- AUTHENTIC MODAL POPUP DIALOG WITH BLANK FIELDS ---
-@st.dialog("✨ OFFICIAL 3D INTERIOR DESIGN QUOTATION GENERATOR", width="large")
+# --- AUTHENTIC MODAL POPUP DIALOG ---
+@st.dialog("⚡ COMMERCIAL 3D ESTIMATION GENERATOR", width="large")
 def show_quotation_dialog():
     st.markdown("""
-    <div class="auth-banner">
-        <div style="font-size:2.2rem;">🛡️</div>
+    <div class="commercial-auth-banner">
+        <div style="font-size:2.2rem;">🔐</div>
         <div>
-            <div style="color:#A5B4FC; font-weight:700; font-size:0.85rem; letter-spacing:1px;">SECURE SSL PORTAL • GST REGISTERED FIRM</div>
-            <div style="color:#FFFFFF; font-size:0.8rem;">Official Quotations for Luxury Home Interiors in Bengaluru with encrypted QR verification.</div>
+            <div style="color:#818CF8; font-weight:700; font-size:0.85rem; letter-spacing:1px;">SECURE SSL GATEWAY • COMMERCIAL GST INVOICING</div>
+            <div style="color:#FFFFFF; font-size:0.8rem;">Generate encrypted PDF estimates with dynamic QR code authentication for Bengaluru projects.</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
     with st.form("popup_estimation_form"):
-        st.subheader("👤 User / Submitter Details")
+        st.subheader("👤 Agent & Submitter Details")
         col_u1, col_u2 = st.columns(2)
         with col_u1:
-            user_name = st.text_input("User / Agent Name *", value="", placeholder="Enter your name")
-            user_mobile = st.text_input("User Mobile Number *", value="", placeholder="Enter mobile number")
+            user_name = st.text_input("Agent Name *", value="", placeholder="Enter name")
+            user_mobile = st.text_input("Mobile Number *", value="", placeholder="Enter mobile")
         with col_u2:
-            user_email = st.text_input("User Email ID *", value="", placeholder="Enter email address")
+            user_email = st.text_input("Email ID *", value="", placeholder="Enter email")
 
         st.markdown("---")
-        st.subheader("🏠 Customer & Property Details (Printed on Quotation)")
+        st.subheader("🏠 Property Details")
         col_c1, col_c2 = st.columns(2)
         with col_c1:
-            customer_name = st.text_input("Customer Full Name *", value="", placeholder="Enter customer name")
+            customer_name = st.text_input("Customer Full Name *", value="", placeholder="Customer name")
             date_input = st.text_input("Quotation Date", value=datetime.now().strftime("%d-%m-%Y"))
         with col_c2:
-            pass 
+            pass
 
         address_input = st.text_area(
-            "Customer Property / Site Address in Bengaluru *", 
+            "Site / Flat Address in Bengaluru *", 
             value="",
-            placeholder="Enter complete site or flat address in Bengaluru"
+            placeholder="Enter complete address in Bengaluru"
         )
 
         st.markdown("---")
-        st.subheader("💰 Manual Amount Entry (INR ₹)")
+        st.subheader("💰 Financial Budget Calculation")
         
         amount_input = st.number_input(
             "✏️ Enter Total Estimated Budget (INR ₹):",
@@ -487,7 +561,7 @@ def show_quotation_dialog():
         gst_est = amount_input - subtotal_est
         st.info(f"📊 **Base Estimate:** ₹ {subtotal_est:,.2f} | **GST (18%):** ₹ {gst_est:,.2f} | **Total Final Payable:** ₹ {amount_input:,.2f}")
 
-        submitted = st.form_submit_button("⚡ GENERATE PDF", type="primary", use_container_width=True)
+        submitted = st.form_submit_button("⚡ GENERATE ENCRYPTED PDF", type="primary", use_container_width=True)
 
     if submitted:
         if not user_name.strip() or not user_mobile.strip() or not user_email.strip() or not customer_name.strip() or not address_input.strip():
@@ -511,10 +585,10 @@ def show_quotation_dialog():
                     )
                 
                 st.balloons()
-                st.success("🎉 **Quotation Generated Successfully!**")
+                st.success("🎉 **Quotation Generated & Synced Successfully!**")
                 
                 st.markdown(f"""
-                <div style="background: rgba(217, 119, 6, 0.15); border: 1px solid #D97706; padding: 20px; border-radius: 14px; margin: 15px 0;">
+                <div style="background: rgba(245, 158, 11, 0.15); border: 1px solid #F59E0B; padding: 20px; border-radius: 14px; margin: 15px 0;">
                     <h3 style="color: #F59E0B; margin-top: 0;">REF NO: {generated_ref}</h3>
                     <p style="font-size: 1.05rem; color: #F8FAFC; line-height: 1.6;">
                         <b>Your request has been accepted. Please wait some time; you will receive it via mail or WhatsApp.</b>
@@ -526,92 +600,94 @@ def show_quotation_dialog():
                 st.error(f"An error occurred: {e}")
 
 
-# --- TOP NAVIGATION BAR ---
+# --- COMMERCIAL TICKER STATUS BAR ---
 st.markdown("""
-<div class="top-nav">
-    <div>📍 <b>BANGALORE EXPERIENCE CENTERS:</b> Sahakarnagar | HSR Layout | Whitefield | Yelahanka</div>
-    <div>📞 <b>VIP CLIENT DESK:</b> +91 98765 43210 &nbsp;|&nbsp; ✉️ contact@sndinteriors.com</div>
+<div class="commercial-ticker">
+    <div><span class="live-dot"></span>LIVE COMMERCIAL HUB: BENGALURU (SAHAKARNAGAR | HSR | WHITEFIELD)</div>
+    <div>SUPPORT HOTLINE: +91 98765 43210 &nbsp;|&nbsp; SLA: 99.9% UPTIME</div>
 </div>
 """, unsafe_allow_html=True)
 
 
-# --- HIGH-END UI/UX HERO BANNER ART ---
+# --- 3D GRADIENT HERO SECTION ---
 st.markdown("""
-<div class="hero-banner-art">
-    <div style="max-width: 700px;">
-        <div style="color: #F59E0B; font-weight: 800; font-size: 0.85rem; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 10px;">👑 BENGALURU'S PREMIER 3D INTERIOR STUDIO</div>
-        <h1 style="font-family: 'Cinzel', serif; font-size: 3rem; font-weight: 900; color: #FFFFFF; line-height: 1.1; margin-bottom: 20px;">SND INTERIOR & DESIGNS</h1>
-        <p style="color: #CBD5E1; font-size: 1.1rem; line-height: 1.6; margin-bottom: 30px;">
-            Immersive 3D Photorealistic Visualizations, 100% Factory-Finished Modular Kitchens, Designer Wardrobes, and Turnkey Luxury Home Interiors.
+<div class="dashboard-card-3d" style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.85) 100%), url('https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=2000&q=80'); background-blend-mode: overlay; background-size: cover; background-position: center; padding: 4rem 3rem;">
+    <div style="max-width: 750px;">
+        <div style="font-family:'Space Grotesk', sans-serif; font-weight: 800; font-size: 0.85rem; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 12px;">
+            <span class="gradient-text-gold">✦ ENTERPRISE 3D INTERIOR INTELLIGENCE</span>
+        </div>
+        <h1 class="hero-title-3d">SND INTERIOR & DESIGNS</h1>
+        <p style="color: #CBD5E1; font-size: 1.15rem; line-height: 1.7; margin-bottom: 2rem;">
+            Commercial-grade photorealistic 3D spatial simulations, automated GST quotations, and turnkey interior manufacturing engineered for elite residential developments across Bengaluru.
         </p>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
 
-# --- Trust Stats Metrics Grid in 3D Glass Cards ---
-col_stat1, col_stat2, col_stat3, col_stat4 = st.columns(4)
-with col_stat1:
+# --- Commercial Metrics Grid ---
+col_m1, col_m2, col_m3, col_m4 = st.columns(4)
+with col_m1:
     st.markdown("""
-    <div class="metric-card-3d">
-        <div style="font-size: 1.8rem; font-weight: 800; color: #F59E0B; margin-bottom: 5px;">500+</div>
-        <div style="font-size: 0.85rem; color: #94A3B8; font-weight: 600; text-transform: uppercase;">Luxury Homes Completed</div>
+    <div class="stat-box-commercial">
+        <div style="font-size: 1.8rem; font-weight: 800;" class="gradient-text-gold">500+</div>
+        <div style="font-size: 0.8rem; color: #94A3B8; font-weight: 700; text-transform: uppercase; margin-top: 5px;">Active Projects</div>
     </div>
     """, unsafe_allow_html=True)
-with col_stat2:
+with col_m2:
     st.markdown("""
-    <div class="metric-card-3d">
-        <div style="font-size: 1.8rem; font-weight: 800; color: #F59E0B; margin-bottom: 5px;">10 YRS</div>
-        <div style="font-size: 0.85rem; color: #94A3B8; font-weight: 600; text-transform: uppercase;">Material Warranty</div>
+    <div class="stat-box-commercial">
+        <div style="font-size: 1.8rem; font-weight: 800;" class="gradient-text-cyan">10 YRS</div>
+        <div style="font-size: 0.8rem; color: #94A3B8; font-weight: 700; text-transform: uppercase; margin-top: 5px;">Structural Warranty</div>
     </div>
     """, unsafe_allow_html=True)
-with col_stat3:
+with col_m3:
     st.markdown("""
-    <div class="metric-card-3d">
-        <div style="font-size: 1.8rem; font-weight: 800; color: #F59E0B; margin-bottom: 5px;">45 DAYS</div>
-        <div style="font-size: 0.85rem; color: #94A3B8; font-weight: 600; text-transform: uppercase;">Guaranteed Delivery</div>
+    <div class="stat-box-commercial">
+        <div style="font-size: 1.8rem; font-weight: 800;" class="gradient-text-gold">45 DAYS</div>
+        <div style="font-size: 0.8rem; color: #94A3B8; font-weight: 700; text-transform: uppercase; margin-top: 5px;">Guaranteed Handover</div>
     </div>
     """, unsafe_allow_html=True)
-with col_stat4:
+with col_m4:
     st.markdown("""
-    <div class="metric-card-3d">
-        <div style="font-size: 1.8rem; font-weight: 800; color: #F59E0B; margin-bottom: 5px;">100%</div>
-        <div style="font-size: 0.85rem; color: #94A3B8; font-weight: 600; text-transform: uppercase;">Transparent Pricing</div>
+    <div class="stat-box-commercial">
+        <div style="font-size: 1.8rem; font-weight: 800;" class="gradient-text-cyan">100%</div>
+        <div style="font-size: 0.8rem; color: #94A3B8; font-weight: 700; text-transform: uppercase; margin-top: 5px;">Encrypted Sync</div>
     </div>
     """, unsafe_allow_html=True)
 
 
-# --- ADMIN LOGIN & RECENT HISTORY / LOOKUP SECTION ---
-st.markdown("---")
-st.markdown("### 🔐 Admin Portal: Recent History & Cloud Lookup")
+# --- ADMIN PORTAL SECTION ---
+st.markdown("<br>", unsafe_allow_html=True)
+st.markdown("### 🔐 Enterprise Admin Control & Cloud Records")
 
 if not st.session_state.is_admin_logged_in:
     with st.form("admin_login_form"):
-        st.markdown("<p style='color:#94A3B8;'>Please enter administrator credentials to access client history and lookup tools.</p>", unsafe_allow_html=True)
+        st.markdown("<p style='color:#94A3B8;'>Authenticate with enterprise credentials to access live quotation databases and audit logs.</p>", unsafe_allow_html=True)
         login_user = st.text_input("Username", value="")
         login_pass = st.text_input("Password", type="password", value="")
-        login_submit = st.form_submit_button("🔑 Login to Admin Dashboard", type="primary")
+        login_submit = st.form_submit_button("🔑 Authorize Access", type="primary")
 
     if login_submit:
         if login_user == "HARI1109" and login_pass == "73384@Hks":
             st.session_state.is_admin_logged_in = True
-            st.success("🎉 Login successful! Unlocking dashboard...")
+            st.success("🎉 Authorization successful! Loading dashboard...")
             st.rerun()
         else:
-            st.error("❌ Invalid Username or Password. Please try again.")
+            st.error("❌ Invalid enterprise credentials.")
 else:
-    st.success("🔓 Authenticated as Admin (HARI1109)")
-    if st.button("🔒 Logout"):
+    st.success("🔓 Authenticated as Administrator (HARI1109)")
+    if st.button("🔒 Terminate Session"):
         st.session_state.is_admin_logged_in = False
         st.rerun()
 
     st.markdown("---")
-    tab_history, tab_lookup = st.tabs(["📊 Recent Quotation History", "🔍 Cloud Document Lookup"])
+    tab_history, tab_lookup = st.tabs(["📊 Live Estimation Records", "🔍 Document Cloud Lookup"])
 
     with tab_history:
-        st.markdown("#### 📋 Recent Quotation Records")
+        st.markdown("#### 📋 Recent Quotations Ledger")
         if not supabase:
-            st.warning("⚠️ Supabase client is not configured.")
+            st.warning("⚠️ Supabase connection inactive.")
         else:
             try:
                 res = supabase.table("estimation_logs").select("*").order("est_date", desc=True).limit(20).execute()
@@ -619,23 +695,23 @@ else:
                 if data:
                     st.dataframe(data, use_container_width=True)
                 else:
-                    st.info("No records found in database.")
+                    st.info("No records found.")
             except Exception as e:
-                st.error(f"Error fetching history: {e}")
+                st.error(f"Database error: {e}")
 
     with tab_lookup:
-        st.markdown("#### 🔎 Search Specific Quotation Record")
+        st.markdown("#### 🔎 Reference Code Cloud Search")
         search_ref = st.text_input("Enter Reference Number:", placeholder="e.g. 104502082026")
-        if st.button("Search Cloud Record", type="primary"):
+        if st.button("Query Cloud Database", type="primary"):
             if not supabase:
-                st.warning("⚠️ Supabase client is not configured.")
+                st.warning("⚠️ Supabase connection inactive.")
             else:
                 try:
                     response = supabase.table("estimation_logs").select("*").eq("ref_no", search_ref.strip()).execute()
                     records = response.data
                     if records:
                         rec = records[0]
-                        st.success(f"✅ **Record Found!** Customer: **{rec.get('customer_name')}** | User: {rec.get('user_name', 'N/A')} | Date: {rec.get('est_date')} | Amount: ₹ {rec.get('amount'):,.2f}")
+                        st.success(f"✅ **Record Verified!** Customer: **{rec.get('customer_name')}** | Agent: {rec.get('user_name', 'N/A')} | Date: {rec.get('est_date')} | Total: ₹ {rec.get('amount'):,.2f}")
                         
                         url_std = rec.get('pdf_url')
                         url_no_hdr = rec.get('pdf_url_no_header')
@@ -646,131 +722,142 @@ else:
 
                         sc1, sc2 = st.columns(2)
                         with sc1:
-                            if url_std: st.markdown(f"[📥 Download Standard Copy (Cloud)]({url_std})")
+                            if url_std: st.markdown(f"[📥 Download Standard PDF (Cloud)]({url_std})")
                         with sc2:
-                            if url_no_hdr: st.markdown(f"[📥 Download No-Header Copy (Cloud)]({url_no_hdr})")
+                            if url_no_hdr: st.markdown(f"[📥 Download Clean PDF (Cloud)]({url_no_hdr})")
                     else:
-                        st.error(f"❌ No record found matching Reference Number: `{search_ref}`")
+                        st.error(f"❌ No records matched reference: `{search_ref}`")
                 except Exception as e:
-                    st.error(f"Error executing lookup: {e}")
+                    st.error(f"Query execution failed: {e}")
 
 
-# --- INTERACTIVE 3D ROOM VISUALIZER SELECTOR ---
+# --- INTERACTIVE 3D ANIMATED / GIF VISUALIZER ---
 st.markdown("<br>", unsafe_allow_html=True)
-st.markdown("### 🥽 Explore Interactive 3D Room Visualizer Gallery")
-st.markdown("<p style='color:#94A3B8; font-size:0.95rem; margin-bottom:1.5rem;'>Select a zone below to inspect 3D spatial layouts, lighting configurations, and premium material finishes.</p>", unsafe_allow_html=True)
+st.markdown("### 🌀 Interactive 3D Spatial Simulator & Live Renderings")
+st.markdown("<p style='color:#94A3B8; font-size:0.95rem; margin-bottom:1.5rem;'>Select a commercial zone to inspect real-time spatial physics, lighting loops, and modular material simulations.</p>", unsafe_allow_html=True)
 
 selected_room = st.radio(
-    "Select Zone to Visualize:",
-    ["🍳 Modular Kitchen (Island & U-Shape)", "🛋️ Luxury Living & Entertainment", "🛏️ Designer Wardrobes & Bedroom", "💡 False Ceiling & Ambient Lighting", "🪵 Italian Flooring & Wall Paneling"],
+    "Select Simulation Zone:",
+    ["🍳 Modular Kitchen (Island & U-Shape)", "🛋️ Luxury Living & Media Lounge", "🛏️ Designer Wardrobes & Bedroom", "💡 Architectural False Ceiling", "🪵 Italian Flooring & Paneling"],
     horizontal=True,
     label_visibility="collapsed"
 )
 
 if "Kitchen" in selected_room:
     st.markdown("""
-    <div class="glass-card-3d" style="display:flex; gap:30px; align-items:center;">
+    <div class="dashboard-card-3d" style="display:flex; gap:35px; align-items:center;">
         <div style="flex:1;">
-            <div style="color:#F59E0B; font-weight:800; font-size:0.8rem; letter-spacing:2px; text-transform:uppercase;">3D SPATIAL ZONE 01</div>
-            <h2 style="font-family:'Cinzel', serif; font-size:2rem; color:#FFF; margin:8px 0 12px 0;">German Soft-Close Acrylic Kitchen</h2>
-            <p style="color:#CBD5E1; line-height:1.6; margin-bottom:1.5rem;">
-                Featuring Blum tandem box systems, quartz stone countertops with anti-scratch coating, integrated profile LED under-cabinet illumination, and water-resistant boiling waterproof (BWP) ply cores.
+            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#F59E0B; text-transform:uppercase;">SIMULATION MODULE 01</div>
+            <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">German Soft-Close Acrylic Kitchen</h2>
+            <p style="color:#CBD5E1; line-height:1.7; margin-bottom:1.5rem;">
+                Engineered with Blum tandem box mechanisms, scratch-resistant quartz stone counters, integrated LED profile strip lighting, and water-resistant BWP marine-grade plywood cores.
             </p>
-            <div style="display:flex; gap:15px; color:#FBBF24; font-size:0.9rem; font-weight:700;">
-                <div>✔️ Handleless Profile</div>
-                <div>✔️ Anti-Fingerprint Finish</div>
-                <div>✔️ 10-Year Warranty</div>
+            <div style="display:flex; gap:15px; color:#38BDF8; font-weight:700; font-size:0.9rem;">
+                <div>⚡ Blum Hardware</div>
+                <div>⚡ Quartz Stone</div>
+                <div>⚡ 10-Yr Warranty</div>
             </div>
         </div>
         <div style="flex:1;">
-            <img src="https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1000&q=80" style="width:100%; height:320px; object-fit:cover; border-radius:18px; border:1px solid rgba(217,119,6,0.4);" alt="Kitchen 3D">
+            <div class="visualizer-frame-3d">
+                <img src="https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1000&q=80" alt="Kitchen 3D GIF">
+            </div>
         </div>
     </div>
     """, unsafe_allow_html=True)
 elif "Living" in selected_room:
     st.markdown("""
-    <div class="glass-card-3d" style="display:flex; gap:30px; align-items:center;">
+    <div class="dashboard-card-3d" style="display:flex; gap:35px; align-items:center;">
         <div style="flex:1;">
-            <div style="color:#F59E0B; font-weight:800; font-size:0.8rem; letter-spacing:2px; text-transform:uppercase;">3D SPATIAL ZONE 02</div>
-            <h2 style="font-family:'Cinzel', serif; font-size:2rem; color:#FFF; margin:8px 0 12px 0;">Grand Living & TV Media Lounge</h2>
-            <p style="color:#CBD5E1; line-height:1.6; margin-bottom:1.5rem;">
-                Custom fluted wall paneling, Italian marble media console backdrops, concealed wiring ducts, automated smart curtains, and acoustic wall insulation for high-fidelity home theater experiences.
+            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#F59E0B; text-transform:uppercase;">SIMULATION MODULE 02</div>
+            <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">Grand Living & Media Lounge</h2>
+            <p style="color:#CBD5E1; line-height:1.7; margin-bottom:1.5rem;">
+                Featuring custom acoustic fluted panels, sintered stone TV media backdrops, motorized smart curtains, and concealed wiring channels for high-end home theater setups.
             </p>
-            <div style="display:flex; gap:15px; color:#FBBF24; font-size:0.9rem; font-weight:700;">
-                <div>✔️ Fluted Wooden Panels</div>
-                <div>✔️ Acoustic Insulation</div>
-                <div>✔️ Smart Lighting Sync</div>
+            <div style="display:flex; gap:15px; color:#38BDF8; font-weight:700; font-size:0.9rem;">
+                <div>⚡ Fluted Panels</div>
+                <div>⚡ Acoustic Wall</div>
+                <div>⚡ Smart Motorized</div>
             </div>
         </div>
         <div style="flex:1;">
-            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80" style="width:100%; height:320px; object-fit:cover; border-radius:18px; border:1px solid rgba(217,119,6,0.4);" alt="Living 3D">
+            <div class="visualizer-frame-3d">
+                <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80" alt="Living 3D GIF">
+            </div>
         </div>
     </div>
     """, unsafe_allow_html=True)
 elif "Wardrobes" in selected_room:
     st.markdown("""
-    <div class="glass-card-3d" style="display:flex; gap:30px; align-items:center;">
+    <div class="dashboard-card-3d" style="display:flex; gap:35px; align-items:center;">
         <div style="flex:1;">
-            <div style="color:#F59E0B; font-weight:800; font-size:0.8rem; letter-spacing:2px; text-transform:uppercase;">3D SPATIAL ZONE 03</div>
-            <h2 style="font-family:'Cinzel', serif; font-size:2rem; color:#FFF; margin:8px 0 12px 0;">Floor-to-Ceiling Glass Wardrobes</h2>
-            <p style="color:#CBD5E1; line-height:1.6; margin-bottom:1.5rem;">
-                Tinted bronze glass wardrobe shutters with integrated sensor-activated wardrobe lighting rails, velvet-lined pull-out jewelry drawers, and heavy-duty soft-close mechanisms.
+            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#F59E0B; text-transform:uppercase;">SIMULATION MODULE 03</div>
+            <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">Floor-to-Ceiling Glass Wardrobes</h2>
+            <p style="color:#CBD5E1; line-height:1.7; margin-bottom:1.5rem;">
+                Bronze tinted safety glass sliding doors equipped with motion-activated LED hanging rails, velvet-lined pull-out organizer trays, and soft-closing dampeners.
             </p>
-            <div style="display:flex; gap:15px; color:#FBBF24; font-size:0.9rem; font-weight:700;">
-                <div>✔️ Sensor Lighting</div>
-                <div>✔️ Velvet Pull-outs</div>
-                <div>✔️ Bronze Tinted Glass</div>
+            <div style="display:flex; gap:15px; color:#38BDF8; font-weight:700; font-size:0.9rem;">
+                <div>⚡ Sensor Lighting</div>
+                <div>⚡ Velvet Trays</div>
+                <div>⚡ Tinted Glass</div>
             </div>
         </div>
         <div style="flex:1;">
-            <img src="https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1000&q=80" style="width:100%; height:320px; object-fit:cover; border-radius:18px; border:1px solid rgba(217,119,6,0.4);" alt="Wardrobes 3D">
+            <div class="visualizer-frame-3d">
+                <img src="https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1000&q=80" alt="Wardrobes 3D GIF">
+            </div>
         </div>
     </div>
     """, unsafe_allow_html=True)
 elif "Ceiling" in selected_room:
     st.markdown("""
-    <div class="glass-card-3d" style="display:flex; gap:30px; align-items:center;">
+    <div class="dashboard-card-3d" style="display:flex; gap:35px; align-items:center;">
         <div style="flex:1;">
-            <div style="color:#F59E0B; font-weight:800; font-size:0.8rem; letter-spacing:2px; text-transform:uppercase;">3D SPATIAL ZONE 04</div>
-            <h2 style="font-family:'Cinzel', serif; font-size:2rem; color:#FFF; margin:8px 0 12px 0;">Architectural False Ceiling & Coves</h2>
-            <p style="color:#CBD5E1; line-height:1.6; margin-bottom:1.5rem;">
-                Multi-layered gypsum board ceilings with concealed warm LED cove lighting, architectural magnetic track spotlights, and elegant chandelier centerpieces engineered for luxury ambiance.
+            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#F59E0B; text-transform:uppercase;">SIMULATION MODULE 04</div>
+            <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">Architectural False Ceiling & Coves</h2>
+            <p style="color:#CBD5E1; line-height:1.7; margin-bottom:1.5rem;">
+                Multi-tier gypsum board architectural drops featuring warm concealed cove lighting lines, magnetic track spotlight fixtures, and statement crystal chandelier mounts.
             </p>
-            <div style="display:flex; gap:15px; color:#FBBF24; font-size:0.9rem; font-weight:700;">
-                <div>✔️ Magnetic Track Lights</div>
-                <div>✔️ Warm Cove LED</div>
-                <div>✔️ Gypsum Precision</div>
+            <div style="display:flex; gap:15px; color:#38BDF8; font-weight:700; font-size:0.9rem;">
+                <div>⚡ Magnetic Tracks</div>
+                <div>⚡ Warm Cove LED</div>
+                <div>⚡ Gypsum Finish</div>
             </div>
         </div>
         <div style="flex:1;">
-            <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1000&q=80" style="width:100%; height:320px; object-fit:cover; border-radius:18px; border:1px solid rgba(217,119,6,0.4);" alt="Ceiling 3D">
+            <div class="visualizer-frame-3d">
+                <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1000&q=80" alt="Ceiling 3D GIF">
+            </div>
         </div>
     </div>
     """, unsafe_allow_html=True)
 else:
     st.markdown("""
-    <div class="glass-card-3d" style="display:flex; gap:30px; align-items:center;">
+    <div class="dashboard-card-3d" style="display:flex; gap:35px; align-items:center;">
         <div style="flex:1;">
-            <div style="color:#F59E0B; font-weight:800; font-size:0.8rem; letter-spacing:2px; text-transform:uppercase;">3D SPATIAL ZONE 05</div>
-            <h2 style="font-family:'Cinzel', serif; font-size:2rem; color:#FFF; margin:8px 0 12px 0;">Italian Marble & Wood Paneling</h2>
-            <p style="color:#CBD5E1; line-height:1.6; margin-bottom:1.5rem;">
-                Imported large-format Italian marble flooring with mirror-finish diamond polishing, coupled with seamless veneer wall paneling and brass inlay accents.
+            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#F59E0B; text-transform:uppercase;">SIMULATION MODULE 05</div>
+            <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">Imported Italian Marble & Wood Paneling</h2>
+            <p style="color:#CBD5E1; line-height:1.7; margin-bottom:1.5rem;">
+                Mirror-polished large-format Italian marble tiles paired with vertical natural wood veneer wall cladding and brushed brass inlay metal trims.
             </p>
-            <div style="display:flex; gap:15px; color:#FBBF24; font-size:0.9rem; font-weight:700;">
-                <div>✔️ Imported Marble</div>
-                <div>✔️ Brass Inlays</div>
-                <div>✔️ Mirror Polish</div>
+            <div style="display:flex; gap:15px; color:#38BDF8; font-weight:700; font-size:0.9rem;">
+                <div>⚡ Italian Marble</div>
+                <div>⚡ Brass Inlays</div>
+                <div>⚡ Veneer Finish</div>
             </div>
         </div>
         <div style="flex:1;">
-            <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1000&q=80" style="width:100%; height:320px; object-fit:cover; border-radius:18px; border:1px solid rgba(217,119,6,0.4);" alt="Flooring 3D">
+            <div class="visualizer-frame-3d">
+                <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1000&q=80" alt="Flooring 3D GIF">
+            </div>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-# --- MAIN CALL TO ACTION ---
+
+# --- MAIN ACTION BUTTON ---
 st.markdown("<br>", unsafe_allow_html=True)
 col_cta1, col_cta2, col_cta3 = st.columns([1, 2, 1])
 with col_cta2:
-    if st.button("🚀 GENERATE QUOTATION", type="primary", use_container_width=True):
+    if st.button("⚡ LAUNCH 3D QUOTATION GENERATOR", type="primary", use_container_width=True):
         show_quotation_dialog()
