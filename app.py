@@ -388,23 +388,23 @@ def show_quotation_dialog():
         st.subheader("👤 User / Submitter Details")
         col_u1, col_u2 = st.columns(2)
         with col_u1:
-            user_name = st.text_input("User / Agent Name *", value="HARI")
-            user_mobile = st.text_input("User Mobile Number *", value="7338425213")
+            user_name = st.text_input("User / Agent Name *", placeholder="Enter your name")
+            user_mobile = st.text_input("User Mobile Number *", placeholder="Enter mobile number")
         with col_u2:
-            user_email = st.text_input("User Email ID *", value="hari@sndinteriors.com")
+            user_email = st.text_input("User Email ID *", placeholder="Enter email address")
 
         st.markdown("---")
         st.subheader("🏠 Customer & Property Details (Printed on Quotation)")
         col_c1, col_c2 = st.columns(2)
         with col_c1:
-            customer_name = st.text_input("Customer Full Name *", value="KUSHAL ANAND & HKS")
+            customer_name = st.text_input("Customer Full Name *", placeholder="Enter customer name")
             date_input = st.text_input("Quotation Date", value=datetime.now().strftime("%d-%m-%Y"))
         with col_c2:
             pass # Placeholder for layout alignment if needed
 
         address_input = st.text_area(
             "Customer Property / Site Address in Bengaluru *", 
-            value="BIRLA TRIMAYA PHASE 4 FLAT-1205, T-6, F-12, DEVANAHALLI CHIKKAJALA, BENGALURU"
+            placeholder="Enter complete site or flat address in Bengaluru"
         )
 
         st.markdown("---")
@@ -426,6 +426,10 @@ def show_quotation_dialog():
         submitted = st.form_submit_button("⚡ GENERATE PDF", type="primary", use_container_width=True)
 
     if submitted:
+        if not user_name.strip() or not user_mobile.strip() or not user_email.strip() or not customer_name.strip() or not address_input.strip():
+            st.warning("⚠️ Please fill in all required fields before generating the quotation.")
+            return
+
         with st.spinner('Generating PDF copies and syncing securely with cloud storage...'):
             try:
                 pdf_bytes_std, filename_std, generated_ref, final_total = generate_estimation_pdf_bytes(
@@ -449,7 +453,7 @@ def show_quotation_dialog():
                 <div style="background: rgba(217, 119, 6, 0.15); border: 1px solid #D97706; padding: 20px; border-radius: 14px; margin: 15px 0;">
                     <h3 style="color: #F59E0B; margin-top: 0;">REF NO: {generated_ref}</h3>
                     <p style="font-size: 1.05rem; color: #F8FAFC; line-height: 1.6;">
-                        <b>Your request has been accepted. Please wait some time; you will receive it via mail or WhatsApp. Please copy this reference number and WhatsApp it to 7338425213 for instant quotation tracking.</b>
+                        <b>Your request has been accepted. Please wait some time; you will receive it via mail or WhatsApp.</b>
                     </p>
                 </div>
                 """, unsafe_allow_html=True)
