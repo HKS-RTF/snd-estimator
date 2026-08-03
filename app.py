@@ -861,7 +861,7 @@ with col_hero2:
 
 # --- STATIC & FIXED 10 IMAGES GALLERY SHOWCASE ---
 st.markdown("<br>", unsafe_allow_html=True)
-st.markdown("### 🏛️ Portfolio Master Collection (10 Fixed Showcase Galleries)")
+st.markdown("### 🏛️ Portfolio Master Collection")
 st.markdown("<p style='color:#94A3B8; font-size:0.95rem; margin-bottom:1rem;'>Explore our curated permanent catalog of architectural finishes, structural modules, and luxury interior spaces.</p>", unsafe_allow_html=True)
 
 st.markdown("""
