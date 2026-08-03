@@ -426,7 +426,7 @@ def show_quotation_dialog():
         submitted = st.form_submit_button("⚡ GENERATE PDF", type="primary", use_container_width=True)
 
     if submitted:
-        with st.spinner('Generating both PDF copies & syncing securely with cloud storage...'):
+        with st.spinner('Generating PDF copies and syncing securely with cloud storage...'):
             try:
                 pdf_bytes_std, filename_std, generated_ref, final_total = generate_estimation_pdf_bytes(
                     customer_name, address_input, date_input, float(amount_input), include_header=True
@@ -443,37 +443,16 @@ def show_quotation_dialog():
                     )
                 
                 st.balloons()
-                st.success(f"🎉 **Quotation Generated Successfully!**")
+                st.success("🎉 **Quotation Generated Successfully!**")
                 
                 st.markdown(f"""
                 <div style="background: rgba(217, 119, 6, 0.15); border: 1px solid #D97706; padding: 20px; border-radius: 14px; margin: 15px 0;">
-                    <h3 style="color: #F59E0B; margin-top: 0;">REF NO:- {generated_ref}</h3>
+                    <h3 style="color: #F59E0B; margin-top: 0;">REF NO: {generated_ref}</h3>
                     <p style="font-size: 1.05rem; color: #F8FAFC; line-height: 1.6;">
-                        <b>HELLO YOU WILL RECEIVE QUOTATION VIA WHATS APP AND MAIL IN SOME TIME , AND COPY THIS REFRENCE NUMBER AND WHATS APP TO 7338425213 FOR INSTANT QUATION.</b>
+                        <b>Your request has been accepted. Please wait some time; you will receive it via mail or WhatsApp. Please copy this reference number and WhatsApp it to 7338425213 for instant quotation tracking.</b>
                     </p>
                 </div>
                 """, unsafe_allow_html=True)
-
-                st.markdown("### 📥 Instant Downloads")
-                dl_col1, dl_col2 = st.columns(2)
-                with dl_col1:
-                    st.download_button(
-                        label="📄 Download Standard PDF",
-                        data=pdf_bytes_std,
-                        file_name=filename_std,
-                        mime="application/pdf",
-                        type="primary",
-                        use_container_width=True
-                    )
-                with dl_col2:
-                    st.download_button(
-                        label="📄 Download No-Header PDF",
-                        data=pdf_bytes_no_hdr,
-                        file_name=filename_no_hdr,
-                        mime="application/pdf",
-                        type="secondary",
-                        use_container_width=True
-                    )
 
             except Exception as e:
                 st.error(f"An error occurred: {e}")
