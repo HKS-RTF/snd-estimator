@@ -298,6 +298,85 @@ st.markdown("""
         background: linear-gradient(to bottom, rgba(15, 23, 42, 0.9), rgba(3, 7, 18, 0.95));
     }
 
+    /* Full-Size Vertical Scrolling Gallery Section */
+    .vertical-gallery-container {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        margin-top: 1.5rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .vertical-gallery-card {
+        position: relative;
+        width: 100%;
+        height: 520px;
+        border-radius: 24px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
+        transition: transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+        background: #0b0f19;
+    }
+
+    .vertical-gallery-card:hover {
+        transform: translateY(-6px);
+        border-color: rgba(245, 158, 11, 0.5);
+        box-shadow: 0 35px 70px rgba(245, 158, 11, 0.25);
+    }
+
+    .vertical-gallery-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.6s ease;
+    }
+
+    .vertical-gallery-card:hover img {
+        transform: scale(1.03);
+    }
+
+    .vertical-card-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(to top, rgba(3, 7, 18, 0.95) 0%, rgba(3, 7, 18, 0.6) 60%, transparent 100%);
+        padding: 40px 35px 30px 35px;
+        color: #FFFFFF;
+        font-family: 'Outfit', sans-serif;
+    }
+
+    .vertical-card-badge {
+        display: inline-block;
+        padding: 6px 14px;
+        background: rgba(245, 158, 11, 0.2);
+        border: 1px solid rgba(245, 158, 11, 0.5);
+        color: #FBBF24;
+        font-size: 0.75rem;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        border-radius: 20px;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+    }
+
+    .vertical-card-title {
+        font-size: 1.8rem;
+        font-weight: 800;
+        margin-bottom: 8px;
+        color: #FFFFFF;
+    }
+
+    .vertical-card-desc {
+        color: #94A3B8;
+        font-size: 0.95rem;
+        font-weight: 500;
+        max-width: 800px;
+        line-height: 1.5;
+    }
+
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
 </style>
@@ -796,7 +875,6 @@ with col_hero1:
     """, unsafe_allow_html=True)
 
 with col_hero2:
-    # Auto-sliding showcase slideshow using standard HTML <img> tags for reliable loading
     st.markdown("""
     <div class="slider-box" id="interiorCarousel">
         <div class="carousel-slide active">
@@ -861,7 +939,7 @@ with col_hero2:
 
 # --- STATIC & FIXED 10 IMAGES GALLERY SHOWCASE ---
 st.markdown("<br>", unsafe_allow_html=True)
-st.markdown("### 🏛️ Portfolio Master Collection")
+st.markdown("### 🏛️ Portfolio Master Collection (10 Fixed Showcase Galleries)")
 st.markdown("<p style='color:#94A3B8; font-size:0.95rem; margin-bottom:1rem;'>Explore our curated permanent catalog of architectural finishes, structural modules, and luxury interior spaces.</p>", unsafe_allow_html=True)
 
 st.markdown("""
@@ -905,6 +983,107 @@ st.markdown("""
     <div class="static-gallery-item">
         <img src="https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=600&q=80" alt="Balcony Decking">
         <div class="static-gallery-label">10. Balcony Decking</div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+
+# --- FULL-SIZE VERTICAL SCROLLING SHOWCASE (10 FULL SIZE IMAGES) ---
+st.markdown("<br>", unsafe_allow_html=True)
+st.markdown("### 📸 10 Full-Size Vertical Architectural Showcase")
+st.markdown("<p style='color:#94A3B8; font-size:0.95rem; margin-bottom:1.5rem;'>Scroll down through our 10 full-width, high-definition architectural project features.</p>", unsafe_allow_html=True)
+
+st.markdown("""
+<div class="vertical-gallery-container">
+    <!-- 01 -->
+    <div class="vertical-gallery-card">
+        <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=80" alt="Architectural Living Room">
+        <div class="vertical-card-overlay">
+            <span class="vertical-card-badge">Full Size Feature • 01</span>
+            <div class="vertical-card-title">Architectural Grand Living Lounge & Media Suite</div>
+            <div class="vertical-card-desc">Double-height ceiling, acoustic timber louvers, integrated ambient profile LED lighting, and Italian marble accents.</div>
+        </div>
+    </div>
+    <!-- 02 -->
+    <div class="vertical-gallery-card">
+        <img src="https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1600&q=80" alt="Modular German Kitchen">
+        <div class="vertical-card-overlay">
+            <span class="vertical-card-badge">Full Size Feature • 02</span>
+            <div class="vertical-card-title">Ultra-Modern Modular German Island Kitchen</div>
+            <div class="vertical-card-desc">Handleless acrylic cabinetry, waterfall quartz island, fully integrated Blum motorized hardware, and smart appliances.</div>
+        </div>
+    </div>
+    <!-- 03 -->
+    <div class="vertical-gallery-card">
+        <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1600&q=80" alt="Master Penthouse Suite">
+        <div class="vertical-card-overlay">
+            <span class="vertical-card-badge">Full Size Feature • 03</span>
+            <div class="vertical-card-title">Executive Master Bedroom & Penthouse Lounge</div>
+            <div class="vertical-card-desc">Upholstered headboard backdrop, warm cove architectural lighting, floor-to-ceiling glass paneling, and engineered hardwood flooring.</div>
+        </div>
+    </div>
+    <!-- 04 -->
+    <div class="vertical-gallery-card">
+        <img src="https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1600&q=80" alt="Walk-in Glass Wardrobe">
+        <div class="vertical-card-overlay">
+            <span class="vertical-card-badge">Full Size Feature • 04</span>
+            <div class="vertical-card-title">Luxury Tinted Glass Walk-in Wardrobe System</div>
+            <div class="vertical-card-desc">Custom aluminum-framed glass wardrobe doors, motion-sensor interior illumination, velvet jewelry trays, and hidden biometric vault space.</div>
+        </div>
+    </div>
+    <!-- 05 -->
+    <div class="vertical-gallery-card">
+        <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1600&q=80" alt="Italian Marble Foyer">
+        <div class="vertical-card-overlay">
+            <span class="vertical-card-badge">Full Size Feature • 05</span>
+            <div class="vertical-card-title">Imported Italian Marble Foyer & Wall Cladding</div>
+            <div class="vertical-card-desc">High-gloss Statuario marble flooring, custom brass inlay geometric patterns, and vertical natural veneer wall paneling.</div>
+        </div>
+    </div>
+    <!-- 06 -->
+    <div class="vertical-gallery-card">
+        <img src="https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=1600&q=80" alt="Contemporary Dining">
+        <div class="vertical-card-overlay">
+            <span class="vertical-card-badge">Full Size Feature • 06</span>
+            <div class="vertical-card-title">Open-Concept Contemporary Dining Architecture</div>
+            <div class="vertical-card-desc">Custom 10-seater monolith stone dining table, designer crystal drop chandelier, and seamless connection to outdoor green terrace.</div>
+        </div>
+    </div>
+    <!-- 07 -->
+    <div class="vertical-gallery-card">
+        <img src="https://images.unsplash.com/photo-1616046229478-9901c5536a45?auto=format&fit=crop&w=1600&q=80" alt="Executive Home Office">
+        <div class="vertical-card-overlay">
+            <span class="vertical-card-badge">Full Size Feature • 07</span>
+            <div class="vertical-card-title">Bespoke Executive Home Office & Library Suite</div>
+            <div class="vertical-card-desc">Ergonomic acoustic wall paneling, custom floating bookshelves with backlighting, cable management channels, and leather seating.</div>
+        </div>
+    </div>
+    <!-- 08 -->
+    <div class="vertical-gallery-card">
+        <img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=1600&q=80" alt="Luxury Spa Bathroom">
+        <div class="vertical-card-overlay">
+            <span class="vertical-card-badge">Full Size Feature • 08</span>
+            <div class="vertical-card-title">Designer Spa Bathroom & Floating Vanity</div>
+            <div class="vertical-card-desc">Large-format porcelain tiles, backlit anti-fog smart LED mirrors, ceiling-mounted rain shower system, and concealed Kohler fittings.</div>
+        </div>
+    </div>
+    <!-- 09 -->
+    <div class="vertical-gallery-card">
+        <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1600&q=80" alt="Architectural Ceiling">
+        <div class="vertical-card-overlay">
+            <span class="vertical-card-badge">Full Size Feature • 09</span>
+            <div class="vertical-card-title">Multi-Tier Architectural False Ceiling & Coves</div>
+            <div class="vertical-card-desc">Seamless Gyproc false ceiling, rimless magnetic track spotlighting, ambient warm perimeter LEDs, and hidden AC diffuser grilles.</div>
+        </div>
+    </div>
+    <!-- 10 -->
+    <div class="vertical-gallery-card">
+        <img src="https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1600&q=80" alt="Sky Penthouse Balcony">
+        <div class="vertical-card-overlay">
+            <span class="vertical-card-badge">Full Size Feature • 10</span>
+            <div class="vertical-card-title">Sky Penthouse Balcony & Exterior Lounge Decking</div>
+            <div class="vertical-card-desc">Weatherproof composite WPC wooden decking, frameless glass railings, vertical garden green wall, and exterior warm illumination.</div>
+        </div>
     </div>
 </div>
 """, unsafe_allow_html=True)
