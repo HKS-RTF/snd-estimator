@@ -1255,5 +1255,5 @@ else:
 st.markdown("<br>", unsafe_allow_html=True)
 col_cta1, col_cta2, col_cta3 = st.columns([1, 2, 1])
 with col_cta2:
-    if st.button("⚡ GET YOUR QUOTATION NOW ", type="primary", use_container_width=True):
+    if st.button("⚡ GET YOUR QUOTATION ", type="primary", use_container_width=True):
         show_quotation_dialog()
