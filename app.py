@@ -579,7 +579,7 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
             
             self.restoreState()
 
-    doc = SimpleDocTemplate(pdf_buffer, pagesize=A4, rightMargin=10, leftMargin=10, topMargin=20, bottomMargin=10)
+    doc = SimpleDocTemplate(pdf_buffer, pagesize=A4, rightMargin=10, leftMargin=10, topMargin=10, bottomMargin=10)
     styles = getSampleStyleSheet()
 
     RED_COLOR, BLUE_COLOR, LIGHT_PINK, BORDER_BLUE = colors.HexColor("#DC2626"), colors.HexColor("#1E40AF"), colors.HexColor("#EC4899"), colors.HexColor("#2563EB")
