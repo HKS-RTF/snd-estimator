@@ -5,25 +5,12 @@ from datetime import datetime
 import streamlit as st
 from supabase import create_client, Client
 
-import io
-import os
-import random
-from datetime import datetime
-from reportlab.graphics.barcode.qr import QrCodeWidget
-from reportlab.graphics.shapes import Drawing
-from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
-from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
-from reportlab.platypus import (
-    PageBreak,
-    Paragraph,
-    SimpleDocTemplate,
-    Spacer,
-    Table,
-    TableStyle,
-)
-import streamlit as st
-from supabase import Client, create_client
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib import colors
+from reportlab.graphics.shapes import Drawing
+from reportlab.graphics.barcode.qr import QrCodeWidget
 
 # --- Page Configuration ---
 st.set_page_config(
@@ -83,7 +70,7 @@ st.markdown("""
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         text-shadow: 0 20px 40px rgba(0,0,0,0.8);
-        letter-spacing: -1px;
+        A4-spacing: -1px;
         margin-bottom: 10px;
     }
 
@@ -267,7 +254,7 @@ st.markdown("""
         font-family: 'Outfit', sans-serif;
         font-weight: 700;
         font-size: 1.25rem;
-        letter-spacing: 0.5px;
+        A4-spacing: 0.5px;
     }
 
     /* Static Grid Gallery Styles */
@@ -369,7 +356,7 @@ st.markdown("""
         color: #FBBF24;
         font-size: 0.75rem;
         font-weight: 800;
-        letter-spacing: 1.5px;
+        A4-spacing: 1.5px;
         border-radius: 20px;
         text-transform: uppercase;
         margin-bottom: 10px;
@@ -592,7 +579,7 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
             
             self.restoreState()
 
-    doc = SimpleDocTemplate(pdf_buffer, pagesize=letter, rightMargin=30, leftMargin=30, topMargin=50, bottomMargin=15)
+    doc = SimpleDocTemplate(pdf_buffer, pagesize=A4, rightMargin=30, leftMargin=30, topMargin=50, bottomMargin=15)
     styles = getSampleStyleSheet()
 
     RED_COLOR, BLUE_COLOR, LIGHT_PINK, BORDER_BLUE = colors.HexColor("#DC2626"), colors.HexColor("#1E40AF"), colors.HexColor("#EC4899"), colors.HexColor("#2563EB")
@@ -731,7 +718,7 @@ def show_quotation_dialog():
     <div class="commercial-auth-banner">
         <div style="font-size:2.2rem;">🔐</div>
         <div>
-            <div style="color:#818CF8; font-weight:700; font-size:0.85rem; letter-spacing:1px;">SECURE SSL GATEWAY • COMMERCIAL GST INVOICING</div>
+            <div style="color:#818CF8; font-weight:700; font-size:0.85rem; A4-spacing:1px;">SECURE SSL GATEWAY • COMMERCIAL GST INVOICING</div>
             <div style="color:#FFFFFF; font-size:0.8rem;">Generate encrypted PDF estimates with dynamic QR code authentication for Bengaluru projects.</div>
         </div>
     </div>
@@ -917,7 +904,7 @@ col_hero1, col_hero2 = st.columns([1.2, 1])
 with col_hero1:
     st.markdown("""
     <div class="dashboard-card-3d" style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.85) 100%); padding: 3rem 2.5rem; height: 100%;">
-        <div style="font-family:'Space Grotesk', sans-serif; font-weight: 800; font-size: 0.85rem; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 12px;">
+        <div style="font-family:'Space Grotesk', sans-serif; font-weight: 800; font-size: 0.85rem; A4-spacing: 3px; text-transform: uppercase; margin-bottom: 12px;">
             <span class="gradient-text-gold">✦ ENTERPRISE EXTERIOR & INTERIOR </span>
         </div>
         <h1 class="hero-title-3d" style="font-size: 3rem;">SND INTERIOR & DESIGNS</h1>
@@ -1190,7 +1177,7 @@ if "Kitchen" in selected_room:
     st.markdown("""
     <div class="dashboard-card-3d" style="display:flex; gap:35px; align-items:center;">
         <div style="flex:1;">
-            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#F59E0B; text-transform:uppercase;">SIMULATION MODULE 01</div>
+            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; A4-spacing:2px; color:#F59E0B; text-transform:uppercase;">SIMULATION MODULE 01</div>
             <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">German Soft-Close Acrylic Kitchen</h2>
             <p style="color:#CBD5E1; line-height:1.7; margin-bottom:1.5rem;">
                 Engineered with Blum tandem box mechanisms, scratch-resistant quartz stone counters, integrated LED profile strip lighting, and water-resistant BWP marine-grade plywood cores.
@@ -1212,7 +1199,7 @@ elif "Living" in selected_room:
     st.markdown("""
     <div class="dashboard-card-3d" style="display:flex; gap:35px; align-items:center;">
         <div style="flex:1;">
-            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#F59E0B; text-transform:uppercase;">SIMULATION MODULE 02</div>
+            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; A4-spacing:2px; color:#F59E0B; text-transform:uppercase;">SIMULATION MODULE 02</div>
             <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">Grand Living & Media Lounge</h2>
             <p style="color:#CBD5E1; line-height:1.7; margin-bottom:1.5rem;">
                 Featuring custom acoustic fluted panels, sintered stone TV media backdrops, motorized smart curtains, and concealed wiring channels for high-end home theater setups.
@@ -1234,7 +1221,7 @@ elif "Wardrobes" in selected_room:
     st.markdown("""
     <div class="dashboard-card-3d" style="display:flex; gap:35px; align-items:center;">
         <div style="flex:1;">
-            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#F59E0B; text-transform:uppercase;">SIMULATION MODULE 03</div>
+            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; A4-spacing:2px; color:#F59E0B; text-transform:uppercase;">SIMULATION MODULE 03</div>
             <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">Floor-to-Ceiling Glass Wardrobes</h2>
             <p style="color:#CBD5E1; line-height:1.7; margin-bottom:1.5rem;">
                 Bronze tinted safety glass sliding doors equipped with motion-activated LED hanging rails, velvet-lined pull-out organizer trays, and soft-closing dampeners.
@@ -1256,7 +1243,7 @@ elif "Ceiling" in selected_room:
     st.markdown("""
     <div class="dashboard-card-3d" style="display:flex; gap:35px; align-items:center;">
         <div style="flex:1;">
-            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#F59E0B; text-transform:uppercase;">SIMULATION MODULE 04</div>
+            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; A4-spacing:2px; color:#F59E0B; text-transform:uppercase;">SIMULATION MODULE 04</div>
             <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">Architectural False Ceiling & Coves</h2>
             <p style="color:#CBD5E1; line-height:1.7; margin-bottom:1.5rem;">
                 Multi-tier gypsum board architectural drops featuring warm concealed cove lighting lines, magnetic track spotlight fixtures, and statement crystal chandelier mounts.
@@ -1278,7 +1265,7 @@ else:
     st.markdown("""
     <div class="dashboard-card-3d" style="display:flex; gap:35px; align-items:center;">
         <div style="flex:1;">
-            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#F59E0B; text-transform:uppercase;">SIMULATION MODULE 05</div>
+            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; A4-spacing:2px; color:#F59E0B; text-transform:uppercase;">SIMULATION MODULE 05</div>
             <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">Imported Italian Marble & Wood Paneling</h2>
             <p style="color:#CBD5E1; line-height:1.7; margin-bottom:1.5rem;">
                 Mirror-polished large-format Italian marble tiles paired with vertical natural wood veneer wall cladding and brushed brass inlay metal trims.
