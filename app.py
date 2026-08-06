@@ -543,7 +543,43 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
     filename = f"Estimation_{ref_no}_{clean_customer_name}{'_NoHeader' if not include_header else ''}.pdf"
 
     pdf_buffer = io.BytesIO()
-    doc = SimpleDocTemplate(pdf_buffer, pagesize=letter, rightMargin=30, leftMargin=30, topMargin=15, bottomMargin=15)
+    
+    # Custom canvas class to print header, ref no, and date on ALL pages automatically
+    from reportlab.pdfgen import canvas
+    class NumberedCanvas(canvas.Canvas):
+        def __init__(self, *args, **kwargs):
+            canvas.Canvas.__init__(self, *args, **kwargs)
+            self._saved_page_states = []
+
+        def showPage(self):
+            self._saved_page_states.append(dict(self.__dict__))
+            self._startPage()
+
+        def save(self):
+            num_pages = len(self._saved_page_states)
+            for state in self._saved_page_states:
+                self.__dict__.update(state)
+                self.draw_page_decorations(ref_no, est_date, include_header)
+                canvas.Canvas.showPage(self)
+            canvas.Canvas.save(self)
+
+        def draw_page_decorations(self, r_no, e_date, incl_hdr):
+            self.saveState()
+            self.setFont("Helvetica", 10)
+            
+            # Draw top Ref No and Date on every page consistently (e.g., at Y=770)
+            self.drawString(30, 770, f"REF NO:-{r_no}")
+            self.drawRightString(582, 770, f"DATE: {e_date}")
+            
+            if incl_hdr:
+                # Optional visual separator line under the repeating top meta info
+                self.setStrokeColor(colors.HexColor("#1E40AF"))
+                self.setLineWidth(0.5)
+                self.line(30, 762, 582, 762)
+            
+            self.restoreState()
+
+    doc = SimpleDocTemplate(pdf_buffer, pagesize=letter, rightMargin=30, leftMargin=30, topMargin=50, bottomMargin=15)
     styles = getSampleStyleSheet()
 
     RED_COLOR, BLUE_COLOR, LIGHT_PINK, BORDER_BLUE = colors.HexColor("#DC2626"), colors.HexColor("#1E40AF"), colors.HexColor("#EC4899"), colors.HexColor("#2563EB")
@@ -552,8 +588,6 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
     sub_style = ParagraphStyle("Sub", parent=styles["Normal"], alignment=1, fontSize=9, leading=12, fontName="Helvetica-Bold", textColor=BLUE_COLOR)
     contact_style = ParagraphStyle("Contact", parent=styles["Normal"], alignment=1, fontSize=8.5, leading=11, fontName="Helvetica-Bold", textColor=BLUE_COLOR)
     gstin_style = ParagraphStyle("GSTIN", parent=styles["Normal"], alignment=1, fontSize=9, leading=12, fontName="Helvetica-Bold", textColor=LIGHT_PINK)
-    ref_left_style = ParagraphStyle("RefLeft", parent=styles["Normal"], alignment=0, fontSize=10, leading=12, fontName="Helvetica")
-    ref_right_style = ParagraphStyle("RefRight", parent=styles["Normal"], alignment=2, fontSize=10, leading=12, fontName="Helvetica")
     box_hdr_style = ParagraphStyle("BoxHdr", parent=styles["Normal"], alignment=1, fontSize=14, leading=16, fontName="Helvetica-Bold", textColor=colors.black)
     box_detail_style = ParagraphStyle("BoxDetail", parent=styles["Normal"], alignment=1, fontSize=12.5, leading=15, fontName="Helvetica-Bold", textColor=colors.black)
     
@@ -599,8 +633,7 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
         return [header_table, Spacer(1, 4)]
 
     elements.extend(create_header_with_qr())
-    elements.append(Table([[Paragraph(f"REF NO:-{ref_no}", ref_left_style), Paragraph(f"DATE: {est_date}", ref_right_style)]], colWidths=[270, 280]))
-    elements.append(Spacer(1, 4))
+    elements.append(Spacer(1, 8))
 
     address_parts = [p.strip() for p in address.split(',')]
     mid_idx = len(address_parts) // 2
@@ -639,6 +672,7 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
 
         elements.append(PageBreak())
         elements.extend(create_header_with_qr())
+        elements.append(Spacer(1, 8))
 
         p2_table_data = [[Paragraph("SL.NO", hdr_12_bold_center), Paragraph("Description", hdr_12_bold_center), Paragraph("Qty", hdr_12_bold_center), Paragraph("Amount Rs.", hdr_12_bold_center)]]
         for idx in range(9, 15):
@@ -670,7 +704,7 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
         elements.append(Paragraph(point, terms_point_size_8))
         elements.append(Spacer(1, 2))
 
-    doc.build(elements)
+    doc.build(elements, canvasmaker=NumberedCanvas)
     pdf_bytes = pdf_buffer.getvalue()
     pdf_buffer.close()
 
