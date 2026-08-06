@@ -1,10 +1,15 @@
+"""
+SND Interior & Designs - Commercial & Residential Interior Dashboard
+A Streamlit-based enterprise application for generating interior design estimations.
+"""
+
 import os
 import random
 import io
 from datetime import datetime
+
 import streamlit as st
 from supabase import create_client, Client
-
 from reportlab.lib.pagesizes import A4
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -70,7 +75,7 @@ st.markdown("""
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         text-shadow: 0 20px 40px rgba(0,0,0,0.8);
-        A4-spacing: -1px;
+        letter-spacing: -1px;
         margin-bottom: 10px;
     }
 
@@ -254,7 +259,7 @@ st.markdown("""
         font-family: 'Outfit', sans-serif;
         font-weight: 700;
         font-size: 1.25rem;
-        A4-spacing: 0.5px;
+        letter-spacing: 0.5px;
     }
 
     /* Static Grid Gallery Styles */
@@ -356,7 +361,7 @@ st.markdown("""
         color: #FBBF24;
         font-size: 0.75rem;
         font-weight: 800;
-        A4-spacing: 1.5px;
+        letter-spacing: 1.5px;
         border-radius: 20px;
         text-transform: uppercase;
         margin-bottom: 10px;
@@ -385,13 +390,11 @@ st.markdown("""
 <div class="bg-glow-2"></div>
 """, unsafe_allow_html=True)
 
-
 # --- Initialize Session State ---
 if "is_admin_logged_in" not in st.session_state:
     st.session_state.is_admin_logged_in = False
 if "show_admin_modal" not in st.session_state:
     st.session_state.show_admin_modal = False
-
 
 # --- Initialize Supabase Client ---
 @st.cache_resource
@@ -409,7 +412,6 @@ def init_supabase() -> Client:
     return create_client(url, key)
 
 supabase = init_supabase()
-
 
 # --- Helper Functions ---
 def num_to_words_indian_clean(num):
@@ -487,7 +489,6 @@ def upload_to_cloud(ref_no, pdf_bytes_standard, pdf_bytes_no_header, filename_st
 
     return url_std, url_no_hdr
 
-
 def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total, include_header=True):
     is_single_page = target_total < 1500000
     FIXED_ITEMS_MASTER = [
@@ -543,43 +544,7 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
     filename = f"Estimation_{ref_no}_{clean_customer_name}{'_NoHeader' if not include_header else ''}.pdf"
 
     pdf_buffer = io.BytesIO()
-    
-    # Custom canvas class to print header, ref no, and date on ALL pages automatically
-    from reportlab.pdfgen import canvas
-    class NumberedCanvas(canvas.Canvas):
-        def __init__(self, *args, **kwargs):
-            canvas.Canvas.__init__(self, *args, **kwargs)
-            self._saved_page_states = []
-
-        def showPage(self):
-            self._saved_page_states.append(dict(self.__dict__))
-            self._startPage()
-
-        def save(self):
-            num_pages = len(self._saved_page_states)
-            for state in self._saved_page_states:
-                self.__dict__.update(state)
-                self.draw_page_decorations(ref_no, est_date, include_header)
-                canvas.Canvas.showPage(self)
-            canvas.Canvas.save(self)
-
-        def draw_page_decorations(self, r_no, e_date, incl_hdr):
-            self.saveState()
-            self.setFont("Helvetica", 10)
-            
-            # Draw top Ref No and Date on every page consistently (e.g., at Y=770)
-            self.drawString(30, 770, f"REF NO:-{r_no}")
-            self.drawRightString(582, 770, f"DATE: {e_date}")
-            
-            if incl_hdr:
-                # Optional visual separator line under the repeating top meta info
-                self.setStrokeColor(colors.HexColor("#1E40AF"))
-                self.setLineWidth(0.5)
-                self.line(30, 762, 582, 762)
-            
-            self.restoreState()
-
-    doc = SimpleDocTemplate(pdf_buffer, pagesize=A4, rightMargin=10, leftMargin=10, topMargin=10, bottomMargin=10)
+    doc = SimpleDocTemplate(pdf_buffer, pagesize=A4, rightMargin=30, leftMargin=30, topMargin=15, bottomMargin=15)
     styles = getSampleStyleSheet()
 
     RED_COLOR, BLUE_COLOR, LIGHT_PINK, BORDER_BLUE = colors.HexColor("#DC2626"), colors.HexColor("#1E40AF"), colors.HexColor("#EC4899"), colors.HexColor("#2563EB")
@@ -588,6 +553,8 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
     sub_style = ParagraphStyle("Sub", parent=styles["Normal"], alignment=1, fontSize=9, leading=12, fontName="Helvetica-Bold", textColor=BLUE_COLOR)
     contact_style = ParagraphStyle("Contact", parent=styles["Normal"], alignment=1, fontSize=8.5, leading=11, fontName="Helvetica-Bold", textColor=BLUE_COLOR)
     gstin_style = ParagraphStyle("GSTIN", parent=styles["Normal"], alignment=1, fontSize=9, leading=12, fontName="Helvetica-Bold", textColor=LIGHT_PINK)
+    ref_left_style = ParagraphStyle("RefLeft", parent=styles["Normal"], alignment=0, fontSize=10, leading=12, fontName="Helvetica")
+    ref_right_style = ParagraphStyle("RefRight", parent=styles["Normal"], alignment=2, fontSize=10, leading=12, fontName="Helvetica")
     box_hdr_style = ParagraphStyle("BoxHdr", parent=styles["Normal"], alignment=1, fontSize=14, leading=16, fontName="Helvetica-Bold", textColor=colors.black)
     box_detail_style = ParagraphStyle("BoxDetail", parent=styles["Normal"], alignment=1, fontSize=12.5, leading=15, fontName="Helvetica-Bold", textColor=colors.black)
     
@@ -633,7 +600,8 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
         return [header_table, Spacer(1, 4)]
 
     elements.extend(create_header_with_qr())
-    elements.append(Spacer(1, 8))
+    elements.append(Table([[Paragraph(f"REF NO:-{ref_no}", ref_left_style), Paragraph(f"DATE: {est_date}", ref_right_style)]], colWidths=[270, 280]))
+    elements.append(Spacer(1, 4))
 
     address_parts = [p.strip() for p in address.split(',')]
     mid_idx = len(address_parts) // 2
@@ -672,7 +640,6 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
 
         elements.append(PageBreak())
         elements.extend(create_header_with_qr())
-        elements.append(Spacer(1, 8))
 
         p2_table_data = [[Paragraph("SL.NO", hdr_12_bold_center), Paragraph("Description", hdr_12_bold_center), Paragraph("Qty", hdr_12_bold_center), Paragraph("Amount Rs.", hdr_12_bold_center)]]
         for idx in range(9, 15):
@@ -704,12 +671,11 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
         elements.append(Paragraph(point, terms_point_size_8))
         elements.append(Spacer(1, 2))
 
-    doc.build(elements, canvasmaker=NumberedCanvas)
+    doc.build(elements)
     pdf_bytes = pdf_buffer.getvalue()
     pdf_buffer.close()
 
     return pdf_bytes, filename, ref_no, final_total
-
 
 # --- AUTHENTIC MODAL POPUP DIALOG FOR ESTIMATION ---
 @st.dialog("⚡ COMMERCIAL & RESIDENTIAL ESTIMATION GENERATOR", width="large")
@@ -718,7 +684,7 @@ def show_quotation_dialog():
     <div class="commercial-auth-banner">
         <div style="font-size:2.2rem;">🔐</div>
         <div>
-            <div style="color:#818CF8; font-weight:700; font-size:0.85rem; A4-spacing:1px;">SECURE SSL GATEWAY • COMMERCIAL GST INVOICING</div>
+            <div style="color:#818CF8; font-weight:700; font-size:0.85rem; letter-spacing:1px;">SECURE SSL GATEWAY • COMMERCIAL GST INVOICING</div>
             <div style="color:#FFFFFF; font-size:0.8rem;">Generate encrypted PDF estimates with dynamic QR code authentication for Bengaluru projects.</div>
         </div>
     </div>
@@ -802,7 +768,6 @@ def show_quotation_dialog():
             except Exception as e:
                 st.error(f"An error occurred: {e}")
 
-
 # --- ADMIN MODAL POPUP DIALOG ---
 @st.dialog("🔐 ENTERPRISE ADMIN PORTAL", width="large")
 def show_admin_dialog():
@@ -875,7 +840,6 @@ def show_admin_dialog():
                     except Exception as e:
                         st.error(f"Query execution failed: {e}")
 
-
 # --- COMMERCIAL TICKER STATUS BAR WITH LOGIN ICON BUTTON ---
 col_tick1, col_tick2 = st.columns([10, 1])
 with col_tick1:
@@ -897,14 +861,13 @@ with col_top_btn2:
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-
 # --- 3D GRADIENT HERO SECTION WITH CAROUSEL ---
 col_hero1, col_hero2 = st.columns([1.2, 1])
 
 with col_hero1:
     st.markdown("""
     <div class="dashboard-card-3d" style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.85) 100%); padding: 3rem 2.5rem; height: 100%;">
-        <div style="font-family:'Space Grotesk', sans-serif; font-weight: 800; font-size: 0.85rem; A4-spacing: 3px; text-transform: uppercase; margin-bottom: 12px;">
+        <div style="font-family:'Space Grotesk', sans-serif; font-weight: 800; font-size: 0.85rem; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 12px;">
             <span class="gradient-text-gold">✦ ENTERPRISE EXTERIOR & INTERIOR </span>
         </div>
         <h1 class="hero-title-3d" style="font-size: 3rem;">SND INTERIOR & DESIGNS</h1>
@@ -976,7 +939,6 @@ with col_hero2:
     </script>
     """, unsafe_allow_html=True)
 
-
 # --- STATIC & FIXED 10 IMAGES GALLERY SHOWCASE ---
 st.markdown("<br>", unsafe_allow_html=True)
 st.markdown("### 🏛️ Portfolio Master Collection (10 Fixed Showcase Galleries)")
@@ -1026,7 +988,6 @@ st.markdown("""
     </div>
 </div>
 """, unsafe_allow_html=True)
-
 
 # --- FULL-SIZE VERTICAL SCROLLING SHOWCASE (10 FULL SIZE IMAGES) ---
 st.markdown("<br>", unsafe_allow_html=True)
@@ -1128,7 +1089,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-
 # --- Commercial Metrics Grid ---
 col_m1, col_m2, col_m3, col_m4 = st.columns(4)
 with col_m1:
@@ -1160,7 +1120,6 @@ with col_m4:
     </div>
     """, unsafe_allow_html=True)
 
-
 # --- INTERACTIVE 3D ANIMATED / GIF VISUALIZER ---
 st.markdown("<br>", unsafe_allow_html=True)
 st.markdown("### 🌀 Interactive Content")
@@ -1177,7 +1136,7 @@ if "Kitchen" in selected_room:
     st.markdown("""
     <div class="dashboard-card-3d" style="display:flex; gap:35px; align-items:center;">
         <div style="flex:1;">
-            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; A4-spacing:2px; color:#F59E0B; text-transform:uppercase;">SIMULATION MODULE 01</div>
+            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#F59E0B; text-transform:uppercase;">SIMULATION MODULE 01</div>
             <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">German Soft-Close Acrylic Kitchen</h2>
             <p style="color:#CBD5E1; line-height:1.7; margin-bottom:1.5rem;">
                 Engineered with Blum tandem box mechanisms, scratch-resistant quartz stone counters, integrated LED profile strip lighting, and water-resistant BWP marine-grade plywood cores.
@@ -1199,7 +1158,7 @@ elif "Living" in selected_room:
     st.markdown("""
     <div class="dashboard-card-3d" style="display:flex; gap:35px; align-items:center;">
         <div style="flex:1;">
-            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; A4-spacing:2px; color:#F59E0B; text-transform:uppercase;">SIMULATION MODULE 02</div>
+            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#F59E0B; text-transform:uppercase;">SIMULATION MODULE 02</div>
             <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">Grand Living & Media Lounge</h2>
             <p style="color:#CBD5E1; line-height:1.7; margin-bottom:1.5rem;">
                 Featuring custom acoustic fluted panels, sintered stone TV media backdrops, motorized smart curtains, and concealed wiring channels for high-end home theater setups.
@@ -1221,7 +1180,7 @@ elif "Wardrobes" in selected_room:
     st.markdown("""
     <div class="dashboard-card-3d" style="display:flex; gap:35px; align-items:center;">
         <div style="flex:1;">
-            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; A4-spacing:2px; color:#F59E0B; text-transform:uppercase;">SIMULATION MODULE 03</div>
+            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#F59E0B; text-transform:uppercase;">SIMULATION MODULE 03</div>
             <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">Floor-to-Ceiling Glass Wardrobes</h2>
             <p style="color:#CBD5E1; line-height:1.7; margin-bottom:1.5rem;">
                 Bronze tinted safety glass sliding doors equipped with motion-activated LED hanging rails, velvet-lined pull-out organizer trays, and soft-closing dampeners.
@@ -1243,7 +1202,7 @@ elif "Ceiling" in selected_room:
     st.markdown("""
     <div class="dashboard-card-3d" style="display:flex; gap:35px; align-items:center;">
         <div style="flex:1;">
-            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; A4-spacing:2px; color:#F59E0B; text-transform:uppercase;">SIMULATION MODULE 04</div>
+            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#F59E0B; text-transform:uppercase;">SIMULATION MODULE 04</div>
             <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">Architectural False Ceiling & Coves</h2>
             <p style="color:#CBD5E1; line-height:1.7; margin-bottom:1.5rem;">
                 Multi-tier gypsum board architectural drops featuring warm concealed cove lighting lines, magnetic track spotlight fixtures, and statement crystal chandelier mounts.
@@ -1265,7 +1224,7 @@ else:
     st.markdown("""
     <div class="dashboard-card-3d" style="display:flex; gap:35px; align-items:center;">
         <div style="flex:1;">
-            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; A4-spacing:2px; color:#F59E0B; text-transform:uppercase;">SIMULATION MODULE 05</div>
+            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#F59E0B; text-transform:uppercase;">SIMULATION MODULE 05</div>
             <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">Imported Italian Marble & Wood Paneling</h2>
             <p style="color:#CBD5E1; line-height:1.7; margin-bottom:1.5rem;">
                 Mirror-polished large-format Italian marble tiles paired with vertical natural wood veneer wall cladding and brushed brass inlay metal trims.
@@ -1283,7 +1242,6 @@ else:
         </div>
     </div>
     """, unsafe_allow_html=True)
-
 
 # --- MAIN ACTION BUTTON ---
 st.markdown("<br>", unsafe_allow_html=True)
