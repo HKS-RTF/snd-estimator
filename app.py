@@ -1,15 +1,10 @@
-"""
-SND Interior & Designs - Commercial & Residential Interior Dashboard
-A Streamlit-based enterprise application for generating interior design estimations.
-"""
-
 import os
 import random
 import io
 from datetime import datetime
-
 import streamlit as st
 from supabase import create_client, Client
+
 from reportlab.lib.pagesizes import A4
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -390,11 +385,13 @@ st.markdown("""
 <div class="bg-glow-2"></div>
 """, unsafe_allow_html=True)
 
+
 # --- Initialize Session State ---
 if "is_admin_logged_in" not in st.session_state:
     st.session_state.is_admin_logged_in = False
 if "show_admin_modal" not in st.session_state:
     st.session_state.show_admin_modal = False
+
 
 # --- Initialize Supabase Client ---
 @st.cache_resource
@@ -412,6 +409,7 @@ def init_supabase() -> Client:
     return create_client(url, key)
 
 supabase = init_supabase()
+
 
 # --- Helper Functions ---
 def num_to_words_indian_clean(num):
@@ -489,6 +487,7 @@ def upload_to_cloud(ref_no, pdf_bytes_standard, pdf_bytes_no_header, filename_st
 
     return url_std, url_no_hdr
 
+
 def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total, include_header=True):
     is_single_page = target_total < 1500000
     FIXED_ITEMS_MASTER = [
@@ -544,6 +543,7 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
     filename = f"Estimation_{ref_no}_{clean_customer_name}{'_NoHeader' if not include_header else ''}.pdf"
 
     pdf_buffer = io.BytesIO()
+    # Updated to A4 size
     doc = SimpleDocTemplate(pdf_buffer, pagesize=A4, rightMargin=30, leftMargin=30, topMargin=15, bottomMargin=15)
     styles = getSampleStyleSheet()
 
@@ -595,12 +595,13 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
             header_text_flowables = [
                 Spacer(1, 10), Spacer(1, 10), Spacer(1, 10), Spacer(1, 10), Spacer(1, 10)
             ]
-        header_table = Table([["", header_text_flowables, d]], colWidths=[75, 400, 75])
+        # Adjusted table width for A4 (width ~ 535 printable area with margins)
+        header_table = Table([["", header_text_flowables, d]], colWidths=[65, 405, 65])
         header_table.setStyle(TableStyle([('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('LEFTPADDING', (0,0), (-1,-1), 0), ('RIGHTPADDING', (0,0), (-1,-1), 0)]))
         return [header_table, Spacer(1, 4)]
 
     elements.extend(create_header_with_qr())
-    elements.append(Table([[Paragraph(f"REF NO:-{ref_no}", ref_left_style), Paragraph(f"DATE: {est_date}", ref_right_style)]], colWidths=[270, 280]))
+    elements.append(Table([[Paragraph(f"REF NO:-{ref_no}", ref_left_style), Paragraph(f"DATE: {est_date}", ref_right_style)]], colWidths=[265, 270]))
     elements.append(Spacer(1, 4))
 
     address_parts = [p.strip() for p in address.split(',')]
@@ -612,7 +613,7 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
     if addr_line_2: box_content.append([Paragraph(addr_line_2.upper(), box_detail_style)])
     box_content.append([Paragraph(f"OWNER: - {customer_name.upper()}", box_detail_style)])
 
-    project_box = Table(box_content, colWidths=[550])
+    project_box = Table(box_content, colWidths=[535])
     project_box.setStyle(TableStyle([('BOX', (0,0), (-1,-1), 2, BORDER_BLUE), ('ROUNDEDCORNERS', [8, 8, 8, 8]), ('TOPPADDING', (0,0), (-1,-1), 3), ('BOTTOMPADDING', (0,0), (-1,-1), 3)]))
     elements.append(project_box)
     elements.append(Spacer(1, 6))
@@ -625,7 +626,7 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
         p_table_data.append(["", Paragraph("GST 18%", total_14_bold), "", Paragraph(f"{actual_gst:,}", total_14_bold)])
         p_table_data.append(["", Paragraph("TOTAL", total_14_bold), "", Paragraph(f"{final_total:,}", total_14_bold)])
 
-        t1 = Table(p_table_data, colWidths=[50, 280, 100, 120])
+        t1 = Table(p_table_data, colWidths=[45, 270, 100, 120])
         t1.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('TOPPADDING', (0,0), (-1,-1), 6.5), ('BOTTOMPADDING', (0,0), (-1,-1), 6.5)]))
         elements.append(t1)
     else:
@@ -634,12 +635,15 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
             item = processed_items[idx]
             p1_table_data.append([Paragraph(f"{idx+1}.", cell_12_bold_center), Paragraph(item[0], cell_12_bold_center), Paragraph(item[1], cell_12_bold_center), Paragraph(f"{item_amounts[idx]:,}", cell_12_bold_center)])
         
-        t1 = Table(p1_table_data, colWidths=[50, 280, 100, 120])
+        t1 = Table(p1_table_data, colWidths=[45, 270, 100, 120])
         t1.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('TOPPADDING', (0,0), (-1,-1), 16), ('BOTTOMPADDING', (0,0), (-1,-1), 16)]))
         elements.append(t1)
 
         elements.append(PageBreak())
         elements.extend(create_header_with_qr())
+        # Added exact mirror positioning for Ref No and Date on page 2
+        elements.append(Table([[Paragraph(f"REF NO:-{ref_no}", ref_left_style), Paragraph(f"DATE: {est_date}", ref_right_style)]], colWidths=[265, 270]))
+        elements.append(Spacer(1, 4))
 
         p2_table_data = [[Paragraph("SL.NO", hdr_12_bold_center), Paragraph("Description", hdr_12_bold_center), Paragraph("Qty", hdr_12_bold_center), Paragraph("Amount Rs.", hdr_12_bold_center)]]
         for idx in range(9, 15):
@@ -649,7 +653,7 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
         p2_table_data.append(["", Paragraph("GST 18%", total_14_bold), "", Paragraph(f"{actual_gst:,}", total_14_bold)])
         p2_table_data.append(["", Paragraph("TOTAL", total_14_bold), "", Paragraph(f"{final_total:,}", total_14_bold)])
 
-        t2 = Table(p2_table_data, colWidths=[50, 280, 100, 120])
+        t2 = Table(p2_table_data, colWidths=[45, 270, 100, 120])
         t2.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('TOPPADDING', (0,0), (-1,-1), 16), ('BOTTOMPADDING', (0,0), (-1,-1), 16)]))
         elements.append(t2)
 
@@ -676,6 +680,7 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
     pdf_buffer.close()
 
     return pdf_bytes, filename, ref_no, final_total
+
 
 # --- AUTHENTIC MODAL POPUP DIALOG FOR ESTIMATION ---
 @st.dialog("⚡ COMMERCIAL & RESIDENTIAL ESTIMATION GENERATOR", width="large")
@@ -768,6 +773,7 @@ def show_quotation_dialog():
             except Exception as e:
                 st.error(f"An error occurred: {e}")
 
+
 # --- ADMIN MODAL POPUP DIALOG ---
 @st.dialog("🔐 ENTERPRISE ADMIN PORTAL", width="large")
 def show_admin_dialog():
@@ -840,6 +846,7 @@ def show_admin_dialog():
                     except Exception as e:
                         st.error(f"Query execution failed: {e}")
 
+
 # --- COMMERCIAL TICKER STATUS BAR WITH LOGIN ICON BUTTON ---
 col_tick1, col_tick2 = st.columns([10, 1])
 with col_tick1:
@@ -860,6 +867,7 @@ with col_top_btn2:
         show_quotation_dialog()
 
 st.markdown("<br>", unsafe_allow_html=True)
+
 
 # --- 3D GRADIENT HERO SECTION WITH CAROUSEL ---
 col_hero1, col_hero2 = st.columns([1.2, 1])
@@ -939,6 +947,7 @@ with col_hero2:
     </script>
     """, unsafe_allow_html=True)
 
+
 # --- STATIC & FIXED 10 IMAGES GALLERY SHOWCASE ---
 st.markdown("<br>", unsafe_allow_html=True)
 st.markdown("### 🏛️ Portfolio Master Collection (10 Fixed Showcase Galleries)")
@@ -988,6 +997,7 @@ st.markdown("""
     </div>
 </div>
 """, unsafe_allow_html=True)
+
 
 # --- FULL-SIZE VERTICAL SCROLLING SHOWCASE (10 FULL SIZE IMAGES) ---
 st.markdown("<br>", unsafe_allow_html=True)
@@ -1089,6 +1099,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+
 # --- Commercial Metrics Grid ---
 col_m1, col_m2, col_m3, col_m4 = st.columns(4)
 with col_m1:
@@ -1119,6 +1130,7 @@ with col_m4:
         <div style="font-size: 0.8rem; color: #94A3B8; font-weight: 700; text-transform: uppercase; margin-top: 5px;">Encrypted Sync</div>
     </div>
     """, unsafe_allow_html=True)
+
 
 # --- INTERACTIVE 3D ANIMATED / GIF VISUALIZER ---
 st.markdown("<br>", unsafe_allow_html=True)
@@ -1242,6 +1254,7 @@ else:
         </div>
     </div>
     """, unsafe_allow_html=True)
+
 
 # --- MAIN ACTION BUTTON ---
 st.markdown("<br>", unsafe_allow_html=True)
