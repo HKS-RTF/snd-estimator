@@ -339,7 +339,6 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
 
     title_style = ParagraphStyle("Title", parent=styles["Heading1"], alignment=1, fontSize=24, leading=28, fontName="Helvetica-Bold", textColor=RED_COLOR)
     sub_style = ParagraphStyle("Sub", parent=styles["Normal"], alignment=1, fontSize=8.5, leading=11, fontName="Helvetica-Bold", textColor=BLUE_COLOR)
-    contact_style = ParagraphStyle("Contact", parent=styles["Normal"], alignment=1, fontSize=8, leading=10, fontName="Helvetica-Bold", textColor=BLUE_COLOR)
     gstin_style = ParagraphStyle("GSTIN", parent=styles["Normal"], alignment=1, fontSize=8.5, leading=11, fontName="Helvetica-Bold", textColor=LIGHT_PINK)
     ref_left_style = ParagraphStyle("RefLeft", parent=styles["Normal"], alignment=0, fontSize=9.5, leading=11, fontName="Helvetica")
     ref_right_style = ParagraphStyle("RefRight", parent=styles["Normal"], alignment=2, fontSize=9.5, leading=11, fontName="Helvetica")
@@ -395,8 +394,6 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
     elements.append(project_box)
     elements.append(Spacer(1, 4))
 
-    col_widths = [30, 220, 50, 50, 80, 60, 60] # Sl, Desc, Unit, Qty, Rate, Amount
-    # Adjusted to 550 total width: [30, 210, 45, 45, 75, 70, 75]
     col_w = [28, 202, 45, 45, 75, 75, 80]
 
     def build_table_chunk(start_idx, end_idx, include_totals=False, is_last_page=False):
@@ -641,6 +638,3 @@ st.markdown("""
     </p>
 </div>
 """, unsafe_allow_html=True)
-
-<ElicitationsGroup>
-</ElicitationsGroup>
