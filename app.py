@@ -14,8 +14,8 @@ from reportlab.graphics.barcode.qr import QrCodeWidget
 
 # --- Page Configuration ---
 st.set_page_config(
-    page_title="SND Interior & Civil Construction | House Extension & Floor Dashboard",
-    page_icon="⚡",
+    page_title="SND Interior & Designs | Civil Construction & Floor Extension Dashboard",
+    page_icon="🏗️",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
@@ -488,40 +488,40 @@ def upload_to_cloud(ref_no, pdf_bytes_standard, pdf_bytes_no_header, filename_st
     return url_std, url_no_hdr
 
 
-def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total, selected_floors, build_sqft, include_header=True):
-    is_single_page = target_total < 2500000
+def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total, floors_option, buildup_sqft, include_header=True):
+    is_single_page = target_total < 2000000
     
-    # Civil & Structural House Extension Master Items
+    # CIVIL WORKS MASTER ITEMS FOR FLOOR EXTENSIONS
     CIVIL_ITEMS_MASTER = [
-        ("Earth excavation for column footings & foundation ties", "CU. M", "SQFT", 0.06),
-        ("PCC bed concrete (1:4:8) for foundation base", "CU. M", "SQFT", 0.05),
-        ("Reinforced Cement Concrete (RCC) column footings & pedestals", "CU. M", "SQFT", 0.08),
-        ("RCC casting for columns, beams & floor slabs (M25 grade)", "CU. M", "SQFT", 0.14),
-        ("Fe550 Grade TMT steel reinforcement bars procurement & binding", "KG", "SQFT", 0.12),
-        ("Solid concrete block masonry work (6 inch & 4 inch walls)", "SQ. FT", "SQFT", 0.10),
-        ("Internal & external wall plastering with waterproofing compound", "SQ. FT", "SQFT", 0.09),
-        ("Structural staircase casting & reinforcement works", "JOB", "JOB_LOT", 0.05),
-        ("Underground sump tank & overhead water tank construction", "JOB", "JOB_LOT", 0.06),
-        ("Electrical conduit pipe laying, concealed wiring & distribution box", "POINT", "SQFT", 0.06),
-        ("Sanitary drainage lines, PVC pipe networks & chamber construction", "JOB", "JOB_LOT", 0.05),
-        ("Roof waterproofing treatment (Brick bat coba / Chemical coating)", "SQ. FT", "SQFT", 0.05),
-        ("External scaffolding, centering & shuttering materials hire", "JOB", "JOB_LOT", 0.05),
-        ("Site clearance, debris loading & transport charges", "LOT", "JOB_LOT", 0.04)
+        ("Foundation & Column starter extension breaking/reinforcement", "JOB", "JOB_LOT", 0.07),
+        ("RCC Column casting & structural steel framework (Fe550)", "CU. FT", "SQFT", 0.10),
+        ("RCC Beam & Slab casting for floor extension (M25 Grade)", "SQ. FT", "SQFT", 0.12),
+        ("External & Internal Brick masonry / AAC block work", "SQ. FT", "SQFT", 0.09),
+        ("Structural plastering (Internal walls & ceiling)", "SQ. FT", "SQFT", 0.08),
+        ("External wall plastering & weatherproof textured finish", "SQ. FT", "SQFT", 0.07),
+        ("Structural staircase extension & concrete steps casting", "UNIT", "SETS_UNITS", 0.06),
+        ("Terrace waterproofing and chemical damp-proofing", "SQ. FT", "SQFT", 0.06),
+        ("Underground/Overhead plumbing lines & drainage rough-in", "JOB", "JOB_LOT", 0.07),
+        ("Electrical conduit piping, concealed wiring & DB box setup", "JOB", "JOB_LOT", 0.07),
+        ("Parapet wall construction around terrace boundary", "RUN. FT", "SQFT", 0.05),
+        ("Scaffolding erection, safety netting & debris removal", "LOT", "JOB_LOT", 0.05),
+        ("Door and window concrete lintel casting & framing", "JOB", "JOB_LOT", 0.05),
+        ("Flooring screed and tile bedding preparation", "SQ. FT", "SQFT", 0.06),
+        ("Site clearing, architectural layout & centering work", "JOB", "JOB_LOT", 0.04)
     ]
 
-    def calculate_civil_quantity(category, total_amount, sqft_val, floor_count):
-        ratio = max(0.0, min(1.0, (total_amount - 500000.0) / (7500000.0 - 500000.0)))
-        ratio = max(0.0, min(1.0, ratio + random.uniform(-0.03, 0.03)))
-        if category == "SQFT":
-            calculated_sqft = round(sqft_val * ratio) if sqft_val > 0 else round(800 + ratio * 2200)
-            return f"{calculated_sqft} SQ. FT"
+    def calculate_civil_quantity(category, total_sqft):
+        if category == "SQFT": 
+            return f"{round(buildup_sqft)} SQ. FT"
+        elif category == "SETS_UNITS":
+            qty = round(buildup_sqft / 400) if buildup_sqft > 0 else 1
+            return f"{max(1, qty)} SETS"
         elif category == "JOB_LOT":
-            qty = round(1 + floor_count * 0.5)
-            return f"{qty} JOB" if qty > 1 else "1 JOB"
-        return f"{floor_count * 12} UNITS"
+            return "1 JOB"
+        return f"{round(buildup_sqft)} SQ. FT"
 
-    total_items_needed = 10 if is_single_page else 14
-    processed_items = [(desc, calculate_civil_quantity(cat, target_total, build_sqft, len(selected_floors)), w) for desc, _, cat, w in CIVIL_ITEMS_MASTER]
+    total_items_needed = 10 if is_single_page else 15
+    processed_items = [(desc, calculate_civil_quantity(cat, buildup_sqft), w) for desc, _, cat, w in CIVIL_ITEMS_MASTER]
     random.shuffle(processed_items)
     processed_items = processed_items[:total_items_needed]
 
@@ -539,7 +539,7 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
     now = datetime.now()
     ref_no = now.strftime("%H%M%d%m%Y")
     clean_customer_name = customer_name.replace(' ', '_').replace('&', 'AND')
-    filename = f"Civil_Estimation_{ref_no}_{clean_customer_name}{'_NoHeader' if not include_header else ''}.pdf"
+    filename = f"Civil_Extension_{ref_no}_{clean_customer_name}{'_NoHeader' if not include_header else ''}.pdf"
 
     pdf_buffer = io.BytesIO()
     doc = SimpleDocTemplate(pdf_buffer, pagesize=A4, rightMargin=30, leftMargin=30, topMargin=15, bottomMargin=15)
@@ -547,14 +547,14 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
 
     RED_COLOR, BLUE_COLOR, LIGHT_PINK, BORDER_BLUE = colors.HexColor("#DC2626"), colors.HexColor("#1E40AF"), colors.HexColor("#EC4899"), colors.HexColor("#2563EB")
 
-    title_style = ParagraphStyle("Title", parent=styles["Heading1"], alignment=1, fontSize=26, leading=30, fontName="Helvetica-Bold", textColor=RED_COLOR)
-    sub_style = ParagraphStyle("Sub", parent=styles["Normal"], alignment=1, fontSize=8.5, leading=11, fontName="Helvetica-Bold", textColor=BLUE_COLOR)
-    contact_style = ParagraphStyle("Contact", parent=styles["Normal"], alignment=1, fontSize=8, leading=10, fontName="Helvetica-Bold", textColor=BLUE_COLOR)
-    gstin_style = ParagraphStyle("GSTIN", parent=styles["Normal"], alignment=1, fontSize=8.5, leading=11, fontName="Helvetica-Bold", textColor=LIGHT_PINK)
+    title_style = ParagraphStyle("Title", parent=styles["Heading1"], alignment=1, fontSize=28, leading=32, fontName="Helvetica-Bold", textColor=RED_COLOR)
+    sub_style = ParagraphStyle("Sub", parent=styles["Normal"], alignment=1, fontSize=9, leading=12, fontName="Helvetica-Bold", textColor=BLUE_COLOR)
+    contact_style = ParagraphStyle("Contact", parent=styles["Normal"], alignment=1, fontSize=8.5, leading=11, fontName="Helvetica-Bold", textColor=BLUE_COLOR)
+    gstin_style = ParagraphStyle("GSTIN", parent=styles["Normal"], alignment=1, fontSize=9, leading=12, fontName="Helvetica-Bold", textColor=LIGHT_PINK)
     ref_left_style = ParagraphStyle("RefLeft", parent=styles["Normal"], alignment=0, fontSize=10, leading=12, fontName="Helvetica")
     ref_right_style = ParagraphStyle("RefRight", parent=styles["Normal"], alignment=2, fontSize=10, leading=12, fontName="Helvetica")
     box_hdr_style = ParagraphStyle("BoxHdr", parent=styles["Normal"], alignment=1, fontSize=13, leading=15, fontName="Helvetica-Bold", textColor=colors.black)
-    box_detail_style = ParagraphStyle("BoxDetail", parent=styles["Normal"], alignment=1, fontSize=11, leading=14, fontName="Helvetica-Bold", textColor=colors.black)
+    box_detail_style = ParagraphStyle("BoxDetail", parent=styles["Normal"], alignment=1, fontSize=11.5, leading=14, fontName="Helvetica-Bold", textColor=colors.black)
     
     if is_single_page:
         cell_12_bold_center = ParagraphStyle("Cell11BC", parent=styles["Normal"], alignment=1, fontSize=10.5, leading=13, fontName="Helvetica-Bold", textColor=colors.black)
@@ -566,16 +566,15 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
     else:
         cell_12_bold_center = ParagraphStyle("Cell12BC", parent=styles["Normal"], alignment=1, fontSize=11, leading=13.5, fontName="Helvetica-Bold", textColor=colors.black)
         hdr_12_bold_center = ParagraphStyle("Hdr12BC", parent=styles["Normal"], alignment=1, fontSize=11, leading=13.5, fontName="Helvetica-Bold", textColor=colors.black)
-        total_14_bold = ParagraphStyle("Total14B", parent=styles["Normal"], alignment=1, fontSize=13, leading=15, fontName="Helvetica-Bold", textColor=colors.black)
+        total_14_bold = ParagraphStyle("Total14B", parent=styles["Normal"], alignment=1, fontSize=14, leading=16, fontName="Helvetica-Bold", textColor=colors.black)
         words_13_bold_center = ParagraphStyle("Words13BC", parent=styles["Normal"], alignment=1, fontSize=12, leading=15, fontName="Helvetica-Bold", textColor=colors.black)
-        terms_hdr_center = ParagraphStyle("TermsHdr10", parent=styles["Normal"], alignment=1, fontSize=9.5, leading=13, fontName="Helvetica-Bold", textColor=colors.black)
-        terms_point_size_8 = ParagraphStyle("TermsPt8", parent=styles["Normal"], alignment=0, fontSize=7.5, leading=10, fontName="Helvetica-Bold", textColor=colors.black)
+        terms_hdr_center = ParagraphStyle("TermsHdr10", parent=styles["Normal"], alignment=1, fontSize=10, leading=14, fontName="Helvetica-Bold", textColor=colors.black)
+        terms_point_size_8 = ParagraphStyle("TermsPt8", parent=styles["Normal"], alignment=0, fontSize=8, leading=11, fontName="Helvetica-Bold", textColor=colors.black)
 
     elements = []
 
     def create_header_with_qr():
-        floors_str = ", ".join(selected_floors)
-        qr_data = f"CUSTOMER: {customer_name.upper()}\nEXTENSIONS: {floors_str}\nBUILDSQFT: {build_sqft} SQFT\nREF NO: {ref_no}\nDATE: {est_date}\nTOTAL: Rs. {final_total:,}"
+        qr_data = f"CUSTOMER NAME: {customer_name.upper()}\nEXTENSION: {floors_option} ({buildup_sqft} SQFT)\nREF NO: {ref_no}\nDATE: {est_date}\nTOTAL ESTIMATE: Rs. {final_total:,}\nEMAIL: contact@sndinteriors.com"
         qr = QrCodeWidget(qr_data)
         qr_bounds = qr.getBounds()
         w, h = qr_bounds[2] - qr_bounds[0], qr_bounds[3] - qr_bounds[1]
@@ -584,9 +583,9 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
         
         if include_header:
             header_text_flowables = [
-                Paragraph("SND INTERIOR & CIVIL CONSTRUCTION", title_style), Spacer(1, 2),
-                Paragraph("HOUSE EXTENSION, FLOOR ADDITIONS, RCC STRUCTURES & CIVIL ESTIMATES", sub_style),
-                Paragraph("#15, E BLOCK, SAHAKAR NAGAR, BANGALORE-560092", sub_style),
+                Paragraph("SND INTERIOR & DESIGNS", title_style), Spacer(1, 2),
+                Paragraph("STRUCTURAL CIVIL WORKS, FLOOR EXTENSIONS & BUILDING ESTIMATES", sub_style),
+                Paragraph("#15, E BLOCK, SAHAKHAR NAGAR, BANGALORE-560092", sub_style),
                 Paragraph("EMAIL: contact@sndinteriors.com", contact_style),
                 Paragraph("GSTIN: 29ABCDE1234F1Z5", gstin_style),
             ]
@@ -607,14 +606,13 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
     addr_line_1 = ", ".join(address_parts[:mid_idx]) if mid_idx > 0 else address
     addr_line_2 = ", ".join(address_parts[mid_idx:]) if mid_idx > 0 else ""
 
-    floors_display = " + ".join(selected_floors)
     box_content = [
-        [Paragraph(f"CIVIL ESTIMATION FOR HOUSE EXTENSION & FLOOR ADDITION ({floors_display})", box_hdr_style)], 
-        [Paragraph(f"BUILT-UP AREA: {build_sqft} SQ. FT | SITE LOCATION AT", box_hdr_style)], 
+        [Paragraph(f"CIVIL CONSTRUCTION & STRUCTURAL EXTENSION ESTIMATE FOR", box_hdr_style)], 
+        [Paragraph(f"ADDITION OF {floors_option.upper()} ({buildup_sqft} SQ. FT) AT", box_hdr_style)], 
         [Paragraph(addr_line_1.upper(), box_detail_style)]
     ]
     if addr_line_2: box_content.append([Paragraph(addr_line_2.upper(), box_detail_style)])
-    box_content.append([Paragraph(f"OWNER: - {customer_name.upper()}", box_detail_style)])
+    box_content.append([Paragraph(f"PROPERTY OWNER: - {customer_name.upper()}", box_detail_style)])
 
     project_box = Table(box_content, colWidths=[535])
     project_box.setStyle(TableStyle([('BOX', (0,0), (-1,-1), 2, BORDER_BLUE), ('ROUNDEDCORNERS', [8, 8, 8, 8]), ('TOPPADDING', (0,0), (-1,-1), 3), ('BOTTOMPADDING', (0,0), (-1,-1), 3)]))
@@ -622,7 +620,7 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
     elements.append(Spacer(1, 6))
 
     if is_single_page:
-        p_table_data = [[Paragraph("SL.NO", hdr_12_bold_center), Paragraph("Civil Work Description", hdr_12_bold_center), Paragraph("Qty / Ext", hdr_12_bold_center), Paragraph("Amount Rs.", hdr_12_bold_center)]]
+        p_table_data = [[Paragraph("SL.NO", hdr_12_bold_center), Paragraph("Civil Work Description", hdr_12_bold_center), Paragraph("Qty / Area", hdr_12_bold_center), Paragraph("Amount Rs.", hdr_12_bold_center)]]
         for idx in range(10):
             item = processed_items[idx]
             p_table_data.append([Paragraph(f"{idx+1}.", cell_12_bold_center), Paragraph(item[0], cell_12_bold_center), Paragraph(item[1], cell_12_bold_center), Paragraph(f"{item_amounts[idx]:,}", cell_12_bold_center)])
@@ -630,16 +628,16 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
         p_table_data.append(["", Paragraph("TOTAL", total_14_bold), "", Paragraph(f"{final_total:,}", total_14_bold)])
 
         t1 = Table(p_table_data, colWidths=[45, 270, 100, 120])
-        t1.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('TOPPADDING', (0,0), (-1,-1), 5.5), ('BOTTOMPADDING', (0,0), (-1,-1), 5.5)]))
+        t1.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('TOPPADDING', (0,0), (-1,-1), 6), ('BOTTOMPADDING', (0,0), (-1,-1), 6)]))
         elements.append(t1)
     else:
-        p1_table_data = [[Paragraph("SL.NO", hdr_12_bold_center), Paragraph("Civil Work Description", hdr_12_bold_center), Paragraph("Qty / Ext", hdr_12_bold_center), Paragraph("Amount Rs.", hdr_12_bold_center)]]
-        for idx in range(7):
+        p1_table_data = [[Paragraph("SL.NO", hdr_12_bold_center), Paragraph("Civil Work Description", hdr_12_bold_center), Paragraph("Qty / Area", hdr_12_bold_center), Paragraph("Amount Rs.", hdr_12_bold_center)]]
+        for idx in range(9):
             item = processed_items[idx]
             p1_table_data.append([Paragraph(f"{idx+1}.", cell_12_bold_center), Paragraph(item[0], cell_12_bold_center), Paragraph(item[1], cell_12_bold_center), Paragraph(f"{item_amounts[idx]:,}", cell_12_bold_center)])
         
         t1 = Table(p1_table_data, colWidths=[45, 270, 100, 120])
-        t1.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('TOPPADDING', (0,0), (-1,-1), 12), ('BOTTOMPADDING', (0,0), (-1,-1), 12)]))
+        t1.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('TOPPADDING', (0,0), (-1,-1), 14), ('BOTTOMPADDING', (0,0), (-1,-1), 14)]))
         elements.append(t1)
 
         elements.append(PageBreak())
@@ -647,8 +645,8 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
         elements.append(Table([[Paragraph(f"REF NO:-{ref_no}", ref_left_style), Paragraph(f"DATE: {est_date}", ref_right_style)]], colWidths=[265, 270]))
         elements.append(Spacer(1, 4))
 
-        p2_table_data = [[Paragraph("SL.NO", hdr_12_bold_center), Paragraph("Civil Work Description", hdr_12_bold_center), Paragraph("Qty / Ext", hdr_12_bold_center), Paragraph("Amount Rs.", hdr_12_bold_center)]]
-        for idx in range(7, 14):
+        p2_table_data = [[Paragraph("SL.NO", hdr_12_bold_center), Paragraph("Civil Work Description", hdr_12_bold_center), Paragraph("Qty / Area", hdr_12_bold_center), Paragraph("Amount Rs.", hdr_12_bold_center)]]
+        for idx in range(9, 15):
             item = processed_items[idx]
             p2_table_data.append([Paragraph(f"{idx+1}.", cell_12_bold_center), Paragraph(item[0], cell_12_bold_center), Paragraph(item[1], cell_12_bold_center), Paragraph(f"{item_amounts[idx]:,}", cell_12_bold_center)])
 
@@ -656,22 +654,22 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
         p2_table_data.append(["", Paragraph("TOTAL", total_14_bold), "", Paragraph(f"{final_total:,}", total_14_bold)])
 
         t2 = Table(p2_table_data, colWidths=[45, 270, 100, 120])
-        t2.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('TOPPADDING', (0,0), (-1,-1), 12), ('BOTTOMPADDING', (0,0), (-1,-1), 12)]))
+        t2.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('TOPPADDING', (0,0), (-1,-1), 14), ('BOTTOMPADDING', (0,0), (-1,-1), 14)]))
         elements.append(t2)
 
     elements.append(Spacer(1, 6))
     elements.append(Paragraph(num_to_words_indian_clean(final_total), words_13_bold_center))
     elements.append(Spacer(1, 5))
-    elements.append(Paragraph("TERMS AND CONDITIONS (CIVIL WORKS):", terms_hdr_center))
+    elements.append(Paragraph("TERMS AND CONDITIONS FOR CIVIL & STRUCTURAL WORKS:", terms_hdr_center))
     elements.append(Spacer(1, 3))
 
     terms_points = [
-        "1. This Is A Preliminary Civil Estimate For House Extension / Additional Floors.",
-        "2. Payment Structure: 25% Advance, 25% Upon Foundation/Roof Slab, 30% Masonry/Plastering, 20% Final Handover.",
-        "3. Validity: This Estimation Is Valid For 45 Days From The Date Of Issue.",
-        "4. Structural Responsibility: Client must ensure existing foundation strength supports requested vertical extension.",
-        "5. Materials: Cement (ACC/Ultratech), TMT Steel (Fe550 Grade) and Solid Blocks of approved ISI standards.",
-        "6. Project Duration: Estimated Execution Time Is 120 Working Days From Site Handover."
+        "1. This Is A Preliminary Civil Estimate Based On Buildup Area And Structural Requirements.",
+        "2. Payment Schedule: 30% Advance, 30% Upon Slab Casting, 30% Masonry & Plastering, 10% Handover.",
+        "3. Validity: This Estimate Is Valid For 30 Days From The Date Of Issue Due To Steel/Cement Price Fluctuations.",
+        "4. Structural Responsibility: Existing Foundation Load-Bearing Capacity Must Be Verified Prior to Work.",
+        "5. Material Standards: Fe550 Grade TMT Steel and OPC/PPC Cement will be utilized as per specifications.",
+        "6. Project Duration: Estimated Structural Completion Time Is 120 Working Days From Advance Receipt."
     ]
     for point in terms_points:
         elements.append(Paragraph(point, terms_point_size_8))
@@ -684,15 +682,15 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
     return pdf_bytes, filename, ref_no, final_total
 
 
-# --- AUTHENTIC MODAL POPUP DIALOG FOR ESTIMATION ---
-@st.dialog("⚡ HOUSE EXTENSION & CIVIL ESTIMATION GENERATOR", width="large")
+# --- AUTHENTIC MODAL POPUP DIALOG FOR CIVIL ESTIMATION ---
+@st.dialog("🏗️ CIVIL CONSTRUCTION & FLOOR EXTENSION ESTIMATOR", width="large")
 def show_quotation_dialog():
     st.markdown("""
     <div class="commercial-auth-banner">
-        <div style="font-size:2.2rem;">🏗️</div>
+        <div style="font-size:2.2rem;">🔐</div>
         <div>
-            <div style="color:#818CF8; font-weight:700; font-size:0.85rem; letter-spacing:1px;">SECURE SSL GATEWAY • CIVIL & STRUCTURAL INVOICING</div>
-            <div style="color:#FFFFFF; font-size:0.8rem;">Generate encrypted PDF civil estimates for house extensions, additional floors, and RCC works in Bengaluru.</div>
+            <div style="color:#818CF8; font-weight:700; font-size:0.85rem; letter-spacing:1px;">SECURE SSL GATEWAY • CIVIL STRUCTURAL INVOICING</div>
+            <div style="color:#FFFFFF; font-size:0.8rem;">Generate encrypted civil estimation PDFs for building upper floor extensions in Bengaluru.</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -707,39 +705,38 @@ def show_quotation_dialog():
             user_email = st.text_input("Email ID *", value="", placeholder="Enter email")
 
         st.markdown("---")
-        st.subheader("🏠 Property & Extension Details")
-        
+        st.subheader("🏠 Property & Extension Floor Options")
         col_c1, col_c2 = st.columns(2)
         with col_c1:
             customer_name = st.text_input("Customer Full Name *", value="", placeholder="Customer name")
-            date_input = st.text_input("Quotation Date", value=datetime.now().strftime("%d-%m-%Y"))
+            floors_option = st.selectbox(
+                "Select Floors to Add *",
+                ["2nd Floor Only", "2nd & 3rd Floors", "3rd Floor Only", "1st, 2nd & 3rd Floors", "Custom Multi-Floor Extension"]
+            )
         with col_c2:
-            build_sqft = st.number_input("Total Extension Build-Up Area (SQ. FT) *", min_value=100.0, max_value=10000.0, value=1200.0, step=50.0)
-
-        st.markdown("**Select Floor Extension Option(s) *:**")
-        f_col1, f_col2, f_col3, f_col4 = st.columns(4)
-        with f_col1:
-            ext_1st = st.checkbox("1st Floor", value=False)
-        with f_col2:
-            ext_2nd = st.checkbox("2nd Floor", value=True)
-        with f_col3:
-            ext_3nd = st.checkbox("3rd Floor", value=False)
-        with f_col4:
-            ext_pent = st.checkbox("Penthouse / Terrace", value=False)
+            date_input = st.text_input("Quotation Date", value=datetime.now().strftime("%d-%m-%Y"))
+            buildup_sqft = st.number_input(
+                "📐 Buildup Area (SQ. FT) *",
+                min_value=100.0,
+                max_value=10000.0,
+                value=1200.0,
+                step=50.0,
+                format="%.2f"
+            )
 
         address_input = st.text_area(
-            "Site / Property Address *", 
+            "Site / Building Address *", 
             value="",
-            placeholder="Enter complete address"
+            placeholder="Enter complete site address"
         )
 
         st.markdown("---")
-        st.subheader("💰 YOUR CIVIL BUDGET")
+        st.subheader("💰 CIVIL WORKS BUDGET")
         
         amount_input = st.number_input(
-            "✏️ Enter Total Civil Estimated Budget (INR ₹):",
+            "✏️ Enter Total Estimated Civil Budget (INR ₹):",
             min_value=100000.0,
-            max_value=10000000.0,
+            max_value=20000000.0,
             value=2500000.0,
             step=50000.0,
             format="%.2f"
@@ -747,31 +744,22 @@ def show_quotation_dialog():
 
         subtotal_est = round(amount_input / 1.18)
         gst_est = amount_input - subtotal_est
-        st.info(f"📊 **Base Estimate:** ₹ {subtotal_est:,.2f} | **GST (18%):** ₹ {gst_est:,.2f} | **Total Final Payable:** ₹ {amount_input:,.2f}")
+        st.info(f"📊 **Base Civil Estimate:** ₹ {subtotal_est:,.2f} | **GST (18%):** ₹ {gst_est:,.2f} | **Total Final Payable:** ₹ {amount_input:,.2f}")
 
-        submitted = st.form_submit_button("⚡ GENERATE CIVIL QUOTATION", type="primary", use_container_width=True)
+        submitted = st.form_submit_button("⚡ GENERATE CIVIL ESTIMATE", type="primary", use_container_width=True)
 
     if submitted:
-        selected_floors = []
-        if ext_1st: selected_floors.append("1ST FLOOR")
-        if ext_2nd: selected_floors.append("2ND FLOOR")
-        if ext_3nd: selected_floors.append("3RD FLOOR")
-        if ext_pent: selected_floors.append("PENTHOUSE")
-
-        if not selected_floors:
-            selected_floors = ["2ND FLOOR"] # Default fallback
-
         if not user_name.strip() or not user_mobile.strip() or not user_email.strip() or not customer_name.strip() or not address_input.strip():
             st.warning("⚠️ Please fill in all required fields before generating the quotation.")
             return
 
-        with st.spinner('Generating Civil PDF copies and syncing securely with cloud storage...'):
+        with st.spinner('Generating PDF copies and syncing securely with cloud storage...'):
             try:
                 pdf_bytes_std, filename_std, generated_ref, final_total = generate_estimation_pdf_bytes(
-                    customer_name, address_input, date_input, float(amount_input), selected_floors, float(build_sqft), include_header=True
+                    customer_name, address_input, date_input, float(amount_input), floors_option, float(buildup_sqft), include_header=True
                 )
                 pdf_bytes_no_hdr, filename_no_hdr, _, _ = generate_estimation_pdf_bytes(
-                    customer_name, address_input, date_input, float(amount_input), selected_floors, float(build_sqft), include_header=False
+                    customer_name, address_input, date_input, float(amount_input), floors_option, float(buildup_sqft), include_header=False
                 )
                 
                 if supabase:
@@ -875,7 +863,7 @@ col_tick1, col_tick2 = st.columns([10, 1])
 with col_tick1:
     st.markdown("""
     <div class="commercial-ticker" style="margin-bottom:0;">
-        <div><span class="live-dot"></span>LIVE CIVIL & EXTENSION HUB: BENGALURU (SAHAKARNAGAR | HSR | WHITEFIELD)</div>
+        <div><span class="live-dot"></span>LIVE CIVIL HUB: BENGALURU (SAHAKARNAGAR | HSR | WHITEFIELD)</div>
         <div>SUPPORT HOTLINE: +91 98765 43210 &nbsp;|&nbsp; SLA: 99.9% UPTIME</div>
     </div>
     """, unsafe_allow_html=True)
@@ -899,11 +887,11 @@ with col_hero1:
     st.markdown("""
     <div class="dashboard-card-3d" style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.85) 100%); padding: 3rem 2.5rem; height: 100%;">
         <div style="font-family:'Space Grotesk', sans-serif; font-weight: 800; font-size: 0.85rem; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 12px;">
-            <span class="gradient-text-gold">✦ HOUSE EXTENSION & CIVIL WORKS </span>
+            <span class="gradient-text-gold">✦ STRUCTURAL CIVIL & FLOOR EXTENSION </span>
         </div>
-        <h1 class="hero-title-3d" style="font-size: 3rem;">SND INTERIOR & CIVIL CONSTRUCTION</h1>
+        <h1 class="hero-title-3d" style="font-size: 3rem;">SND INTERIOR & DESIGNS</h1>
         <p style="color: #CBD5E1; font-size: 1.1rem; line-height: 1.7; margin-bottom: 2rem;">
-            Specialized in vertical house extensions, 2nd & 3rd floor additions, RCC structural frameworks, civil estimates, and turn-key construction across Bengaluru.
+            Professional civil construction, floor additions (2nd and 3rd floors), structural framework engineering, GST quotations, and turnkey building execution across Bengaluru.
         </p>
     </div>
     """, unsafe_allow_html=True)
@@ -912,44 +900,44 @@ with col_hero2:
     st.markdown("""
     <div class="slider-box" id="interiorCarousel">
         <div class="carousel-slide active">
-            <img src="https://images.unsplash.com/photo-1541888946425-d0fbb18f86f6?auto=format&fit=crop&w=1000&q=80" alt="Civil Construction">
-            <div class="carousel-caption">01 - RCC Column & Beam Framework Casting</div>
+            <img src="https://images.unsplash.com/photo-1541888946425-d0fbb18f7292?auto=format&fit=crop&w=1000&q=80" alt="Civil Construction">
+            <div class="carousel-caption">01 - Structural Floor Extension & Column Casting</div>
         </div>
         <div class="carousel-slide">
-            <img src="https://images.unsplash.com/photo-1590381105924-c72589b9ef3f?auto=format&fit=crop&w=1000&q=80" alt="House Extension">
-            <div class="carousel-caption">02 - Multi-Floor House Extension & Brickwork</div>
+            <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1000&q=80" alt="Building Blueprint">
+            <div class="carousel-caption">02 - Architectural Planning & Structural Design</div>
         </div>
         <div class="carousel-slide">
-            <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1000&q=80" alt="Structural Engineering">
-            <div class="carousel-caption">03 - Structural Engineering & Blueprint Layouts</div>
+            <img src="https://images.unsplash.com/photo-1590381105924-c72589b9ef3f?auto=format&fit=crop&w=1000&q=80" alt="RCC Slab">
+            <div class="carousel-caption">03 - RCC Roof Slab Casting & Reinforcement</div>
         </div>
         <div class="carousel-slide">
-            <img src="https://images.unsplash.com/photo-1581094288338-2314dddb7ece?auto=format&fit=crop&w=1000&q=80" alt="Foundation Works">
-            <div class="carousel-caption">04 - Foundation Footings & Excavation Works</div>
+            <img src="https://images.unsplash.com/photo-1581094288338-2314dddb7ece?auto=format&fit=crop&w=1000&q=80" alt="Brick Masonry">
+            <div class="carousel-caption">04 - External & Internal Brick Masonry Walls</div>
         </div>
         <div class="carousel-slide">
-            <img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=1000&q=80" alt="Steel Reinforcement">
-            <div class="carousel-caption">05 - Fe550 Grade TMT Steel Reinforcement</div>
+            <img src="https://images.unsplash.com/photo-1517581177682-a085bb7ffb15?auto=format&fit=crop&w=1000&q=80" alt="Scaffolding">
+            <div class="carousel-caption">05 - Multi-Floor Scaffolding & Safety Works</div>
         </div>
         <div class="carousel-slide">
-            <img src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1000&q=80" alt="Slab Casting">
-            <div class="carousel-caption">06 - Roof Slab Shuttering & Concrete Pouring</div>
+            <img src="https://images.unsplash.com/photo-1541971875076-8f970d573be6?auto=format&fit=crop&w=1000&q=80" alt="Concrete Plastering">
+            <div class="carousel-caption">06 - Structural Plastering & Wall Finishing</div>
         </div>
         <div class="carousel-slide">
-            <img src="https://images.unsplash.com/photo-1590579491624-f98f3bb15dcf?auto=format&fit=crop&w=1000&q=80" alt="Masonry & Plastering">
-            <div class="carousel-caption">07 - External & Internal Wall Plastering</div>
+            <img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=1000&q=80" alt="Electrical Plumbing">
+            <div class="carousel-caption">07 - Concealed Conduit & Plumbing Rough-in</div>
         </div>
         <div class="carousel-slide">
-            <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1000&q=80" alt="Electrical & Plumbing">
-            <div class="carousel-caption">08 - Concealed Plumbing & Electrical Conduits</div>
+            <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1000&q=80" alt="Finished Exterior">
+            <div class="carousel-caption">08 - Multi-Storey Building Elevation Handover</div>
         </div>
         <div class="carousel-slide">
-            <img src="https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1000&q=80" alt="Terrace Waterproofing">
-            <div class="carousel-caption">09 - Terrace Waterproofing & Curing</div>
+            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80" alt="Terrace Waterproofing">
+            <div class="carousel-caption">09 - Terrace Waterproofing & Parapet Walls</div>
         </div>
         <div class="carousel-slide">
-            <img src="https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=1000&q=80" alt="Completed Civil Structure">
-            <div class="carousel-caption">10 - Completed Additional Floor Handover</div>
+            <img src="https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&w=1000&q=80" alt="Foundation Works">
+            <div class="carousel-caption">10 - Foundation & Column Starter Reinforcement</div>
         </div>
     </div>
 
@@ -970,49 +958,49 @@ with col_hero2:
 # --- STATIC & FIXED 10 IMAGES GALLERY SHOWCASE ---
 st.markdown("<br>", unsafe_allow_html=True)
 st.markdown("### 🏛️ Civil Construction Master Collection (10 Fixed Showcase Galleries)")
-st.markdown("<p style='color:#94A3B8; font-size:0.95rem; margin-bottom:1rem;'>Explore our structural workflow stages from foundation excavation to multi-floor slab completion.</p>", unsafe_allow_html=True)
+st.markdown("<p style='color:#94A3B8; font-size:0.95rem; margin-bottom:1rem;'>Explore our curated permanent catalog of structural frames, slab casting, and multi-floor building extensions.</p>", unsafe_allow_html=True)
 
 st.markdown("""
 <div class="static-gallery-grid">
     <div class="static-gallery-item">
-        <img src="https://images.unsplash.com/photo-1541888946425-d0fbb18f86f6?auto=format&fit=crop&w=600&q=80" alt="RCC Frame">
-        <div class="static-gallery-label">01. RCC Framework</div>
+        <img src="https://images.unsplash.com/photo-1541888946425-d0fbb18f7292?auto=format&fit=crop&w=600&q=80" alt="Extension">
+        <div class="static-gallery-label">01. Floor Extension</div>
     </div>
     <div class="static-gallery-item">
-        <img src="https://images.unsplash.com/photo-1590381105924-c72589b9ef3f?auto=format&fit=crop&w=600&q=80" alt="Extension">
-        <div class="static-gallery-label">02. Floor Extension</div>
+        <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=600&q=80" alt="Blueprint">
+        <div class="static-gallery-label">02. Structural Plan</div>
     </div>
     <div class="static-gallery-item">
-        <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=600&q=80" alt="Engineering">
-        <div class="static-gallery-label">03. Engineering</div>
+        <img src="https://images.unsplash.com/photo-1590381105924-c72589b9ef3f?auto=format&fit=crop&w=600&q=80" alt="RCC Slab">
+        <div class="static-gallery-label">03. RCC Slab Casting</div>
     </div>
     <div class="static-gallery-item">
-        <img src="https://images.unsplash.com/photo-1581094288338-2314dddb7ece?auto=format&fit=crop&w=600&q=80" alt="Foundation">
-        <div class="static-gallery-label">04. Foundation</div>
+        <img src="https://images.unsplash.com/photo-1581094288338-2314dddb7ece?auto=format&fit=crop&w=600&q=80" alt="Masonry">
+        <div class="static-gallery-label">04. Brick Masonry</div>
     </div>
     <div class="static-gallery-item">
-        <img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=600&q=80" alt="TMT Steel">
-        <div class="static-gallery-label">05. TMT Steel Bars</div>
+        <img src="https://images.unsplash.com/photo-1517581177682-a085bb7ffb15?auto=format&fit=crop&w=600&q=80" alt="Scaffolding">
+        <div class="static-gallery-label">05. Safety Scaffolding</div>
     </div>
     <div class="static-gallery-item">
-        <img src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=600&q=80" alt="Slab Casting">
-        <div class="static-gallery-label">06. Slab Casting</div>
+        <img src="https://images.unsplash.com/photo-1541971875076-8f970d573be6?auto=format&fit=crop&w=600&q=80" alt="Plastering">
+        <div class="static-gallery-label">06. Wall Plastering</div>
     </div>
     <div class="static-gallery-item">
-        <img src="https://images.unsplash.com/photo-1590579491624-f98f3bb15dcf?auto=format&fit=crop&w=600&q=80" alt="Plastering">
-        <div class="static-gallery-label">07. Wall Plastering</div>
+        <img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=600&q=80" alt="Conduits">
+        <div class="static-gallery-label">07. Electrical/Plumbing</div>
     </div>
     <div class="static-gallery-item">
-        <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=600&q=80" alt="Conduits">
-        <div class="static-gallery-label">08. Conduits & Pipes</div>
+        <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=600&q=80" alt="Elevation">
+        <div class="static-gallery-label">08. Building Handover</div>
     </div>
     <div class="static-gallery-item">
-        <img src="https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=600&q=80" alt="Waterproofing">
+        <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80" alt="Waterproofing">
         <div class="static-gallery-label">09. Waterproofing</div>
     </div>
     <div class="static-gallery-item">
-        <img src="https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=600&q=80" alt="Handover">
-        <div class="static-gallery-label">10. Floor Handover</div>
+        <img src="https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&w=600&q=80" alt="Foundation">
+        <div class="static-gallery-label">10. Column Starter</div>
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -1021,98 +1009,98 @@ st.markdown("""
 # --- FULL-SIZE VERTICAL SCROLLING SHOWCASE (10 FULL SIZE IMAGES) ---
 st.markdown("<br>", unsafe_allow_html=True)
 st.markdown("### 📸 10 Full-Size Vertical Civil Construction Showcase")
-st.markdown("<p style='color:#94A3B8; font-size:0.95rem; margin-bottom:1.5rem;'>Scroll down through our high-definition structural and civil extension milestone features.</p>", unsafe_allow_html=True)
+st.markdown("<p style='color:#94A3B8; font-size:0.95rem; margin-bottom:1.5rem;'>Scroll down through our 10 full-width, high-definition structural and floor extension project features.</p>", unsafe_allow_html=True)
 
 st.markdown("""
 <div class="vertical-gallery-container">
     <!-- 01 -->
     <div class="vertical-gallery-card">
-        <img src="https://images.unsplash.com/photo-1541888946425-d0fbb18f86f6?auto=format&fit=crop&w=1600&q=80" alt="RCC Framework">
+        <img src="https://images.unsplash.com/photo-1541888946425-d0fbb18f7292?auto=format&fit=crop&w=1600&q=80" alt="Civil Construction">
         <div class="vertical-card-overlay">
             <span class="vertical-card-badge">Full Size Feature • 01</span>
-            <div class="vertical-card-title">Heavy-Duty RCC Column & Beam Framework Casting</div>
-            <div class="vertical-card-desc">Precision M25 grade concrete mixing, column alignment checks, and rigid formwork shoring for multi-floor load distribution.</div>
+            <div class="vertical-card-title">Structural Floor Extension & Column Starter Casting</div>
+            <div class="vertical-card-desc">Strengthening existing footings, chemical anchoring of rebar, and precision column extensions for upper 2nd & 3rd floors.</div>
         </div>
     </div>
     <!-- 02 -->
     <div class="vertical-gallery-card">
-        <img src="https://images.unsplash.com/photo-1590381105924-c72589b9ef3f?auto=format&fit=crop&w=1600&q=80" alt="House Extension">
+        <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1600&q=80" alt="Blueprint">
         <div class="vertical-card-overlay">
             <span class="vertical-card-badge">Full Size Feature • 02</span>
-            <div class="vertical-card-title">Second & Third Floor Vertical House Extension</div>
-            <div class="vertical-card-desc">Seamless integration of vertical load-bearing columns onto existing ground structures with minimal disruption to lower living areas.</div>
+            <div class="vertical-card-title">Architectural Planning & Load Calculation</div>
+            <div class="vertical-card-desc">Comprehensive structural stability analysis, BBMP compliance drafting, and exact material takeoff for vertical additions.</div>
         </div>
     </div>
     <!-- 03 -->
     <div class="vertical-gallery-card">
-        <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1600&q=80" alt="Structural Engineering">
+        <img src="https://images.unsplash.com/photo-1590381105924-c72589b9ef3f?auto=format&fit=crop&w=1600&q=80" alt="RCC Slab">
         <div class="vertical-card-overlay">
             <span class="vertical-card-badge">Full Size Feature • 03</span>
-            <div class="vertical-card-title">Architectural Blueprints & Structural Engineering</div>
-            <div class="vertical-card-desc">Comprehensive load calculations, soil load-bearing capacity testing, and municipal compliance drawing approvals.</div>
+            <div class="vertical-card-title">M25 Grade RCC Roof Slab Casting & Shuttering</div>
+            <div class="vertical-card-desc">Heavy-duty centering, Fe550 grade steel grid reinforcement, and mechanized pump concrete pouring for superior slab strength.</div>
         </div>
     </div>
     <!-- 04 -->
     <div class="vertical-gallery-card">
-        <img src="https://images.unsplash.com/photo-1581094288338-2314dddb7ece?auto=format&fit=crop&w=1600&q=80" alt="Foundation Works">
+        <img src="https://images.unsplash.com/photo-1581094288338-2314dddb7ece?auto=format&fit=crop&w=1600&q=80" alt="Brickwork">
         <div class="vertical-card-overlay">
             <span class="vertical-card-badge">Full Size Feature • 04</span>
-            <div class="vertical-card-title">Foundation Excavation & Footing Reinforcement</div>
-            <div class="vertical-card-desc">Deep soil excavation, PCC base laying, and reinforced isolated footing construction for earthquake-resistant stability.</div>
+            <div class="vertical-card-title">AAC Block & Red Brick Masonry Partition Walls</div>
+            <div class="vertical-card-desc">Precision wall alignment, damp-proof course integration, and sturdy lintel beam support over all door and window openings.</div>
         </div>
     </div>
     <!-- 05 -->
     <div class="vertical-gallery-card">
-        <img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=1600&q=80" alt="TMT Steel Bars">
+        <img src="https://images.unsplash.com/photo-1517581177682-a085bb7ffb15?auto=format&fit=crop&w=1600&q=80" alt="Scaffolding">
         <div class="vertical-card-overlay">
             <span class="vertical-card-badge">Full Size Feature • 05</span>
-            <div class="vertical-card-title">Fe550 Grade TMT Steel Bar Procurement & Binding</div>
-            <div class="vertical-card-desc">High-tensile ribbed steel bar fabrication, precise bending schedules, and binding wire mesh grid assembly for slabs and beams.</div>
+            <div class="vertical-card-title">External Scaffolding & Multi-Storey Safety Systems</div>
+            <div class="vertical-card-desc">Industrial steel scaffolding structures, safety debris netting, and harness compliance for secure upper-level execution.</div>
         </div>
     </div>
     <!-- 06 -->
     <div class="vertical-gallery-card">
-        <img src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1600&q=80" alt="Slab Casting">
+        <img src="https://images.unsplash.com/photo-1541971875076-8f970d573be6?auto=format&fit=crop&w=1600&q=80" alt="Plastering">
         <div class="vertical-card-overlay">
             <span class="vertical-card-badge">Full Size Feature • 06</span>
-            <div class="vertical-card-title">Roof Slab Shuttering & Continuous Concrete Pouring</div>
-            <div class="vertical-card-desc">Waterproof marine plywood centering, mechanical vibrator compaction, and controlled water curing protocols.</div>
+            <div class="vertical-card-title">Internal & External Structural Wall Plastering</div>
+            <div class="vertical-card-desc">Double-coat cement mortar plastering with chicken mesh reinforcement at column junctions to prevent structural cracking.</div>
         </div>
     </div>
     <!-- 07 -->
     <div class="vertical-gallery-card">
-        <img src="https://images.unsplash.com/photo-1590579491624-f98f3bb15dcf?auto=format&fit=crop&w=1600&q=80" alt="Wall Plastering">
+        <img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=1600&q=80" alt="Conduits">
         <div class="vertical-card-overlay">
             <span class="vertical-card-badge">Full Size Feature • 07</span>
-            <div class="vertical-card-title">Solid Block Masonry & 3-Coat Wall Plastering</div>
-            <div class="vertical-card-desc">Precision vertical plumb line block work with mortar bands and anti-crack mesh plaster finishes for smooth painting readiness.</div>
+            <div class="vertical-card-title">Concealed Electrical Piping & Plumbing Rough-Ins</div>
+            <div class="vertical-card-desc">Heavy-gauge FR PVC conduit laying in slabs/walls and CPVC/UPVC water supply line networking for bathrooms and kitchens.</div>
         </div>
     </div>
     <!-- 08 -->
     <div class="vertical-gallery-card">
-        <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1600&q=80" alt="Conduits & Pipes">
+        <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1600&q=80" alt="Handover">
         <div class="vertical-card-overlay">
             <span class="vertical-card-badge">Full Size Feature • 08</span>
-            <div class="vertical-card-title">Concealed Electrical Conduits & Plumbing Networks</div>
-            <div class="vertical-card-desc">Heavy-duty ISI grade FR electrical conduit pipe chases and pressure-tested CPVC/UPVC water supply line installations.</div>
+            <div class="vertical-card-title">Completed Multi-Storey Building Elevation Handover</div>
+            <div class="vertical-card-desc">Fully cured structural extension ready for interior finishing, painting, flooring, and final client occupancy inspection.</div>
         </div>
     </div>
     <!-- 09 -->
     <div class="vertical-gallery-card">
-        <img src="https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1600&q=80" alt="Terrace Waterproofing">
+        <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=80" alt="Waterproofing">
         <div class="vertical-card-overlay">
             <span class="vertical-card-badge">Full Size Feature • 09</span>
-            <div class="vertical-card-title">Terrace Brick Bat Coba & Chemical Waterproofing</div>
-            <div class="vertical-card-desc">Multi-layer slope screeding and polymer-modified membrane waterproofing to prevent seepage and thermal heat gain.</div>
+            <div class="vertical-card-title">Terrace Waterproofing & Parapet Wall Construction</div>
+            <div class="vertical-card-desc">Multi-layer polymer chemical waterproofing membrane for terrace slabs and solid brick parapet boundary walls.</div>
         </div>
     </div>
     <!-- 10 -->
     <div class="vertical-gallery-card">
-        <img src="https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=1600&q=80" alt="Floor Handover">
+        <img src="https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&w=1600&q=80" alt="Foundation">
         <div class="vertical-card-overlay">
             <span class="vertical-card-badge">Full Size Feature • 10</span>
-            <div class="vertical-card-title">Completed Additional Floor Structure Handover</div>
-            <div class="vertical-card-desc">Final structural audit, clean site handover, and certified documentation ready for interior fit-outs and finishing.</div>
+            <div class="vertical-card-title">Foundation & Column Starter Reinforcement Checks</div>
+            <div class="vertical-card-desc">Rigorous non-destructive testing (NDT) and rebar tensile verification before initiating upper floor load additions.</div>
         </div>
     </div>
 </div>
@@ -1124,22 +1112,22 @@ col_m1, col_m2, col_m3, col_m4 = st.columns(4)
 with col_m1:
     st.markdown("""
     <div class="stat-box-commercial">
-        <div style="font-size: 1.8rem; font-weight: 800;" class="gradient-text-gold">450+</div>
-        <div style="font-size: 0.8rem; color: #94A3B8; font-weight: 700; text-transform: uppercase; margin-top: 5px;">House Extensions</div>
+        <div style="font-size: 1.8rem; font-weight: 800;" class="gradient-text-gold">350+</div>
+        <div style="font-size: 0.8rem; color: #94A3B8; font-weight: 700; text-transform: uppercase; margin-top: 5px;">Floor Extensions</div>
     </div>
     """, unsafe_allow_html=True)
 with col_m2:
     st.markdown("""
     <div class="stat-box-commercial">
         <div style="font-size: 1.8rem; font-weight: 800;" class="gradient-text-cyan">15 YRS</div>
-        <div style="font-size: 0.8rem; color: #94A3B8; font-weight: 700; text-transform: uppercase; margin-top: 5px;">Structural Warranty</div>
+        <div style="font-size: 0.8rem; color: #94A3B8; font-weight: 700; text-transform: uppercase; margin-top: 5px;">Structural Guarantee</div>
     </div>
     """, unsafe_allow_html=True)
 with col_m3:
     st.markdown("""
     <div class="stat-box-commercial">
         <div style="font-size: 1.8rem; font-weight: 800;" class="gradient-text-gold">120 DAYS</div>
-        <div style="font-size: 0.8rem; color: #94A3B8; font-weight: 700; text-transform: uppercase; margin-top: 5px;">Floor Handover</div>
+        <div style="font-size: 0.8rem; color: #94A3B8; font-weight: 700; text-transform: uppercase; margin-top: 5px;">Slab & Frame Handover</div>
     </div>
     """, unsafe_allow_html=True)
 with col_m4:
@@ -1153,100 +1141,100 @@ with col_m4:
 
 # --- INTERACTIVE 3D ANIMATED / GIF VISUALIZER ---
 st.markdown("<br>", unsafe_allow_html=True)
-st.markdown("### 🌀 Interactive Civil Engineering Modules")
-st.markdown("<p style='color:#94A3B8; font-size:0.95rem; margin-bottom:1.5rem;'>Select a construction milestone to inspect structural load behavior, material grades, and reinforcement specs.</p>", unsafe_allow_html=True)
+st.markdown("### 🌀 Interactive Civil Simulation Modules")
+st.markdown("<p style='color:#94A3B8; font-size:0.95rem; margin-bottom:1.5rem;'>Select a civil construction stage to inspect structural engineering specifications and load-bearing parameters.</p>", unsafe_allow_html=True)
 
-selected_module = st.radio(
-    "Select Civil Module:",
-    ["🏗️ Column & Beam RCC Framework", "🧱 Solid Block Masonry & Plastering", "🪜 Staircase & Balcony Extensions", "🌧️ Roof Slab & Waterproofing", "⚡ Electrical & Plumbing Conduits"],
+selected_room = st.radio(
+    "Select Simulation Zone:",
+    ["🏗️ Column & Foundation Extension", "🧱 RCC Slab & Beam Casting", "🧱 Brick Masonry & AAC Blocks", "🌧️ Terrace Waterproofing", "🔌 Electrical & Plumbing Rough-In"],
     horizontal=True,
     label_visibility="collapsed"
 )
 
-if "Column" in selected_module:
+if "Column" in selected_room:
     st.markdown("""
     <div class="dashboard-card-3d" style="display:flex; gap:35px; align-items:center;">
         <div style="flex:1;">
             <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#F59E0B; text-transform:uppercase;">CIVIL MODULE 01</div>
-            <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">RCC Column & Beam Framework</h2>
+            <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">Column & Foundation Extension</h2>
             <p style="color:#CBD5E1; line-height:1.7; margin-bottom:1.5rem;">
-                Engineered with M25 grade concrete mix, Fe550 grade high-yield TMT steel bars, rigid column starter ties, and laser-aligned vertical shuttering for secure multi-floor load transfers.
+                Chemical anchoring of high-tensile rebar into existing foundation footings, chipping old column starters, and extending structural pillars to support upper 2nd and 3rd floors safely.
             </p>
             <div style="display:flex; gap:15px; color:#38BDF8; font-weight:700; font-size:0.9rem;">
-                <div>⚡ M25 Grade Concrete</div>
-                <div>⚡ Fe550 TMT Steel</div>
-                <div>⚡ 15-Yr Warranty</div>
+                <div>⚡ Fe550 Steel Rebar</div>
+                <div>⚡ Chemical Anchoring</div>
+                <div>⚡ NDT Verified</div>
             </div>
         </div>
         <div style="flex:1;">
             <div class="visualizer-frame-3d">
-                <img src="https://images.unsplash.com/photo-1541888946425-d0fbb18f86f6?auto=format&fit=crop&w=1000&q=80" alt="Civil 3D 1">
+                <img src="https://images.unsplash.com/photo-1541888946425-d0fbb18f7292?auto=format&fit=crop&w=1000&q=80" alt="Column Extension">
             </div>
         </div>
     </div>
     """, unsafe_allow_html=True)
-elif "Masonry" in selected_module:
+elif "Slab" in selected_room:
     st.markdown("""
     <div class="dashboard-card-3d" style="display:flex; gap:35px; align-items:center;">
         <div style="flex:1;">
             <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#F59E0B; text-transform:uppercase;">CIVIL MODULE 02</div>
-            <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">Solid Block Masonry & Plastering</h2>
+            <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">RCC Roof Slab & Beam Casting</h2>
             <p style="color:#CBD5E1; line-height:1.7; margin-bottom:1.5rem;">
-                Heavy-duty solid concrete blocks laid with plumb-line precision, accompanied by 3-course waterproof cement plastering to insulate against moisture and heat.
+                Heavy-duty scaffolding centering, double-mesh steel reinforcement laying, and M25 grade mechanized pump concrete pouring to ensure robust roof slab integrity.
             </p>
             <div style="display:flex; gap:15px; color:#38BDF8; font-weight:700; font-size:0.9rem;">
-                <div>⚡ Solid Blocks</div>
-                <div>⚡ Waterproof Mortar</div>
-                <div>⚡ Plumb Precision</div>
+                <div>⚡ M25 Grade Concrete</div>
+                <div>⚡ Double-Mesh Grid</div>
+                <div>⚡ Mechanized Pumping</div>
             </div>
         </div>
         <div style="flex:1;">
             <div class="visualizer-frame-3d">
-                <img src="https://images.unsplash.com/photo-1590579491624-f98f3bb15dcf?auto=format&fit=crop&w=1000&q=80" alt="Civil 3D 2">
+                <img src="https://images.unsplash.com/photo-1590381105924-c72589b9ef3f?auto=format&fit=crop&w=1000&q=80" alt="Slab Casting">
             </div>
         </div>
     </div>
     """, unsafe_allow_html=True)
-elif "Staircase" in selected_module:
+elif "Brick" in selected_room:
     st.markdown("""
     <div class="dashboard-card-3d" style="display:flex; gap:35px; align-items:center;">
         <div style="flex:1;">
             <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#F59E0B; text-transform:uppercase;">CIVIL MODULE 03</div>
-            <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">Staircase & Balcony Cantilever Extensions</h2>
+            <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">Brick Masonry & AAC Blocks</h2>
             <p style="color:#CBD5E1; line-height:1.7; margin-bottom:1.5rem;">
-                Durable cantilevered RCC staircases and cantilever balcony slabs engineered to connect ground levels seamlessly to newly added 2nd and 3rd floors.
+                Precision outer and inner wall construction using high-density AAC blocks or first-quality wire-cut red bricks with damp-proof course (DPC) layers.
             </p>
             <div style="display:flex; gap:15px; color:#38BDF8; font-weight:700; font-size:0.9rem;">
-                <div>⚡ Cantilever Slabs</div>
-                <div>⚡ RCC Staircases</div>
-                <div>⚡ Safe Load Ratings</div>
+                <div>⚡ AAC / Red Bricks</div>
+                <div>⚡ DPC Protected</div>
+                <div>⚡ Plumb Alignment</div>
             </div>
         </div>
         <div style="flex:1;">
             <div class="visualizer-frame-3d">
-                <img src="https://images.unsplash.com/photo-1590381105924-c72589b9ef3f?auto=format&fit=crop&w=1000&q=80" alt="Civil 3D 3">
+                <img src="https://images.unsplash.com/photo-1581094288338-2314dddb7ece?auto=format&fit=crop&w=1000&q=80" alt="Masonry">
             </div>
         </div>
     </div>
     """, unsafe_allow_html=True)
-elif "Roof" in selected_module:
+elif "Waterproofing" in selected_room:
     st.markdown("""
     <div class="dashboard-card-3d" style="display:flex; gap:35px; align-items:center;">
         <div style="flex:1;">
             <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#F59E0B; text-transform:uppercase;">CIVIL MODULE 04</div>
-            <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">Roof Slab Casting & Waterproofing</h2>
+            <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">Terrace Waterproofing & Parapet</h2>
             <p style="color:#CBD5E1; line-height:1.7; margin-bottom:1.5rem;">
-                Heavy shuttering support, machine-mixed concrete casting with superplasticizers, brick-bat coba slope screeding, and chemical membrane waterproofing.
+                Multi-layer polymer chemical waterproofing membrane applied on terrace roofs with brick-bat coba slope grading and solid parapet boundary walls.
             </p>
             <div style="display:flex; gap:15px; color:#38BDF8; font-weight:700; font-size:0.9rem;">
-                <div>⚡ Brick Bat Coba</div>
-                <div>⚡ Polymer Coating</div>
-                <div>⚡ Anti-Seepage</div>
+                <div>⚡ Polymer Membrane</div>
+                <div>⚡ Brick-Bat Coba</div>
+                <div>⚡ Leak-Proof Guarantee</div>
             </div>
         </div>
         <div style="flex:1;">
             <div class="visualizer-frame-3d">
-                <img src="https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1000&q=80" alt="Civil 3D 4">
+                <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80" alt="Waterproofing">
             </div>
         </div>
     </div>
@@ -1256,19 +1244,19 @@ else:
     <div class="dashboard-card-3d" style="display:flex; gap:35px; align-items:center;">
         <div style="flex:1;">
             <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#F59E0B; text-transform:uppercase;">CIVIL MODULE 05</div>
-            <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">Concealed Electrical & Plumbing Conduits</h2>
+            <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">Electrical & Plumbing Rough-In</h2>
             <p style="color:#CBD5E1; line-height:1.7; margin-bottom:1.5rem;">
-                ISI-grade heavy duty conduit pipe laying in walls and roof slabs before concrete pouring, plus pressure-tested supply and drainage piping networks.
+                Concealed heavy-gauge FR PVC conduit pipe laying in columns/slabs and CPVC/UPVC water supply network installation prior to wall plastering.
             </p>
             <div style="display:flex; gap:15px; color:#38BDF8; font-weight:700; font-size:0.9rem;">
-                <div>⚡ ISI Conduit Pipes</div>
+                <div>⚡ FR PVC Conduits</div>
+                <div>⚡ CPVC Water Lines</div>
                 <div>⚡ Pressure Tested</div>
-                <div>⚡ Distribution Boxes</div>
             </div>
         </div>
         <div style="flex:1;">
             <div class="visualizer-frame-3d">
-                <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1000&q=80" alt="Civil 3D 5">
+                <img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=1000&q=80" alt="Conduits">
             </div>
         </div>
     </div>
