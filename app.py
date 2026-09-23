@@ -31,7 +31,6 @@ st.markdown("""
         color: #F8FAFC;
     }
 
-    /* Ambient Background Glow Orbs */
     .bg-glow-1 {
         position: fixed;
         top: -10%;
@@ -61,7 +60,6 @@ st.markdown("""
         100% { transform: scale(1.15); opacity: 1; }
     }
 
-    /* Commercial Gradient Header Text with 3D Depth */
     .hero-title-3d {
         font-family: 'Outfit', sans-serif;
         font-weight: 900;
@@ -86,7 +84,6 @@ st.markdown("""
         -webkit-text-fill-color: transparent;
     }
 
-    /* Top Commercial Ticker / Status Bar */
     .commercial-ticker {
         background: linear-gradient(90deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.95) 100%);
         backdrop-filter: blur(16px);
@@ -120,7 +117,6 @@ st.markdown("""
         100% { transform: scale(0.95); opacity: 0.8; box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
     }
 
-    /* Commercial Glass Dashboard Container */
     .dashboard-card-3d {
         background: linear-gradient(145deg, rgba(17, 24, 39, 0.85) 0%, rgba(3, 7, 18, 0.95) 100%);
         backdrop-filter: blur(20px);
@@ -140,7 +136,6 @@ st.markdown("""
         box-shadow: 0 40px 80px rgba(245, 158, 11, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.25);
     }
 
-    /* Interactive 3D Visualizer Frame Container */
     .visualizer-frame-3d {
         border-radius: 20px;
         overflow: hidden;
@@ -162,7 +157,6 @@ st.markdown("""
         transform: scale(1.04);
     }
 
-    /* Metric Stat Card */
     .stat-box-commercial {
         background: linear-gradient(145deg, rgba(30, 41, 59, 0.6), rgba(15, 23, 42, 0.8));
         border: 1px solid rgba(255, 255, 255, 0.06);
@@ -178,7 +172,6 @@ st.markdown("""
         transform: translateY(-4px);
     }
 
-    /* Primary Action Buttons */
     .stButton > button {
         background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
         color: #030712;
@@ -197,7 +190,6 @@ st.markdown("""
         transform: translateY(-3px);
     }
 
-    /* Auth & Security Banner */
     .commercial-auth-banner {
         background: linear-gradient(135deg, rgba(30, 27, 75, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
         border: 1px solid rgba(99, 102, 241, 0.4);
@@ -210,7 +202,6 @@ st.markdown("""
         box-shadow: 0 15px 35px rgba(99, 102, 241, 0.2);
     }
 
-    /* Robust Direct IMG Carousel Styles */
     .slider-box {
         position: relative;
         width: 100%;
@@ -257,7 +248,6 @@ st.markdown("""
         letter-spacing: 0.5px;
     }
 
-    /* Static Grid Gallery Styles */
     .static-gallery-grid {
         display: grid;
         grid-template-columns: repeat(5, 1fr);
@@ -298,7 +288,6 @@ st.markdown("""
         background: linear-gradient(to bottom, rgba(15, 23, 42, 0.9), rgba(3, 7, 18, 0.95));
     }
 
-    /* Full-Size Vertical Scrolling Gallery Section */
     .vertical-gallery-container {
         display: flex;
         flex-direction: column;
@@ -385,13 +374,11 @@ st.markdown("""
 <div class="bg-glow-2"></div>
 """, unsafe_allow_html=True)
 
-
 # --- Initialize Session State ---
 if "is_admin_logged_in" not in st.session_state:
     st.session_state.is_admin_logged_in = False
 if "show_admin_modal" not in st.session_state:
     st.session_state.show_admin_modal = False
-
 
 # --- Initialize Supabase Client ---
 @st.cache_resource
@@ -410,8 +397,6 @@ def init_supabase() -> Client:
 
 supabase = init_supabase()
 
-
-# --- Helper Functions ---
 def num_to_words_indian_clean(num):
     num = int(round(num))
     if num == 0: return "ZERO RUPEES ONLY"
@@ -489,7 +474,6 @@ def upload_to_cloud(ref_no, pdf_bytes_standard, pdf_bytes_no_header, filename_st
 
 
 def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total, builtin_area, selected_floors, include_header=True):
-    # Master list of exactly 35 Civil & Building Floor Plan particulars
     CIVIL_PARTICULARS_MASTER = [
         ("Site clearing, excavation, and earthwork in foundation", "CU. M", 0.025),
         ("PCC bed (1:4:8) for foundation footings and base", "SQ. FT", 0.025),
@@ -528,10 +512,7 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
         ("Compound wall construction and MS safety gate", "R. FT", 0.030)
     ]
 
-    # Subtotal targeting from user budget
     subtotal_target = target_total / 1.18
-    
-    # Weight distribution across 35 items
     raw_weights = [item[2] * random.uniform(0.9, 1.1) for item in CIVIL_PARTICULARS_MASTER]
     total_w = sum(raw_weights)
     norm_weights = [w / total_w for w in raw_weights]
@@ -569,27 +550,28 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
     filename = f"BuildingEstimation_{ref_no}_{clean_customer_name}{'_NoHeader' if not include_header else ''}.pdf"
 
     pdf_buffer = io.BytesIO()
-    doc = SimpleDocTemplate(pdf_buffer, pagesize=A4, rightMargin=25, leftMargin=25, topMargin=15, bottomMargin=15)
+    # Margins 18 left/right -> printable width = 595.27 - 36 = 559.27 (approx 560)
+    doc = SimpleDocTemplate(pdf_buffer, pagesize=A4, rightMargin=18, leftMargin=18, topMargin=12, bottomMargin=12)
     styles = getSampleStyleSheet()
 
     RED_COLOR, BLUE_COLOR, LIGHT_PINK, BORDER_BLUE = colors.HexColor("#DC2626"), colors.HexColor("#1E40AF"), colors.HexColor("#EC4899"), colors.HexColor("#2563EB")
 
-    title_style = ParagraphStyle("Title", parent=styles["Heading1"], alignment=1, fontSize=26, leading=30, fontName="Helvetica-Bold", textColor=RED_COLOR)
+    title_style = ParagraphStyle("Title", parent=styles["Heading1"], alignment=1, fontSize=24, leading=28, fontName="Helvetica-Bold", textColor=RED_COLOR)
     sub_style = ParagraphStyle("Sub", parent=styles["Normal"], alignment=1, fontSize=8.5, leading=11, fontName="Helvetica-Bold", textColor=BLUE_COLOR)
     contact_style = ParagraphStyle("Contact", parent=styles["Normal"], alignment=1, fontSize=8, leading=10, fontName="Helvetica-Bold", textColor=BLUE_COLOR)
     gstin_style = ParagraphStyle("GSTIN", parent=styles["Normal"], alignment=1, fontSize=8.5, leading=11, fontName="Helvetica-Bold", textColor=LIGHT_PINK)
-    ref_left_style = ParagraphStyle("RefLeft", parent=styles["Normal"], alignment=0, fontSize=9.5, leading=12, fontName="Helvetica")
-    ref_right_style = ParagraphStyle("RefRight", parent=styles["Normal"], alignment=2, fontSize=9.5, leading=12, fontName="Helvetica")
-    box_hdr_style = ParagraphStyle("BoxHdr", parent=styles["Normal"], alignment=1, fontSize=12, leading=14, fontName="Helvetica-Bold", textColor=colors.black)
-    box_detail_style = ParagraphStyle("BoxDetail", parent=styles["Normal"], alignment=1, fontSize=11, leading=13.5, fontName="Helvetica-Bold", textColor=colors.black)
+    ref_left_style = ParagraphStyle("RefLeft", parent=styles["Normal"], alignment=0, fontSize=9.5, leading=12, fontName="Helvetica-Bold")
+    ref_right_style = ParagraphStyle("RefRight", parent=styles["Normal"], alignment=2, fontSize=9.5, leading=12, fontName="Helvetica-Bold")
+    box_hdr_style = ParagraphStyle("BoxHdr", parent=styles["Normal"], alignment=1, fontSize=11, leading=13, fontName="Helvetica-Bold", textColor=colors.black)
+    box_detail_style = ParagraphStyle("BoxDetail", parent=styles["Normal"], alignment=1, fontSize=10, leading=12.5, fontName="Helvetica-Bold", textColor=colors.black)
     
-    cell_style = ParagraphStyle("Cell", parent=styles["Normal"], alignment=0, fontSize=8.5, leading=11, fontName="Helvetica", textColor=colors.black)
-    cell_center = ParagraphStyle("CellC", parent=styles["Normal"], alignment=1, fontSize=8.5, leading=11, fontName="Helvetica", textColor=colors.black)
-    cell_right = ParagraphStyle("CellR", parent=styles["Normal"], alignment=2, fontSize=8.5, leading=11, fontName="Helvetica", textColor=colors.black)
+    cell_style = ParagraphStyle("Cell", parent=styles["Normal"], alignment=0, fontSize=9, leading=12, fontName="Helvetica", textColor=colors.black)
+    cell_center = ParagraphStyle("CellC", parent=styles["Normal"], alignment=1, fontSize=9, leading=12, fontName="Helvetica", textColor=colors.black)
+    cell_right = ParagraphStyle("CellR", parent=styles["Normal"], alignment=2, fontSize=9, leading=12, fontName="Helvetica", textColor=colors.black)
     
-    hdr_style = ParagraphStyle("Hdr", parent=styles["Normal"], alignment=1, fontSize=9, leading=11, fontName="Helvetica-Bold", textColor=colors.black)
-    total_style = ParagraphStyle("Tot", parent=styles["Normal"], alignment=2, fontSize=10, leading=12, fontName="Helvetica-Bold", textColor=colors.black)
-    total_val_style = ParagraphStyle("TotV", parent=styles["Normal"], alignment=2, fontSize=10, leading=12, fontName="Helvetica-Bold", textColor=colors.black)
+    hdr_style = ParagraphStyle("Hdr", parent=styles["Normal"], alignment=1, fontSize=9.5, leading=12, fontName="Helvetica-Bold", textColor=colors.black)
+    total_style = ParagraphStyle("Tot", parent=styles["Normal"], alignment=2, fontSize=10, leading=13, fontName="Helvetica-Bold", textColor=colors.black)
+    total_val_style = ParagraphStyle("TotV", parent=styles["Normal"], alignment=2, fontSize=10, leading=13, fontName="Helvetica-Bold", textColor=colors.black)
     words_style = ParagraphStyle("Words", parent=styles["Normal"], alignment=1, fontSize=10, leading=13, fontName="Helvetica-Bold", textColor=colors.black)
     terms_hdr = ParagraphStyle("TermH", parent=styles["Normal"], alignment=1, fontSize=9, leading=11, fontName="Helvetica-Bold", textColor=colors.black)
     terms_pt = ParagraphStyle("TermP", parent=styles["Normal"], alignment=0, fontSize=7.5, leading=9.5, fontName="Helvetica-Bold", textColor=colors.black)
@@ -601,7 +583,7 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
         qr = QrCodeWidget(qr_data)
         qr_bounds = qr.getBounds()
         w, h = qr_bounds[2] - qr_bounds[0], qr_bounds[3] - qr_bounds[1]
-        d = Drawing(55, 55, transform=[55.0/w, 0, 0, 55.0/h, 0, 0])
+        d = Drawing(50, 50, transform=[50.0/w, 0, 0, 50.0/h, 0, 0])
         d.add(qr)
         
         if include_header:
@@ -615,16 +597,16 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
         else:
             header_text_flowables = [Spacer(1, 10), Spacer(1, 10), Spacer(1, 10), Spacer(1, 10), Spacer(1, 10)]
             
-        header_table = Table([["", header_text_flowables, d]], colWidths=[55, 435, 55])
+        header_table = Table([["", header_text_flowables, d]], colWidths=[50, 460, 50])
         header_table.setStyle(TableStyle([('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('LEFTPADDING', (0,0), (-1,-1), 0), ('RIGHTPADDING', (0,0), (-1,-1), 0)]))
-        return [header_table, Spacer(1, 3)]
+        return [header_table, Spacer(1, 4)]
 
-    # We will slice our 35 items across 4 pages cleanly: e.g. 9 items on page 1, 9 items on page 2, 9 items on page 3, 8 items on page 4
+    # Exactly 35 particulars distributed across 4 pages: 9 items on page 1, 9 items on page 2, 9 items on page 3, 8 items on page 4
     page_splits = [
-        (0, 9),   # Page 1
-        (9, 18),  # Page 2
-        (18, 27), # Page 3
-        (27, 35)  # Page 4
+        (0, 9),   # Page 1 (9 items)
+        (9, 18),  # Page 2 (9 items)
+        (18, 27), # Page 3 (9 items)
+        (27, 35)  # Page 4 (8 items)
     ]
 
     for page_idx, (start_i, end_i) in enumerate(page_splits):
@@ -632,8 +614,8 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
             elements.append(PageBreak())
             
         elements.extend(create_header_with_qr())
-        elements.append(Table([[Paragraph(f"REF NO:- {ref_no}", ref_left_style), Paragraph(f"DATE: {est_date}", ref_right_style)]], colWidths=[272, 273]))
-        elements.append(Spacer(1, 3))
+        elements.append(Table([[Paragraph(f"REF NO:- {ref_no}", ref_left_style), Paragraph(f"DATE: {est_date}", ref_right_style)]], colWidths=[280, 280]))
+        elements.append(Spacer(1, 4))
 
         if page_idx == 0:
             address_parts = [p.strip() for p in address.split(',')]
@@ -651,15 +633,15 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
                 box_content.append([Paragraph(addr_line_2.upper(), box_detail_style)])
             box_content.append([Paragraph(f"OWNER: - {customer_name.upper()}", box_detail_style)])
 
-            project_box = Table(box_content, colWidths=[545])
+            project_box = Table(box_content, colWidths=[560])
             project_box.setStyle(TableStyle([
                 ('BOX', (0,0), (-1,-1), 1.5, BORDER_BLUE), 
                 ('ROUNDEDCORNERS', [6, 6, 6, 6]), 
-                ('TOPPADDING', (0,0), (-1,-1), 3), 
-                ('BOTTOMPADDING', (0,0), (-1,-1), 3)
+                ('TOPPADDING', (0,0), (-1,-1), 4), 
+                ('BOTTOMPADDING', (0,0), (-1,-1), 4)
             ]))
             elements.append(project_box)
-            elements.append(Spacer(1, 4))
+            elements.append(Spacer(1, 6))
 
         table_data = [[
             Paragraph("SL.NO", hdr_style), 
@@ -681,7 +663,7 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
                 Paragraph(f"{amt:,.2f}", cell_right)
             ])
 
-        # If it's the last page, append GST and Total rows inside the table
+        # If it's the last page, append Subtotal, GST, and Total Payable rows inside the table
         if page_idx == len(page_splits) - 1:
             table_data.append([
                 "", Paragraph("Subtotal", total_style), "", "", "", Paragraph(f"{actual_subtotal:,.2f}", total_val_style)
@@ -693,22 +675,22 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
                 "", Paragraph("TOTAL PAYABLE", total_style), "", "", "", Paragraph(f"{final_total:,.2f}", total_val_style)
             ])
 
-        # Column Widths total 545
-        t_page = Table(table_data, colWidths=[35, 245, 55, 75, 45, 90])
+        # Total printable width is exactly 560 pt (distributed across 6 columns)
+        t_page = Table(table_data, colWidths=[35, 265, 55, 80, 45, 80])
         t_page.setStyle(TableStyle([
             ('GRID', (0,0), (-1,-1), 0.5, colors.black),
             ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
-            ('TOPPADDING', (0,0), (-1,-1), 4),
-            ('BOTTOMPADDING', (0,0), (-1,-1), 4),
+            ('TOPPADDING', (0,0), (-1,-1), 5),
+            ('BOTTOMPADDING', (0,0), (-1,-1), 5),
             ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#E2E8F0"))
         ]))
         elements.append(t_page)
 
         # On the final page, add amount in words and Terms & Conditions
         if page_idx == len(page_splits) - 1:
-            elements.append(Spacer(1, 4))
+            elements.append(Spacer(1, 6))
             elements.append(Paragraph(num_to_words_indian_clean(final_total), words_style))
-            elements.append(Spacer(1, 4))
+            elements.append(Spacer(1, 6))
             elements.append(Paragraph("TERMS AND CONDITIONS:", terms_hdr))
             elements.append(Spacer(1, 2))
 
@@ -729,7 +711,6 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
     pdf_buffer.close()
 
     return pdf_bytes, filename, ref_no, final_total
-
 
 # --- AUTHENTIC MODAL POPUP DIALOG FOR ESTIMATION ---
 @st.dialog("⚡ BUILDING FLOOR PLANS & CIVIL WORKS ESTIMATOR", width="large")
@@ -843,7 +824,6 @@ def show_quotation_dialog():
             except Exception as e:
                 st.error(f"An error occurred: {e}")
 
-
 # --- ADMIN MODAL POPUP DIALOG ---
 @st.dialog("🔐 ENTERPRISE ADMIN PORTAL", width="large")
 def show_admin_dialog():
@@ -916,7 +896,6 @@ def show_admin_dialog():
                     except Exception as e:
                         st.error(f"Query execution failed: {e}")
 
-
 # --- COMMERCIAL TICKER STATUS BAR WITH LOGIN ICON BUTTON ---
 col_tick1, col_tick2 = st.columns([10, 1])
 with col_tick1:
@@ -930,7 +909,6 @@ with col_tick2:
     if st.button("🔐", help="Enterprise Admin Portal Login"):
         show_admin_dialog()
 
-# --- TOP GET YOUR QUOTATION NOW BUTTON ---
 col_top_btn1, col_top_btn2, col_top_btn3 = st.columns([2, 2, 2])
 with col_top_btn2:
     if st.button("⚡ GET YOUR QUOTATION NOW ", type="primary", use_container_width=True):
@@ -938,8 +916,6 @@ with col_top_btn2:
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-
-# --- 3D GRADIENT HERO SECTION WITH CAROUSEL ---
 col_hero1, col_hero2 = st.columns([1.2, 1])
 
 with col_hero1:
@@ -1013,8 +989,6 @@ with col_hero2:
     </script>
     """, unsafe_allow_html=True)
 
-
-# --- STATIC & FIXED 10 IMAGES GALLERY SHOWCASE ---
 st.markdown("<br>", unsafe_allow_html=True)
 st.markdown("### 🏛️ Portfolio Master Collection (10 Fixed Showcase Galleries)")
 st.markdown("<p style='color:#94A3B8; font-size:0.95rem; margin-bottom:1rem;'>Explore our permanent civil engineering and architectural planning catalog.</p>", unsafe_allow_html=True)
@@ -1064,15 +1038,12 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-
-# --- FULL-SIZE VERTICAL SCROLLING SHOWCASE (10 FULL SIZE IMAGES) ---
 st.markdown("<br>", unsafe_allow_html=True)
 st.markdown("### 📸 10 Full-Size Vertical Civil Architectural Showcase")
 st.markdown("<p style='color:#94A3B8; font-size:0.95rem; margin-bottom:1.5rem;'>Scroll down through our high-definition structural and civil project features.</p>", unsafe_allow_html=True)
 
 st.markdown("""
 <div class="vertical-gallery-container">
-    <!-- 01 -->
     <div class="vertical-gallery-card">
         <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=80" alt="Structural Foundation">
         <div class="vertical-card-overlay">
@@ -1081,7 +1052,6 @@ st.markdown("""
             <div class="vertical-card-desc">Deep pile and isolated footing foundation designed to withstand maximum seismic load with high-grade Fe550 TMT steel.</div>
         </div>
     </div>
-    <!-- 02 -->
     <div class="vertical-gallery-card">
         <img src="https://images.unsplash.com/photo-1541888946425-d0fbb18fcd07?auto=format&fit=crop&w=1600&q=80" alt="Multi-Floor Construction">
         <div class="vertical-card-overlay">
@@ -1090,7 +1060,6 @@ st.markdown("""
             <div class="vertical-card-desc">Simultaneous ground and multi-story structural casting with automated batching plant concrete and rigorous quality audits.</div>
         </div>
     </div>
-    <!-- 03 -->
     <div class="vertical-gallery-card">
         <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1600&q=80" alt="Floor Plans">
         <div class="vertical-card-overlay">
@@ -1099,7 +1068,6 @@ st.markdown("""
             <div class="vertical-card-desc">Vastu-compliant spatial layouts, structural load calculations, and municipal approval blueprinting for multi-floor expansions.</div>
         </div>
     </div>
-    <!-- 04 -->
     <div class="vertical-gallery-card">
         <img src="https://images.unsplash.com/photo-1590381105924-c72589b9ef3f?auto=format&fit=crop&w=1600&q=80" alt="Block Masonry">
         <div class="vertical-card-overlay">
@@ -1108,7 +1076,6 @@ st.markdown("""
             <div class="vertical-card-desc">High-density thermal insulating concrete blocks laid with plumb-line alignment for superior acoustic and thermal control.</div>
         </div>
     </div>
-    <!-- 05 -->
     <div class="vertical-gallery-card">
         <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1600&q=80" alt="Roof Slab">
         <div class="vertical-card-overlay">
@@ -1117,7 +1084,6 @@ st.markdown("""
             <div class="vertical-card-desc">Pumped concrete slab casting with integral waterproofing compounds and systematic curing protocols.</div>
         </div>
     </div>
-    <!-- 06 -->
     <div class="vertical-gallery-card">
         <img src="https://images.unsplash.com/photo-1581094288338-2314dddb7ece?auto=format&fit=crop&w=1600&q=80" alt="Engineering Supervision">
         <div class="vertical-card-overlay">
@@ -1126,7 +1092,6 @@ st.markdown("""
             <div class="vertical-card-desc">Regular cube testing, slump cone verification, and laser-level alignment inspections by certified civil engineers.</div>
         </div>
     </div>
-    <!-- 07 -->
     <div class="vertical-gallery-card">
         <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1600&q=80" alt="Plastering">
         <div class="vertical-card-overlay">
@@ -1135,7 +1100,6 @@ st.markdown("""
             <div class="vertical-card-desc">Machine-finished cement mortar rendering ensuring flat, crack-free surfaces ready for putty and prime coats.</div>
         </div>
     </div>
-    <!-- 08 -->
     <div class="vertical-gallery-card">
         <img src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1600&q=80" alt="Excavation">
         <div class="vertical-card-overlay">
@@ -1144,7 +1108,6 @@ st.markdown("""
             <div class="vertical-card-desc">Heavy excavator deployment for grading, trenching, soil stabilization, and anti-termite chemical barrier injection.</div>
         </div>
     </div>
-    <!-- 09 -->
     <div class="vertical-gallery-card">
         <img src="https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&w=1600&q=80" alt="Steel Bending">
         <div class="vertical-card-overlay">
@@ -1153,7 +1116,6 @@ st.markdown("""
             <div class="vertical-card-desc">Computerized bar bending schedules and precise lap-length bindings for columns, beams, and sheer walls.</div>
         </div>
     </div>
-    <!-- 10 -->
     <div class="vertical-gallery-card">
         <img src="https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1600&q=80" alt="Turnkey Elevation">
         <div class="vertical-card-overlay">
@@ -1165,8 +1127,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-
-# --- Commercial Metrics Grid ---
 col_m1, col_m2, col_m3, col_m4 = st.columns(4)
 with col_m1:
     st.markdown("""
@@ -1197,8 +1157,6 @@ with col_m4:
     </div>
     """, unsafe_allow_html=True)
 
-
-# --- INTERACTIVE 3D ANIMATED / GIF VISUALIZER ---
 st.markdown("<br>", unsafe_allow_html=True)
 st.markdown("### 🌀 Interactive Content")
 st.markdown("<p style='color:#94A3B8; font-size:0.95rem; margin-bottom:1.5rem;'>Select a civil construction phase to inspect spatial engineering and structural specifications.</p>", unsafe_allow_html=True)
@@ -1321,8 +1279,6 @@ else:
     </div>
     """, unsafe_allow_html=True)
 
-
-# --- MAIN ACTION BUTTON ---
 st.markdown("<br>", unsafe_allow_html=True)
 col_cta1, col_cta2, col_cta3 = st.columns([1, 2, 1])
 with col_cta2:
