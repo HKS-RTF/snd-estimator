@@ -249,7 +249,7 @@ def upload_to_cloud(ref_no, pdf_bytes_standard, pdf_bytes_no_header, filename_st
     return url_std, url_no_hdr
 
 
-# --- 35 DETAILED MASTER ITEMS FOR CIVIL WORKS ---
+# --- FULLY EXPANDED 35 MASTER ITEMS FOR CIVIL WORKS ---
 CIVIL_ITEMS_MASTER_35 = [
     ("Site clearance, leveling, debris removal & temporary storage shed setup", "JOB", 1, 0.015),
     ("Setting out, centerline marking & architectural layout transfer", "SQ. FT", 1, 0.015),
@@ -292,13 +292,12 @@ CIVIL_ITEMS_MASTER_35 = [
 def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total, floors_option, buildup_sqft, include_header=True):
     subtotal_target = target_total / 1.18
     
-    # Calculate exact rates, quantities, and amounts for all 35 particulars
     item_rows = []
     raw_amounts = []
     for desc, unit_type, base_qty_multiplier, weight_factor in CIVIL_ITEMS_MASTER_35:
         if unit_type == "SQ. FT":
             qty = round(buildup_sqft)
-        elif unit_type in ["Kg", "CU. FT", "RFT", "SQ. FT"]:
+        elif unit_type in ["Kg", "CU. FT", "RFT"]:
             qty = round(buildup_sqft * base_qty_multiplier) if base_qty_multiplier > 1 else round(buildup_sqft)
         else:
             qty = base_qty_multiplier
@@ -306,7 +305,6 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
         amt = round(subtotal_target * weight_factor * random.uniform(0.9, 1.1))
         raw_amounts.append((desc, unit_type, qty, amt))
 
-    # Normalize total to match target subtotal
     current_sum = sum([x[3] for x in raw_amounts])
     factor = subtotal_target / current_sum if current_sum > 0 else 1.0
     
