@@ -1,4 +1,4 @@
-name=app.
+
 import os
 import random
 import io
