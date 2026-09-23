@@ -1,4 +1,3 @@
-
 import os
 import random
 import io
@@ -15,7 +14,7 @@ from reportlab.graphics.barcode.qr import QrCodeWidget
 
 # --- Page Configuration ---
 st.set_page_config(
-    page_title="SND Interior & Designs | Commercial & Residential Interior & Civil Dashboard",
+    page_title="SND Interior & Civil Construction | House Extension & Floor Dashboard",
     page_icon="⚡",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -489,73 +488,40 @@ def upload_to_cloud(ref_no, pdf_bytes_standard, pdf_bytes_no_header, filename_st
     return url_std, url_no_hdr
 
 
-def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total, include_header=True, service_type="Interior Works", extension_details=None):
-    # Rule: Budget < 30 Lakhs -> 1 Page (10 Particulars). Budget >= 30 Lakhs -> 2 Pages (20 Particulars)
-    is_single_page = target_total < 3000000.0
-
-    INTERIOR_ITEMS_MASTER = [
-        ("Replacing sanitary fittings inside the toilets", "SETS", "SETS_UNITS", 0.08),
-        ("3 course of oil bond distemper (Inside repaint)", "SQ. FT", "SQFT", 0.07),
-        ("Providing & casting bathroom glazed tiles fixing etc.", "SQ. FT", "SQFT", 0.05),
-        ("Interior works (Wardrobes, Modular Kitchen)", "JOB", "JOB_LOT", 0.12),
-        ("Electrical fittings, cables, switches etc.", "JOB", "JOB_LOT", 0.07),
-        ("Painting (exterior walls)", "SQ. FT", "SQFT", 0.06),
-        ("New plumbing lines and fixtures", "JOB", "JOB_LOT", 0.05),
-        ("Landscaping/Balcony improvements", "JOB", "JOB_LOT", 0.06),
-        ("False ceiling work", "SQ. FT", "SQFT", 0.07),
-        ("Flooring (Tiles/Marble)", "SQ. FT", "SQFT", 0.07),
-        ("Providing & fixing teak wood show case", "UNIT", "SETS_UNITS", 0.06),
-        ("2 course of snow cem paint (Outside repaint)", "SQ. FT", "SQFT", 0.04),
-        ("Replacing sanitary fittings inside the kitchen", "SET", "SETS_UNITS", 0.05),
-        ("Demolition and debris removal", "LOT", "JOB_LOT", 0.06),
-        ("Wall plastering and finishing", "SQ. FT", "SQFT", 0.09),
-        ("TV Unit & Entertainment Wall Paneling", "JOB", "JOB_LOT", 0.06),
-        ("Crockery unit & Bar counter setup", "UNIT", "SETS_UNITS", 0.05),
-        ("Main door safety grill & foyer paneling", "SQ. FT", "SQFT", 0.04),
-        ("Study table & home office workstation", "JOB", "JOB_LOT", 0.05),
-        ("Bathroom vanity units & LED mirrors", "SETS", "SETS_UNITS", 0.04)
-    ]
-
-    CIVIL_ITEMS_MASTER = [
-        ("Excavation and earthwork for foundation extension", "CU. FT", "SQFT", 0.05),
-        ("RCC Column footings and foundation casting", "CU. FT", "SQFT", 0.08),
-        ("Columns, beams, and roof slab casting (M25 grade)", "SQ. FT", "SQFT", 0.12),
-        ("External and internal brick masonry work", "SQ. FT", "SQFT", 0.08),
-        ("Internal and external wall plastering (CM 1:6)", "SQ. FT", "SQFT", 0.07),
-        ("Structural steel reinforcement & binding wire", "KG", "JOB_LOT", 0.09),
-        ("Roof waterproofing treatment & chemical coating", "SQ. FT", "SQFT", 0.05),
-        ("Underground and overhead water sump construction", "JOB", "JOB_LOT", 0.05),
-        ("Staircase fabrication and RCC step casting", "R.FT", "SQFT", 0.06),
-        ("Main drainage and sanitary piping network", "JOB", "JOB_LOT", 0.05),
-        ("Door and window concrete frames (Lintels & Chajjas)", "R.FT", "SQFT", 0.04),
-        ("Electrical conduit pipe laying in RCC slab & walls", "JOB", "JOB_LOT", 0.05),
-        ("Balcony parapet wall construction & coping", "R.FT", "SQFT", 0.04),
-        ("Scaffolding, centering, and shuttering materials", "JOB", "JOB_LOT", 0.06),
-        ("Site clearance, debris hauling, and cleaning", "JOB", "JOB_LOT", 0.03),
-        ("Core structural core cutting and core testing", "JOB", "JOB_LOT", 0.03),
-        ("Compound wall extension and masonry pillar work", "R.FT", "SQFT", 0.05),
-        ("Sump tank slab casting and inlet/outlet connections", "JOB", "JOB_LOT", 0.04),
-        ("Anti-termite soil treatment before flooring bed", "SQ. FT", "SQFT", 0.03),
-        ("Parapet coping plastering and weatherproofing", "R.FT", "SQFT", 0.03)
-    ]
-
-    FIXED_ITEMS_MASTER = CIVIL_ITEMS_MASTER if service_type == "Civil Works & Extension" else INTERIOR_ITEMS_MASTER
-
-    def calculate_quantity(category, total_amount, sqft_val):
-        base_sqft = sqft_val if sqft_val > 0 else 1000.0
-        if category == "SQFT": 
-            return f"{round(base_sqft * random.uniform(0.08, 0.22))} SQ. FT"
-        elif category == "SETS_UNITS":
-            qty = round(random.uniform(1, 5))
-            return f"{qty} SETS" if qty > 1 else "1 SET"
-        elif category == "JOB_LOT":
-            return "1 JOB"
-        return "1 LOT"
-
-    total_items_needed = 10 if is_single_page else 20
-    sqft_input_val = extension_details.get("sqft", 1200.0) if extension_details else 1200.0
+def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total, selected_floors, build_sqft, include_header=True):
+    is_single_page = target_total < 2500000
     
-    processed_items = [(desc, calculate_quantity(cat, target_total, sqft_input_val), w) for desc, _, cat, w in FIXED_ITEMS_MASTER]
+    # Civil & Structural House Extension Master Items
+    CIVIL_ITEMS_MASTER = [
+        ("Earth excavation for column footings & foundation ties", "CU. M", "SQFT", 0.06),
+        ("PCC bed concrete (1:4:8) for foundation base", "CU. M", "SQFT", 0.05),
+        ("Reinforced Cement Concrete (RCC) column footings & pedestals", "CU. M", "SQFT", 0.08),
+        ("RCC casting for columns, beams & floor slabs (M25 grade)", "CU. M", "SQFT", 0.14),
+        ("Fe550 Grade TMT steel reinforcement bars procurement & binding", "KG", "SQFT", 0.12),
+        ("Solid concrete block masonry work (6 inch & 4 inch walls)", "SQ. FT", "SQFT", 0.10),
+        ("Internal & external wall plastering with waterproofing compound", "SQ. FT", "SQFT", 0.09),
+        ("Structural staircase casting & reinforcement works", "JOB", "JOB_LOT", 0.05),
+        ("Underground sump tank & overhead water tank construction", "JOB", "JOB_LOT", 0.06),
+        ("Electrical conduit pipe laying, concealed wiring & distribution box", "POINT", "SQFT", 0.06),
+        ("Sanitary drainage lines, PVC pipe networks & chamber construction", "JOB", "JOB_LOT", 0.05),
+        ("Roof waterproofing treatment (Brick bat coba / Chemical coating)", "SQ. FT", "SQFT", 0.05),
+        ("External scaffolding, centering & shuttering materials hire", "JOB", "JOB_LOT", 0.05),
+        ("Site clearance, debris loading & transport charges", "LOT", "JOB_LOT", 0.04]
+    ]
+
+    def calculate_civil_quantity(category, total_amount, sqft_val, floor_count):
+        ratio = max(0.0, min(1.0, (total_amount - 500000.0) / (7500000.0 - 500000.0)))
+        ratio = max(0.0, min(1.0, ratio + random.uniform(-0.03, 0.03)))
+        if category == "SQFT":
+            calculated_sqft = round(sqft_val * ratio) if sqft_val > 0 else round(800 + ratio * 2200)
+            return f"{calculated_sqft} SQ. FT"
+        elif category == "JOB_LOT":
+            qty = round(1 + floor_count * 0.5)
+            return f"{qty} JOB" if qty > 1 else "1 JOB"
+        return f"{floor_count * 12} UNITS"
+
+    total_items_needed = 10 if is_single_page else 14
+    processed_items = [(desc, calculate_civil_quantity(cat, target_total, build_sqft, len(selected_floors)), w) for desc, _, cat, w in CIVIL_ITEMS_MASTER]
     random.shuffle(processed_items)
     processed_items = processed_items[:total_items_needed]
 
@@ -573,148 +539,143 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
     now = datetime.now()
     ref_no = now.strftime("%H%M%d%m%Y")
     clean_customer_name = customer_name.replace(' ', '_').replace('&', 'AND')
-    filename = f"Estimation_{ref_no}_{clean_customer_name}{'_NoHeader' if not include_header else ''}.pdf"
+    filename = f"Civil_Estimation_{ref_no}_{clean_customer_name}{'_NoHeader' if not include_header else ''}.pdf"
 
     pdf_buffer = io.BytesIO()
-    
-    # Narrow edges for maximum printable horizontal and vertical span
-    doc = SimpleDocTemplate(pdf_buffer, pagesize=A4, rightMargin=20, leftMargin=20, topMargin=10, bottomMargin=10)
+    doc = SimpleDocTemplate(pdf_buffer, pagesize=A4, rightMargin=30, leftMargin=30, topMargin=15, bottomMargin=15)
     styles = getSampleStyleSheet()
 
     RED_COLOR, BLUE_COLOR, LIGHT_PINK, BORDER_BLUE = colors.HexColor("#DC2626"), colors.HexColor("#1E40AF"), colors.HexColor("#EC4899"), colors.HexColor("#2563EB")
 
-    title_style = ParagraphStyle("Title", parent=styles["Heading1"], alignment=1, fontSize=24, leading=28, fontName="Helvetica-Bold", textColor=RED_COLOR)
+    title_style = ParagraphStyle("Title", parent=styles["Heading1"], alignment=1, fontSize=26, leading=30, fontName="Helvetica-Bold", textColor=RED_COLOR)
     sub_style = ParagraphStyle("Sub", parent=styles["Normal"], alignment=1, fontSize=8.5, leading=11, fontName="Helvetica-Bold", textColor=BLUE_COLOR)
     contact_style = ParagraphStyle("Contact", parent=styles["Normal"], alignment=1, fontSize=8, leading=10, fontName="Helvetica-Bold", textColor=BLUE_COLOR)
     gstin_style = ParagraphStyle("GSTIN", parent=styles["Normal"], alignment=1, fontSize=8.5, leading=11, fontName="Helvetica-Bold", textColor=LIGHT_PINK)
-    ref_left_style = ParagraphStyle("RefLeft", parent=styles["Normal"], alignment=0, fontSize=9.5, leading=11, fontName="Helvetica")
-    ref_right_style = ParagraphStyle("RefRight", parent=styles["Normal"], alignment=2, fontSize=9.5, leading=11, fontName="Helvetica")
-    box_hdr_style = ParagraphStyle("BoxHdr", parent=styles["Normal"], alignment=1, fontSize=11, leading=13, fontName="Helvetica-Bold", textColor=colors.black)
-    box_detail_style = ParagraphStyle("BoxDetail", parent=styles["Normal"], alignment=1, fontSize=10, leading=12, fontName="Helvetica-Bold", textColor=colors.black)
+    ref_left_style = ParagraphStyle("RefLeft", parent=styles["Normal"], alignment=0, fontSize=10, leading=12, fontName="Helvetica")
+    ref_right_style = ParagraphStyle("RefRight", parent=styles["Normal"], alignment=2, fontSize=10, leading=12, fontName="Helvetica")
+    box_hdr_style = ParagraphStyle("BoxHdr", parent=styles["Normal"], alignment=1, fontSize=13, leading=15, fontName="Helvetica-Bold", textColor=colors.black)
+    box_detail_style = ParagraphStyle("BoxDetail", parent=styles["Normal"], alignment=1, fontSize=11, leading=14, fontName="Helvetica-Bold", textColor=colors.black)
     
-    # --- Dynamic Adjustments for 1 Page vs 2 Pages ---
     if is_single_page:
-        # Increase text sizes and padding for single page (10 particulars) to cover ~85% of vertical space
-        cell_fontsize = 10.0
-        cell_leading = 13.0
-        cell_top_pad = 8.0
-        cell_bot_pad = 8.0
-        total_fontsize = 10.5
-        words_fontsize = 10.5
-        terms_fontsize = 8.5
-        spacer_gap = 6.0
+        cell_12_bold_center = ParagraphStyle("Cell11BC", parent=styles["Normal"], alignment=1, fontSize=10.5, leading=13, fontName="Helvetica-Bold", textColor=colors.black)
+        hdr_12_bold_center = ParagraphStyle("Hdr11BC", parent=styles["Normal"], alignment=1, fontSize=10.5, leading=13, fontName="Helvetica-Bold", textColor=colors.black)
+        total_14_bold = ParagraphStyle("Total12B", parent=styles["Normal"], alignment=1, fontSize=12, leading=14.5, fontName="Helvetica-Bold", textColor=colors.black)
+        words_13_bold_center = ParagraphStyle("Words11.5BC", parent=styles["Normal"], alignment=1, fontSize=11, leading=13.5, fontName="Helvetica-Bold", textColor=colors.black)
+        terms_hdr_center = ParagraphStyle("TermsHdr9.5", parent=styles["Normal"], alignment=1, fontSize=9.5, leading=12, fontName="Helvetica-Bold", textColor=colors.black)
+        terms_point_size_8 = ParagraphStyle("TermsPt8.5", parent=styles["Normal"], alignment=0, fontSize=8, leading=10, fontName="Helvetica-Bold", textColor=colors.black)
     else:
-        # Compact styling for 2 pages (20 particulars)
-        cell_fontsize = 8.5
-        cell_leading = 10.5
-        cell_top_pad = 2.0
-        cell_bot_pad = 2.0
-        total_fontsize = 9.5
-        words_fontsize = 9.5
-        terms_fontsize = 7.5
-        spacer_gap = 2.0
-
-    cell_style = ParagraphStyle("CellDynamic", parent=styles["Normal"], alignment=1, fontSize=cell_fontsize, leading=cell_leading, fontName="Helvetica-Bold", textColor=colors.black)
-    hdr_style = ParagraphStyle("HdrCompact", parent=styles["Normal"], alignment=1, fontSize=9, leading=11, fontName="Helvetica-Bold", textColor=colors.black)
-    total_style = ParagraphStyle("TotalCompact", parent=styles["Normal"], alignment=1, fontSize=total_fontsize, leading=total_fontsize + 3, fontName="Helvetica-Bold", textColor=colors.black)
-    words_style = ParagraphStyle("WordsCompact", parent=styles["Normal"], alignment=1, fontSize=words_fontsize, leading=words_fontsize + 3, fontName="Helvetica-Bold", textColor=colors.black)
-    terms_hdr_style = ParagraphStyle("TermsHdrCompact", parent=styles["Normal"], alignment=1, fontSize=9, leading=11, fontName="Helvetica-Bold", textColor=colors.black)
-    terms_point_style = ParagraphStyle("TermsPtCompact", parent=styles["Normal"], alignment=0, fontSize=terms_fontsize, leading=terms_fontsize + 2, fontName="Helvetica-Bold", textColor=colors.black)
+        cell_12_bold_center = ParagraphStyle("Cell12BC", parent=styles["Normal"], alignment=1, fontSize=11, leading=13.5, fontName="Helvetica-Bold", textColor=colors.black)
+        hdr_12_bold_center = ParagraphStyle("Hdr12BC", parent=styles["Normal"], alignment=1, fontSize=11, leading=13.5, fontName="Helvetica-Bold", textColor=colors.black)
+        total_14_bold = ParagraphStyle("Total14B", parent=styles["Normal"], alignment=1, fontSize=13, leading=15, fontName="Helvetica-Bold", textColor=colors.black)
+        words_13_bold_center = ParagraphStyle("Words13BC", parent=styles["Normal"], alignment=1, fontSize=12, leading=15, fontName="Helvetica-Bold", textColor=colors.black)
+        terms_hdr_center = ParagraphStyle("TermsHdr10", parent=styles["Normal"], alignment=1, fontSize=9.5, leading=13, fontName="Helvetica-Bold", textColor=colors.black)
+        terms_point_size_8 = ParagraphStyle("TermsPt8", parent=styles["Normal"], alignment=0, fontSize=7.5, leading=10, fontName="Helvetica-Bold", textColor=colors.black)
 
     elements = []
 
     def create_header_with_qr():
-        qr_data = f"CUSTOMER NAME: {customer_name.upper()}\nADDRESS: {address.upper()}\nREF NO: {ref_no}\nDATE: {est_date}\nESTIMATION AMOUNT: Rs. {final_total:,}\nEMAIL: contact@sndinteriors.com"
+        floors_str = ", ".join(selected_floors)
+        qr_data = f"CUSTOMER: {customer_name.upper()}\nEXTENSIONS: {floors_str}\nBUILDSQFT: {build_sqft} SQFT\nREF NO: {ref_no}\nDATE: {est_date}\nTOTAL: Rs. {final_total:,}"
         qr = QrCodeWidget(qr_data)
         qr_bounds = qr.getBounds()
         w, h = qr_bounds[2] - qr_bounds[0], qr_bounds[3] - qr_bounds[1]
-        d = Drawing(50, 50, transform=[50.0/w, 0, 0, 50.0/h, 0, 0])
+        d = Drawing(60, 60, transform=[60.0/w, 0, 0, 60.0/h, 0, 0])
         d.add(qr)
         
         if include_header:
             header_text_flowables = [
-                Paragraph("SND INTERIOR & DESIGNS", title_style), Spacer(1, 1),
-                Paragraph("INTERIOR WORKS, DESIGN ESTIMATE, FLOOR VALUATIONS, CIVIL EXTENSIONS", sub_style),
-                Paragraph("#15, E BLOCK, SAHAKHAR NAGAR, BANGALORE-560092", sub_style),
+                Paragraph("SND INTERIOR & CIVIL CONSTRUCTION", title_style), Spacer(1, 2),
+                Paragraph("HOUSE EXTENSION, FLOOR ADDITIONS, RCC STRUCTURES & CIVIL ESTIMATES", sub_style),
+                Paragraph("#15, E BLOCK, SAHAKAR NAGAR, BANGALORE-560092", sub_style),
                 Paragraph("EMAIL: contact@sndinteriors.com", contact_style),
                 Paragraph("GSTIN: 29ABCDE1234F1Z5", gstin_style),
             ]
         else:
-            header_text_flowables = [Spacer(1, 8) for _ in range(5)]
-            
-        header_table = Table([["", header_text_flowables, d]], colWidths=[50, 455, 50])
+            header_text_flowables = [
+                Spacer(1, 10), Spacer(1, 10), Spacer(1, 10), Spacer(1, 10), Spacer(1, 10)
+            ]
+        header_table = Table([["", header_text_flowables, d]], colWidths=[65, 405, 65])
         header_table.setStyle(TableStyle([('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('LEFTPADDING', (0,0), (-1,-1), 0), ('RIGHTPADDING', (0,0), (-1,-1), 0)]))
-        return [header_table, Spacer(1, spacer_gap)]
+        return [header_table, Spacer(1, 4)]
 
     elements.extend(create_header_with_qr())
-    elements.append(Table([[Paragraph(f"REF NO:-{ref_no}", ref_left_style), Paragraph(f"DATE: {est_date}", ref_right_style)]], colWidths=[275, 280]))
-    elements.append(Spacer(1, spacer_gap))
+    elements.append(Table([[Paragraph(f"REF NO:-{ref_no}", ref_left_style), Paragraph(f"DATE: {est_date}", ref_right_style)]], colWidths=[265, 270]))
+    elements.append(Spacer(1, 4))
 
     address_parts = [p.strip() for p in address.split(',')]
     mid_idx = len(address_parts) // 2
     addr_line_1 = ", ".join(address_parts[:mid_idx]) if mid_idx > 0 else address
     addr_line_2 = ", ".join(address_parts[mid_idx:]) if mid_idx > 0 else ""
 
-    service_title_str = f"ESTIMATION FOR {service_type.upper()}"
-    if service_type == "Civil Works & Extension" and extension_details:
-        service_title_str += f" ({extension_details.get('floors', '2nd & 3rd Floor')} | {extension_details.get('sqft', 0)} SQ.FT)"
-
+    floors_display = " + ".join(selected_floors)
     box_content = [
-        [Paragraph(service_title_str, box_hdr_style)], 
-        [Paragraph("RESIDENTIAL PROPERTY AT", box_hdr_style)], 
+        [Paragraph(f"CIVIL ESTIMATION FOR HOUSE EXTENSION & FLOOR ADDITION ({floors_display})", box_hdr_style)], 
+        [Paragraph(f"BUILT-UP AREA: {build_sqft} SQ. FT | SITE LOCATION AT", box_hdr_style)], 
         [Paragraph(addr_line_1.upper(), box_detail_style)]
     ]
     if addr_line_2: box_content.append([Paragraph(addr_line_2.upper(), box_detail_style)])
     box_content.append([Paragraph(f"OWNER: - {customer_name.upper()}", box_detail_style)])
 
-    project_box = Table(box_content, colWidths=[555])
-    project_box.setStyle(TableStyle([('BOX', (0,0), (-1,-1), 1.5, BORDER_BLUE), ('ROUNDEDCORNERS', [6, 6, 6, 6]), ('TOPPADDING', (0,0), (-1,-1), 3), ('BOTTOMPADDING', (0,0), (-1,-1), 3)]))
+    project_box = Table(box_content, colWidths=[535])
+    project_box.setStyle(TableStyle([('BOX', (0,0), (-1,-1), 2, BORDER_BLUE), ('ROUNDEDCORNERS', [8, 8, 8, 8]), ('TOPPADDING', (0,0), (-1,-1), 3), ('BOTTOMPADDING', (0,0), (-1,-1), 3)]))
     elements.append(project_box)
-    elements.append(Spacer(1, spacer_gap + 1))
+    elements.append(Spacer(1, 6))
 
-    # Unified table data builder with repeatRows
-    table_data = [[Paragraph("SL.NO", hdr_style), Paragraph("Description", hdr_style), Paragraph("Qty", hdr_style), Paragraph("Amount Rs.", hdr_style)]]
-    
-    for idx in range(total_items_needed):
-        item = processed_items[idx]
-        table_data.append([
-            Paragraph(f"{idx+1}.", cell_style), 
-            Paragraph(item[0], cell_style), 
-            Paragraph(item[1], cell_style), 
-            Paragraph(f"{item_amounts[idx]:,}", cell_style)
-        ])
+    if is_single_page:
+        p_table_data = [[Paragraph("SL.NO", hdr_12_bold_center), Paragraph("Civil Work Description", hdr_12_bold_center), Paragraph("Qty / Ext", hdr_12_bold_center), Paragraph("Amount Rs.", hdr_12_bold_center)]]
+        for idx in range(10):
+            item = processed_items[idx]
+            p_table_data.append([Paragraph(f"{idx+1}.", cell_12_bold_center), Paragraph(item[0], cell_12_bold_center), Paragraph(item[1], cell_12_bold_center), Paragraph(f"{item_amounts[idx]:,}", cell_12_bold_center)])
+        p_table_data.append(["", Paragraph("GST 18%", total_14_bold), "", Paragraph(f"{actual_gst:,}", total_14_bold)])
+        p_table_data.append(["", Paragraph("TOTAL", total_14_bold), "", Paragraph(f"{final_total:,}", total_14_bold)])
 
-    table_data.append(["", Paragraph("GST 18%", total_style), "", Paragraph(f"{actual_gst:,}", total_style)])
-    table_data.append(["", Paragraph("TOTAL", total_style), "", Paragraph(f"{final_total:,}", total_style)])
+        t1 = Table(p_table_data, colWidths=[45, 270, 100, 120])
+        t1.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('TOPPADDING', (0,0), (-1,-1), 5.5), ('BOTTOMPADDING', (0,0), (-1,-1), 5.5)]))
+        elements.append(t1)
+    else:
+        p1_table_data = [[Paragraph("SL.NO", hdr_12_bold_center), Paragraph("Civil Work Description", hdr_12_bold_center), Paragraph("Qty / Ext", hdr_12_bold_center), Paragraph("Amount Rs.", hdr_12_bold_center)]]
+        for idx in range(7):
+            item = processed_items[idx]
+            p1_table_data.append([Paragraph(f"{idx+1}.", cell_12_bold_center), Paragraph(item[0], cell_12_bold_center), Paragraph(item[1], cell_12_bold_center), Paragraph(f"{item_amounts[idx]:,}", cell_12_bold_center)])
+        
+        t1 = Table(p1_table_data, colWidths=[45, 270, 100, 120])
+        t1.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('TOPPADDING', (0,0), (-1,-1), 12), ('BOTTOMPADDING', (0,0), (-1,-1), 12)]))
+        elements.append(t1)
 
-    unified_table = Table(table_data, colWidths=[45, 290, 100, 120], repeatRows=1)
-    unified_table.setStyle(TableStyle([
-        ('GRID', (0,0), (-1,-1), 0.5, colors.black), 
-        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), 
-        ('TOPPADDING', (0,0), (-1,-1), cell_top_pad), 
-        ('BOTTOMPADDING', (0,0), (-1,-1), cell_bot_pad),
-        ('LEFTPADDING', (0,0), (-1,-1), 4),
-        ('RIGHTPADDING', (0,0), (-1,-1), 4)
-    ]))
-    
-    elements.append(unified_table)
-    elements.append(Spacer(1, spacer_gap + 1))
-    elements.append(Paragraph(num_to_words_indian_clean(final_total), words_style))
-    elements.append(Spacer(1, spacer_gap))
-    elements.append(Paragraph("TERMS AND CONDITIONS:", terms_hdr_style))
-    elements.append(Spacer(1, 1))
+        elements.append(PageBreak())
+        elements.extend(create_header_with_qr())
+        elements.append(Table([[Paragraph(f"REF NO:-{ref_no}", ref_left_style), Paragraph(f"DATE: {est_date}", ref_right_style)]], colWidths=[265, 270]))
+        elements.append(Spacer(1, 4))
+
+        p2_table_data = [[Paragraph("SL.NO", hdr_12_bold_center), Paragraph("Civil Work Description", hdr_12_bold_center), Paragraph("Qty / Ext", hdr_12_bold_center), Paragraph("Amount Rs.", hdr_12_bold_center)]]
+        for idx in range(7, 14):
+            item = processed_items[idx]
+            p2_table_data.append([Paragraph(f"{idx+1}.", cell_12_bold_center), Paragraph(item[0], cell_12_bold_center), Paragraph(item[1], cell_12_bold_center), Paragraph(f"{item_amounts[idx]:,}", cell_12_bold_center)])
+
+        p2_table_data.append(["", Paragraph("GST 18%", total_14_bold), "", Paragraph(f"{actual_gst:,}", total_14_bold)])
+        p2_table_data.append(["", Paragraph("TOTAL", total_14_bold), "", Paragraph(f"{final_total:,}", total_14_bold)])
+
+        t2 = Table(p2_table_data, colWidths=[45, 270, 100, 120])
+        t2.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('TOPPADDING', (0,0), (-1,-1), 12), ('BOTTOMPADDING', (0,0), (-1,-1), 12)]))
+        elements.append(t2)
+
+    elements.append(Spacer(1, 6))
+    elements.append(Paragraph(num_to_words_indian_clean(final_total), words_13_bold_center))
+    elements.append(Spacer(1, 5))
+    elements.append(Paragraph("TERMS AND CONDITIONS (CIVIL WORKS):", terms_hdr_center))
+    elements.append(Spacer(1, 3))
 
     terms_points = [
-        "1. This Is A Preliminary Estimate And Not A Final Invoice",
-        "2. Payment: 50% Advance, 30% After Material Delivery, 20% Upon Completion.",
+        "1. This Is A Preliminary Civil Estimate For House Extension / Additional Floors.",
+        "2. Payment Structure: 25% Advance, 25% Upon Foundation/Roof Slab, 30% Masonry/Plastering, 20% Final Handover.",
         "3. Validity: This Estimation Is Valid For 45 Days From The Date Of Issue.",
-        "4. Scope Of Work: Any Work Not Explicitly Mentioned In This Estimate Will Be Charged Extra.",
-        "5. Materials: All Materials Used Will Be Of Standard Quality Unless Specified Otherwise.",
-        "6. Project Duration: Estimated Project Completion Time Is 90 Working Days From Advance."
+        "4. Structural Responsibility: Client must ensure existing foundation strength supports requested vertical extension.",
+        "5. Materials: Cement (ACC/Ultratech), TMT Steel (Fe550 Grade) and Solid Blocks of approved ISI standards.",
+        "6. Project Duration: Estimated Execution Time Is 120 Working Days From Site Handover."
     ]
     for point in terms_points:
-        elements.append(Paragraph(point, terms_point_style))
-        elements.append(Spacer(1, 1))
+        elements.append(Paragraph(point, terms_point_size_8))
+        elements.append(Spacer(1, 2))
 
     doc.build(elements)
     pdf_bytes = pdf_buffer.getvalue()
@@ -724,14 +685,14 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
 
 
 # --- AUTHENTIC MODAL POPUP DIALOG FOR ESTIMATION ---
-@st.dialog("⚡ COMMERCIAL & RESIDENTIAL ESTIMATION GENERATOR", width="large")
+@st.dialog("⚡ HOUSE EXTENSION & CIVIL ESTIMATION GENERATOR", width="large")
 def show_quotation_dialog():
     st.markdown("""
     <div class="commercial-auth-banner">
-        <div style="font-size:2.2rem;">🔐</div>
+        <div style="font-size:2.2rem;">🏗️</div>
         <div>
-            <div style="color:#818CF8; font-weight:700; font-size:0.85rem; letter-spacing:1px;">SECURE SSL GATEWAY • COMMERCIAL GST INVOICING</div>
-            <div style="color:#FFFFFF; font-size:0.8rem;">Generate encrypted PDF estimates with dynamic QR code authentication for Bengaluru projects.</div>
+            <div style="color:#818CF8; font-weight:700; font-size:0.85rem; letter-spacing:1px;">SECURE SSL GATEWAY • CIVIL & STRUCTURAL INVOICING</div>
+            <div style="color:#FFFFFF; font-size:0.8rem;">Generate encrypted PDF civil estimates for house extensions, additional floors, and RCC works in Bengaluru.</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -746,73 +707,71 @@ def show_quotation_dialog():
             user_email = st.text_input("Email ID *", value="", placeholder="Enter email")
 
         st.markdown("---")
-        st.subheader("🏗️ Service Selection & Property Details")
+        st.subheader("🏠 Property & Extension Details")
         
-        service_type = st.selectbox(
-            "Select Service Scope *",
-            ["Interior Works & Furnishing", "Civil Works & Extension"]
-        )
-
-        extension_details = {}
-        if service_type == "Civil Works & Extension":
-            col_ex1, col_ex2, col_ex3 = st.columns(3)
-            with col_ex1:
-                target_floors = st.selectbox("Floors to Add", ["2nd Floor", "3rd Floor", "2nd & 3rd Floor", "Ground + 1st & 2nd Floor", "Other Extension"])
-            with col_ex2:
-                target_sqft = st.number_input("Build-up Area (SQ. FT)", min_value=100.0, max_value=10000.0, value=1200.0, step=50.0)
-            with col_ex3:
-                floor_selection = st.selectbox("Which Floor Option", ["Roof Slab Extension", "Full Floor Addition", "Staircase & Balcony Extension", "Structural Pillars & Slab"])
-            
-            extension_details = {
-                "floors": target_floors,
-                "sqft": target_sqft,
-                "option": floor_selection
-            }
-
         col_c1, col_c2 = st.columns(2)
         with col_c1:
             customer_name = st.text_input("Customer Full Name *", value="", placeholder="Customer name")
             date_input = st.text_input("Quotation Date", value=datetime.now().strftime("%d-%m-%Y"))
         with col_c2:
-            pass
+            build_sqft = st.number_input("Total Extension Build-Up Area (SQ. FT) *", min_value=100.0, max_value=10000.0, value=1200.0, step=50.0)
+
+        st.markdown("**Select Floor Extension Option(s) *:**")
+        f_col1, f_col2, f_col3, f_col4 = st.columns(4)
+        with f_col1:
+            ext_1st = st.checkbox("1st Floor", value=False)
+        with f_col2:
+            ext_2nd = st.checkbox("2nd Floor", value=True)
+        with f_col3:
+            ext_3nd = st.checkbox("3rd Floor", value=False)
+        with f_col4:
+            ext_pent = st.checkbox("Penthouse / Terrace", value=False)
 
         address_input = st.text_area(
-            "Site / Property Address  *", 
+            "Site / Property Address *", 
             value="",
             placeholder="Enter complete address"
         )
 
         st.markdown("---")
-        st.subheader("💰 YOUR BUDGET")
+        st.subheader("💰 YOUR CIVIL BUDGET")
         
         amount_input = st.number_input(
-            "✏️ Enter Total Estimated Budget (INR ₹):",
-            min_value=50000.0,
+            "✏️ Enter Total Civil Estimated Budget (INR ₹):",
+            min_value=100000.0,
             max_value=10000000.0,
             value=2500000.0,
-            step=25000.0,
+            step=50000.0,
             format="%.2f"
         )
 
         subtotal_est = round(amount_input / 1.18)
         gst_est = amount_input - subtotal_est
-        page_mode_hint = "📄 1 Page (10 Particulars)" if amount_input < 3000000.0 else "📄 2 Pages (20 Particulars)"
-        st.info(f"📊 **Base Estimate:** ₹ {subtotal_est:,.2f} | **GST (18%):** ₹ {gst_est:,.2f} | **Total Final Payable:** ₹ {amount_input:,.2f} | **Format:** {page_mode_hint}")
+        st.info(f"📊 **Base Estimate:** ₹ {subtotal_est:,.2f} | **GST (18%):** ₹ {gst_est:,.2f} | **Total Final Payable:** ₹ {amount_input:,.2f}")
 
-        submitted = st.form_submit_button("⚡ GENERATE YOUR QUATATION", type="primary", use_container_width=True)
+        submitted = st.form_submit_button("⚡ GENERATE CIVIL QUOTATION", type="primary", use_container_width=True)
 
     if submitted:
+        selected_floors = []
+        if ext_1st: selected_floors.append("1ST FLOOR")
+        if ext_2nd: selected_floors.append("2ND FLOOR")
+        if ext_3nd: selected_floors.append("3RD FLOOR")
+        if ext_pent: selected_floors.append("PENTHOUSE")
+
+        if not selected_floors:
+            selected_floors = ["2ND FLOOR"] # Default fallback
+
         if not user_name.strip() or not user_mobile.strip() or not user_email.strip() or not customer_name.strip() or not address_input.strip():
             st.warning("⚠️ Please fill in all required fields before generating the quotation.")
             return
 
-        with st.spinner('Generating PDF copies and syncing securely with cloud storage...'):
+        with st.spinner('Generating Civil PDF copies and syncing securely with cloud storage...'):
             try:
                 pdf_bytes_std, filename_std, generated_ref, final_total = generate_estimation_pdf_bytes(
-                    customer_name, address_input, date_input, float(amount_input), include_header=True, service_type=service_type, extension_details=extension_details
+                    customer_name, address_input, date_input, float(amount_input), selected_floors, float(build_sqft), include_header=True
                 )
                 pdf_bytes_no_hdr, filename_no_hdr, _, _ = generate_estimation_pdf_bytes(
-                    customer_name, address_input, date_input, float(amount_input), include_header=False, service_type=service_type, extension_details=extension_details
+                    customer_name, address_input, date_input, float(amount_input), selected_floors, float(build_sqft), include_header=False
                 )
                 
                 if supabase:
@@ -823,7 +782,7 @@ def show_quotation_dialog():
                     )
                 
                 st.balloons()
-                st.success("🎉 **Quotation Generated & Synced Successfully!**")
+                st.success("🎉 **Civil Quotation Generated & Synced Successfully!**")
                 
                 st.markdown(f"""
                 <div style="background: rgba(245, 158, 11, 0.15); border: 1px solid #F59E0B; padding: 20px; border-radius: 14px; margin: 15px 0;">
@@ -916,7 +875,7 @@ col_tick1, col_tick2 = st.columns([10, 1])
 with col_tick1:
     st.markdown("""
     <div class="commercial-ticker" style="margin-bottom:0;">
-        <div><span class="live-dot"></span>LIVE COMMERCIAL HUB: BENGALURU (SAHAKARNAGAR | HSR | WHITEFIELD)</div>
+        <div><span class="live-dot"></span>LIVE CIVIL & EXTENSION HUB: BENGALURU (SAHAKARNAGAR | HSR | WHITEFIELD)</div>
         <div>SUPPORT HOTLINE: +91 98765 43210 &nbsp;|&nbsp; SLA: 99.9% UPTIME</div>
     </div>
     """, unsafe_allow_html=True)
@@ -940,11 +899,11 @@ with col_hero1:
     st.markdown("""
     <div class="dashboard-card-3d" style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.85) 100%); padding: 3rem 2.5rem; height: 100%;">
         <div style="font-family:'Space Grotesk', sans-serif; font-weight: 800; font-size: 0.85rem; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 12px;">
-            <span class="gradient-text-gold">✦ ENTERPRISE CIVIL & INTERIOR SOLUTIONS </span>
+            <span class="gradient-text-gold">✦ HOUSE EXTENSION & CIVIL WORKS </span>
         </div>
-        <h1 class="hero-title-3d" style="font-size: 3rem;">SND INTERIOR & DESIGNS</h1>
+        <h1 class="hero-title-3d" style="font-size: 3rem;">SND INTERIOR & CIVIL CONSTRUCTION</h1>
         <p style="color: #CBD5E1; font-size: 1.1rem; line-height: 1.7; margin-bottom: 2rem;">
-            Commercial-grade civil extensions, roof slab casting, floor additions, structural brickwork, and turnkey interior manufacturing engineered for elite residential developments across Bengaluru.
+            Specialized in vertical house extensions, 2nd & 3rd floor additions, RCC structural frameworks, civil estimates, and turn-key construction across Bengaluru.
         </p>
     </div>
     """, unsafe_allow_html=True)
@@ -953,48 +912,44 @@ with col_hero2:
     st.markdown("""
     <div class="slider-box" id="interiorCarousel">
         <div class="carousel-slide active">
-            <img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1000&q=80" alt="Luxury Living Room">
-            <div class="carousel-caption">01 - Luxury Living Room & Entertainment Lounge</div>
+            <img src="https://images.unsplash.com/photo-1541888946425-d0fbb18f86f6?auto=format&fit=crop&w=1000&q=80" alt="Civil Construction">
+            <div class="carousel-caption">01 - RCC Column & Beam Framework Casting</div>
         </div>
         <div class="carousel-slide">
-            <img src="https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1000&q=80" alt="Modular German Kitchen">
-            <div class="carousel-caption">02 - Modular German Acrylic Kitchen</div>
+            <img src="https://images.unsplash.com/photo-1590381105924-c72589b9ef3f?auto=format&fit=crop&w=1000&q=80" alt="House Extension">
+            <div class="carousel-caption">02 - Multi-Floor House Extension & Brickwork</div>
         </div>
         <div class="carousel-slide">
-            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80" alt="Acoustic Fluted Panels">
-            <div class="carousel-caption">03 - Acoustic Fluted Panel Wall Decor</div>
+            <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1000&q=80" alt="Structural Engineering">
+            <div class="carousel-caption">03 - Structural Engineering & Blueprint Layouts</div>
         </div>
         <div class="carousel-slide">
-            <img src="https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1000&q=80" alt="Glass Wardrobes">
-            <div class="carousel-caption">04 - Floor-to-Ceiling Tinted Glass Wardrobes</div>
+            <img src="https://images.unsplash.com/photo-1581094288338-2314dddb7ece?auto=format&fit=crop&w=1000&q=80" alt="Foundation Works">
+            <div class="carousel-caption">04 - Foundation Footings & Excavation Works</div>
         </div>
         <div class="carousel-slide">
-            <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1000&q=80" alt="Italian Marble">
-            <div class="carousel-caption">05 - Imported Italian Marble & Wood Paneling</div>
+            <img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=1000&q=80" alt="Steel Reinforcement">
+            <div class="carousel-caption">05 - Fe550 Grade TMT Steel Reinforcement</div>
         </div>
         <div class="carousel-slide">
-            <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1000&q=80" alt="Minimalist Bedroom">
-            <div class="carousel-caption">06 - Contemporary Minimalist Bedroom Interior</div>
+            <img src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1000&q=80" alt="Slab Casting">
+            <div class="carousel-caption">06 - Roof Slab Shuttering & Concrete Pouring</div>
         </div>
         <div class="carousel-slide">
-            <img src="https://images.unsplash.com/photo-1616046229478-9901c5536a45?auto=format&fit=crop&w=1000&q=80" alt="Home Office">
-            <div class="carousel-caption">07 - Executive Home Office & Study Suite</div>
+            <img src="https://images.unsplash.com/photo-1590579491624-f98f3bb15dcf?auto=format&fit=crop&w=1000&q=80" alt="Masonry & Plastering">
+            <div class="carousel-caption">07 - External & Internal Wall Plastering</div>
         </div>
         <div class="carousel-slide">
-            <img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=1000&q=80" alt="Bathroom Vanity">
-            <div class="carousel-caption">08 - Designer Bathroom Vanity & LED Mirrors</div>
+            <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1000&q=80" alt="Electrical & Plumbing">
+            <div class="carousel-caption">08 - Concealed Plumbing & Electrical Conduits</div>
         </div>
         <div class="carousel-slide">
-            <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1000&q=80" alt="False Ceiling">
-            <div class="carousel-caption">09 - Multi-Tier False Ceiling & Cove Lighting</div>
+            <img src="https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1000&q=80" alt="Terrace Waterproofing">
+            <div class="carousel-caption">09 - Terrace Waterproofing & Curing</div>
         </div>
         <div class="carousel-slide">
-            <img src="https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=1000&q=80" alt="Open Dining">
-            <div class="carousel-caption">10 - Premium Open-Concept Dining Architecture</div>
-        </div>
-        <div class="carousel-slide">
-            <img src="https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1000&q=80" alt="Balcony Decking">
-            <div class="carousel-caption">11 - Luxury Penthouse Balcony & Decking Design</div>
+            <img src="https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=1000&q=80" alt="Completed Civil Structure">
+            <div class="carousel-caption">10 - Completed Additional Floor Handover</div>
         </div>
     </div>
 
@@ -1014,50 +969,50 @@ with col_hero2:
 
 # --- STATIC & FIXED 10 IMAGES GALLERY SHOWCASE ---
 st.markdown("<br>", unsafe_allow_html=True)
-st.markdown("### 🏛️ Portfolio Master Collection (10 Fixed Showcase Galleries)")
-st.markdown("<p style='color:#94A3B8; font-size:0.95rem; margin-bottom:1.0rem;'>Explore our curated permanent catalog of architectural finishes, structural modules, and luxury interior spaces.</p>", unsafe_allow_html=True)
+st.markdown("### 🏛️ Civil Construction Master Collection (10 Fixed Showcase Galleries)")
+st.markdown("<p style='color:#94A3B8; font-size:0.95rem; margin-bottom:1rem;'>Explore our structural workflow stages from foundation excavation to multi-floor slab completion.</p>", unsafe_allow_html=True)
 
 st.markdown("""
 <div class="static-gallery-grid">
     <div class="static-gallery-item">
-        <img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=600&q=80" alt="Living Room">
-        <div class="static-gallery-label">01. Living Lounge</div>
+        <img src="https://images.unsplash.com/photo-1541888946425-d0fbb18f86f6?auto=format&fit=crop&w=600&q=80" alt="RCC Frame">
+        <div class="static-gallery-label">01. RCC Framework</div>
     </div>
     <div class="static-gallery-item">
-        <img src="https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=600&q=80" alt="Kitchen">
-        <div class="static-gallery-label">02. Modular Kitchen</div>
+        <img src="https://images.unsplash.com/photo-1590381105924-c72589b9ef3f?auto=format&fit=crop&w=600&q=80" alt="Extension">
+        <div class="static-gallery-label">02. Floor Extension</div>
     </div>
     <div class="static-gallery-item">
-        <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80" alt="Fluted Panels">
-        <div class="static-gallery-label">03. Fluted Panels</div>
+        <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=600&q=80" alt="Engineering">
+        <div class="static-gallery-label">03. Engineering</div>
     </div>
     <div class="static-gallery-item">
-        <img src="https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=600&q=80" alt="Glass Wardrobes">
-        <div class="static-gallery-label">04. Glass Wardrobes</div>
+        <img src="https://images.unsplash.com/photo-1581094288338-2314dddb7ece?auto=format&fit=crop&w=600&q=80" alt="Foundation">
+        <div class="static-gallery-label">04. Foundation</div>
     </div>
     <div class="static-gallery-item">
-        <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=600&q=80" alt="Italian Marble">
-        <div class="static-gallery-label">05. Italian Marble</div>
+        <img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=600&q=80" alt="TMT Steel">
+        <div class="static-gallery-label">05. TMT Steel Bars</div>
     </div>
     <div class="static-gallery-item">
-        <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=600&q=80" alt="Minimalist Bedroom">
-        <div class="static-gallery-label">06. Minimalist Bed</div>
+        <img src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=600&q=80" alt="Slab Casting">
+        <div class="static-gallery-label">06. Slab Casting</div>
     </div>
     <div class="static-gallery-item">
-        <img src="https://images.unsplash.com/photo-1616046229478-9901c5536a45?auto=format&fit=crop&w=600&q=80" alt="Home Office">
-        <div class="static-gallery-label">07. Study Suite</div>
+        <img src="https://images.unsplash.com/photo-1590579491624-f98f3bb15dcf?auto=format&fit=crop&w=600&q=80" alt="Plastering">
+        <div class="static-gallery-label">07. Wall Plastering</div>
     </div>
     <div class="static-gallery-item">
-        <img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=600&q=80" alt="Bathroom Vanity">
-        <div class="static-gallery-label">08. Luxury Vanity</div>
+        <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=600&q=80" alt="Conduits">
+        <div class="static-gallery-label">08. Conduits & Pipes</div>
     </div>
     <div class="static-gallery-item">
-        <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=600&q=80" alt="False Ceiling">
-        <div class="static-gallery-label">09. Cove Lighting</div>
+        <img src="https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=600&q=80" alt="Waterproofing">
+        <div class="static-gallery-label">09. Waterproofing</div>
     </div>
     <div class="static-gallery-item">
-        <img src="https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=600&q=80" alt="Balcony Decking">
-        <div class="static-gallery-label">10. Balcony Decking</div>
+        <img src="https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=600&q=80" alt="Handover">
+        <div class="static-gallery-label">10. Floor Handover</div>
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -1065,99 +1020,99 @@ st.markdown("""
 
 # --- FULL-SIZE VERTICAL SCROLLING SHOWCASE (10 FULL SIZE IMAGES) ---
 st.markdown("<br>", unsafe_allow_html=True)
-st.markdown("### 📸 10 Full-Size Vertical Architectural Showcase")
-st.markdown("<p style='color:#94A3B8; font-size:0.95rem; margin-bottom:1.5rem;'>Scroll down through our 10 full-width, high-definition architectural project features.</p>", unsafe_allow_html=True)
+st.markdown("### 📸 10 Full-Size Vertical Civil Construction Showcase")
+st.markdown("<p style='color:#94A3B8; font-size:0.95rem; margin-bottom:1.5rem;'>Scroll down through our high-definition structural and civil extension milestone features.</p>", unsafe_allow_html=True)
 
 st.markdown("""
 <div class="vertical-gallery-container">
     <!-- 01 -->
     <div class="vertical-gallery-card">
-        <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=80" alt="Architectural Living Room">
+        <img src="https://images.unsplash.com/photo-1541888946425-d0fbb18f86f6?auto=format&fit=crop&w=1600&q=80" alt="RCC Framework">
         <div class="vertical-card-overlay">
             <span class="vertical-card-badge">Full Size Feature • 01</span>
-            <div class="vertical-card-title">Architectural Grand Living Lounge & Media Suite</div>
-            <div class="vertical-card-desc">Double-height ceiling, acoustic timber louvers, integrated ambient profile LED lighting, and Italian marble accents.</div>
+            <div class="vertical-card-title">Heavy-Duty RCC Column & Beam Framework Casting</div>
+            <div class="vertical-card-desc">Precision M25 grade concrete mixing, column alignment checks, and rigid formwork shoring for multi-floor load distribution.</div>
         </div>
     </div>
     <!-- 02 -->
     <div class="vertical-gallery-card">
-        <img src="https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1600&q=80" alt="Modular German Kitchen">
+        <img src="https://images.unsplash.com/photo-1590381105924-c72589b9ef3f?auto=format&fit=crop&w=1600&q=80" alt="House Extension">
         <div class="vertical-card-overlay">
             <span class="vertical-card-badge">Full Size Feature • 02</span>
-            <div class="vertical-card-title">Ultra-Modern Modular German Island Kitchen</div>
-            <div class="vertical-card-desc">Handleless acrylic cabinetry, waterfall quartz island, fully integrated Blum motorized hardware, and smart appliances.</div>
+            <div class="vertical-card-title">Second & Third Floor Vertical House Extension</div>
+            <div class="vertical-card-desc">Seamless integration of vertical load-bearing columns onto existing ground structures with minimal disruption to lower living areas.</div>
         </div>
     </div>
     <!-- 03 -->
     <div class="vertical-gallery-card">
-        <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1600&q=80" alt="Master Penthouse Suite">
+        <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1600&q=80" alt="Structural Engineering">
         <div class="vertical-card-overlay">
             <span class="vertical-card-badge">Full Size Feature • 03</span>
-            <div class="vertical-card-title">Executive Master Bedroom & Penthouse Lounge</div>
-            <div class="vertical-card-desc">Upholstered headboard backdrop, warm cove architectural lighting, floor-to-ceiling glass paneling, and engineered hardwood flooring.</div>
+            <div class="vertical-card-title">Architectural Blueprints & Structural Engineering</div>
+            <div class="vertical-card-desc">Comprehensive load calculations, soil load-bearing capacity testing, and municipal compliance drawing approvals.</div>
         </div>
     </div>
     <!-- 04 -->
     <div class="vertical-gallery-card">
-        <img src="https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1600&q=80" alt="Walk-in Glass Wardrobe">
+        <img src="https://images.unsplash.com/photo-1581094288338-2314dddb7ece?auto=format&fit=crop&w=1600&q=80" alt="Foundation Works">
         <div class="vertical-card-overlay">
             <span class="vertical-card-badge">Full Size Feature • 04</span>
-            <div class="vertical-card-title">Luxury Tinted Glass Walk-in Wardrobe System</div>
-            <div class="vertical-card-desc">Custom aluminum-framed glass wardrobe doors, motion-sensor interior illumination, velvet jewelry trays, and hidden biometric vault space.</div>
+            <div class="vertical-card-title">Foundation Excavation & Footing Reinforcement</div>
+            <div class="vertical-card-desc">Deep soil excavation, PCC base laying, and reinforced isolated footing construction for earthquake-resistant stability.</div>
         </div>
     </div>
     <!-- 05 -->
     <div class="vertical-gallery-card">
-        <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1600&q=80" alt="Italian Marble Foyer">
+        <img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=1600&q=80" alt="TMT Steel Bars">
         <div class="vertical-card-overlay">
             <span class="vertical-card-badge">Full Size Feature • 05</span>
-            <div class="vertical-card-title">Imported Italian Marble Foyer & Wall Cladding</div>
-            <div class="vertical-card-desc">High-gloss Statuario marble flooring, custom brass inlay geometric patterns, and vertical natural veneer wall paneling.</div>
+            <div class="vertical-card-title">Fe550 Grade TMT Steel Bar Procurement & Binding</div>
+            <div class="vertical-card-desc">High-tensile ribbed steel bar fabrication, precise bending schedules, and binding wire mesh grid assembly for slabs and beams.</div>
         </div>
     </div>
     <!-- 06 -->
     <div class="vertical-gallery-card">
-        <img src="https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=1600&q=80" alt="Contemporary Dining">
+        <img src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1600&q=80" alt="Slab Casting">
         <div class="vertical-card-overlay">
             <span class="vertical-card-badge">Full Size Feature • 06</span>
-            <div class="vertical-card-title">Open-Concept Contemporary Dining Architecture</div>
-            <div class="vertical-card-desc">Custom 10-seater monolith stone dining table, designer crystal drop chandelier, and seamless connection to outdoor green terrace.</div>
+            <div class="vertical-card-title">Roof Slab Shuttering & Continuous Concrete Pouring</div>
+            <div class="vertical-card-desc">Waterproof marine plywood centering, mechanical vibrator compaction, and controlled water curing protocols.</div>
         </div>
     </div>
     <!-- 07 -->
     <div class="vertical-gallery-card">
-        <img src="https://images.unsplash.com/photo-1616046229478-9901c5536a45?auto=format&fit=crop&w=1600&q=80" alt="Executive Home Office">
+        <img src="https://images.unsplash.com/photo-1590579491624-f98f3bb15dcf?auto=format&fit=crop&w=1600&q=80" alt="Wall Plastering">
         <div class="vertical-card-overlay">
             <span class="vertical-card-badge">Full Size Feature • 07</span>
-            <div class="vertical-card-title">Bespoke Executive Home Office & Library Suite</div>
-            <div class="vertical-card-desc">Ergonomic acoustic wall paneling, custom floating bookshelves with backlighting, cable management channels, and leather seating.</div>
+            <div class="vertical-card-title">Solid Block Masonry & 3-Coat Wall Plastering</div>
+            <div class="vertical-card-desc">Precision vertical plumb line block work with mortar bands and anti-crack mesh plaster finishes for smooth painting readiness.</div>
         </div>
     </div>
     <!-- 08 -->
     <div class="vertical-gallery-card">
-        <img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=1600&q=80" alt="Luxury Spa Bathroom">
+        <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1600&q=80" alt="Conduits & Pipes">
         <div class="vertical-card-overlay">
             <span class="vertical-card-badge">Full Size Feature • 08</span>
-            <div class="vertical-card-title">Designer Spa Bathroom & Floating Vanity</div>
-            <div class="vertical-card-desc">Large-format porcelain tiles, backlit anti-fog smart LED mirrors, ceiling-mounted rain shower system, and concealed Kohler fittings.</div>
+            <div class="vertical-card-title">Concealed Electrical Conduits & Plumbing Networks</div>
+            <div class="vertical-card-desc">Heavy-duty ISI grade FR electrical conduit pipe chases and pressure-tested CPVC/UPVC water supply line installations.</div>
         </div>
     </div>
     <!-- 09 -->
     <div class="vertical-gallery-card">
-        <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1600&q=80" alt="Architectural Ceiling">
+        <img src="https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1600&q=80" alt="Terrace Waterproofing">
         <div class="vertical-card-overlay">
             <span class="vertical-card-badge">Full Size Feature • 09</span>
-            <div class="vertical-card-title">Multi-Tier Architectural False Ceiling & Coves</div>
-            <div class="vertical-card-desc">Seamless Gyproc false ceiling, rimless magnetic track spotlighting, ambient warm perimeter LEDs, and hidden AC diffuser grilles.</div>
+            <div class="vertical-card-title">Terrace Brick Bat Coba & Chemical Waterproofing</div>
+            <div class="vertical-card-desc">Multi-layer slope screeding and polymer-modified membrane waterproofing to prevent seepage and thermal heat gain.</div>
         </div>
     </div>
     <!-- 10 -->
     <div class="vertical-gallery-card">
-        <img src="https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1600&q=80" alt="Sky Penthouse Balcony">
+        <img src="https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=1600&q=80" alt="Floor Handover">
         <div class="vertical-card-overlay">
             <span class="vertical-card-badge">Full Size Feature • 10</span>
-            <div class="vertical-card-title">Sky Penthouse Balcony & Exterior Lounge Decking</div>
-            <div class="vertical-card-desc">Weatherproof composite WPC wooden decking, frameless glass railings, vertical garden green wall, and exterior warm illumination.</div>
+            <div class="vertical-card-title">Completed Additional Floor Structure Handover</div>
+            <div class="vertical-card-desc">Final structural audit, clean site handover, and certified documentation ready for interior fit-outs and finishing.</div>
         </div>
     </div>
 </div>
@@ -1169,22 +1124,22 @@ col_m1, col_m2, col_m3, col_m4 = st.columns(4)
 with col_m1:
     st.markdown("""
     <div class="stat-box-commercial">
-        <div style="font-size: 1.8rem; font-weight: 800;" class="gradient-text-gold">500+</div>
-        <div style="font-size: 0.8rem; color: #94A3B8; font-weight: 700; text-transform: uppercase; margin-top: 5px;">Active Projects</div>
+        <div style="font-size: 1.8rem; font-weight: 800;" class="gradient-text-gold">450+</div>
+        <div style="font-size: 0.8rem; color: #94A3B8; font-weight: 700; text-transform: uppercase; margin-top: 5px;">House Extensions</div>
     </div>
     """, unsafe_allow_html=True)
 with col_m2:
     st.markdown("""
     <div class="stat-box-commercial">
-        <div style="font-size: 1.8rem; font-weight: 800;" class="gradient-text-cyan">10 YRS</div>
+        <div style="font-size: 1.8rem; font-weight: 800;" class="gradient-text-cyan">15 YRS</div>
         <div style="font-size: 0.8rem; color: #94A3B8; font-weight: 700; text-transform: uppercase; margin-top: 5px;">Structural Warranty</div>
     </div>
     """, unsafe_allow_html=True)
 with col_m3:
     st.markdown("""
     <div class="stat-box-commercial">
-        <div style="font-size: 1.8rem; font-weight: 800;" class="gradient-text-gold">45 DAYS</div>
-        <div style="font-size: 0.8rem; color: #94A3B8; font-weight: 700; text-transform: uppercase; margin-top: 5px;">Guaranteed Handover</div>
+        <div style="font-size: 1.8rem; font-weight: 800;" class="gradient-text-gold">120 DAYS</div>
+        <div style="font-size: 0.8rem; color: #94A3B8; font-weight: 700; text-transform: uppercase; margin-top: 5px;">Floor Handover</div>
     </div>
     """, unsafe_allow_html=True)
 with col_m4:
@@ -1198,100 +1153,100 @@ with col_m4:
 
 # --- INTERACTIVE 3D ANIMATED / GIF VISUALIZER ---
 st.markdown("<br>", unsafe_allow_html=True)
-st.markdown("### 🌀 Interactive Content")
-st.markdown("<p style='color:#94A3B8; font-size:0.95rem; margin-bottom:1.5rem;'>Select a commercial zone to inspect real-time spatial physics, lighting loops, and modular material simulations.</p>", unsafe_allow_html=True)
+st.markdown("### 🌀 Interactive Civil Engineering Modules")
+st.markdown("<p style='color:#94A3B8; font-size:0.95rem; margin-bottom:1.5rem;'>Select a construction milestone to inspect structural load behavior, material grades, and reinforcement specs.</p>", unsafe_allow_html=True)
 
-selected_room = st.radio(
-    "Select Simulation Zone:",
-    ["🍳 Modular Kitchen (Island & U-Shape)", "🛋️ Luxury Living & Media Lounge", "🛏️ Designer Wardrobes & Bedroom", "💡 Architectural False Ceiling", "🪵 Italian Flooring & Paneling"],
+selected_module = st.radio(
+    "Select Civil Module:",
+    ["🏗️ Column & Beam RCC Framework", "🧱 Solid Block Masonry & Plastering", "🪜 Staircase & Balcony Extensions", "🌧️ Roof Slab & Waterproofing", "⚡ Electrical & Plumbing Conduits"],
     horizontal=True,
     label_visibility="collapsed"
 )
 
-if "Kitchen" in selected_room:
+if "Column" in selected_module:
     st.markdown("""
     <div class="dashboard-card-3d" style="display:flex; gap:35px; align-items:center;">
         <div style="flex:1;">
-            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#F59E0B; text-transform:uppercase;">SIMULATION MODULE 01</div>
-            <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">German Soft-Close Acrylic Kitchen</h2>
+            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#F59E0B; text-transform:uppercase;">CIVIL MODULE 01</div>
+            <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">RCC Column & Beam Framework</h2>
             <p style="color:#CBD5E1; line-height:1.7; margin-bottom:1.5rem;">
-                Engineered with Blum tandem box mechanisms, scratch-resistant quartz stone counters, integrated LED profile strip lighting, and water-resistant BWP marine-grade plywood cores.
+                Engineered with M25 grade concrete mix, Fe550 grade high-yield TMT steel bars, rigid column starter ties, and laser-aligned vertical shuttering for secure multi-floor load transfers.
             </p>
             <div style="display:flex; gap:15px; color:#38BDF8; font-weight:700; font-size:0.9rem;">
-                <div>⚡ Blum Hardware</div>
-                <div>⚡ Quartz Stone</div>
-                <div>⚡ 10-Yr Warranty</div>
+                <div>⚡ M25 Grade Concrete</div>
+                <div>⚡ Fe550 TMT Steel</div>
+                <div>⚡ 15-Yr Warranty</div>
             </div>
         </div>
         <div style="flex:1;">
             <div class="visualizer-frame-3d">
-                <img src="https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1000&q=80" alt="Kitchen 3D">
+                <img src="https://images.unsplash.com/photo-1541888946425-d0fbb18f86f6?auto=format&fit=crop&w=1000&q=80" alt="Civil 3D 1">
             </div>
         </div>
     </div>
     """, unsafe_allow_html=True)
-elif "Living" in selected_room:
+elif "Masonry" in selected_module:
     st.markdown("""
     <div class="dashboard-card-3d" style="display:flex; gap:35px; align-items:center;">
         <div style="flex:1;">
-            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#F59E0B; text-transform:uppercase;">SIMULATION MODULE 02</div>
-            <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">Grand Living & Media Lounge</h2>
+            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#F59E0B; text-transform:uppercase;">CIVIL MODULE 02</div>
+            <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">Solid Block Masonry & Plastering</h2>
             <p style="color:#CBD5E1; line-height:1.7; margin-bottom:1.5rem;">
-                Featuring custom acoustic fluted panels, sintered stone TV media backdrops, motorized smart curtains, and concealed wiring channels for high-end home theater setups.
+                Heavy-duty solid concrete blocks laid with plumb-line precision, accompanied by 3-course waterproof cement plastering to insulate against moisture and heat.
             </p>
             <div style="display:flex; gap:15px; color:#38BDF8; font-weight:700; font-size:0.9rem;">
-                <div>⚡ Fluted Panels</div>
-                <div>⚡ Acoustic Wall</div>
-                <div>⚡ Smart Motorized</div>
+                <div>⚡ Solid Blocks</div>
+                <div>⚡ Waterproof Mortar</div>
+                <div>⚡ Plumb Precision</div>
             </div>
         </div>
         <div style="flex:1;">
             <div class="visualizer-frame-3d">
-                <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80" alt="Living 3D">
+                <img src="https://images.unsplash.com/photo-1590579491624-f98f3bb15dcf?auto=format&fit=crop&w=1000&q=80" alt="Civil 3D 2">
             </div>
         </div>
     </div>
     """, unsafe_allow_html=True)
-elif "Wardrobes" in selected_room:
+elif "Staircase" in selected_module:
     st.markdown("""
     <div class="dashboard-card-3d" style="display:flex; gap:35px; align-items:center;">
         <div style="flex:1;">
-            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#F59E0B; text-transform:uppercase;">SIMULATION MODULE 03</div>
-            <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">Floor-to-Ceiling Glass Wardrobes</h2>
+            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#F59E0B; text-transform:uppercase;">CIVIL MODULE 03</div>
+            <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">Staircase & Balcony Cantilever Extensions</h2>
             <p style="color:#CBD5E1; line-height:1.7; margin-bottom:1.5rem;">
-                Bronze tinted safety glass sliding doors equipped with motion-activated LED hanging rails, velvet-lined pull-out organizer trays, and soft-closing dampeners.
+                Durable cantilevered RCC staircases and cantilever balcony slabs engineered to connect ground levels seamlessly to newly added 2nd and 3rd floors.
             </p>
             <div style="display:flex; gap:15px; color:#38BDF8; font-weight:700; font-size:0.9rem;">
-                <div>⚡ Sensor Lighting</div>
-                <div>⚡ Velvet Trays</div>
-                <div>⚡ Tinted Glass</div>
+                <div>⚡ Cantilever Slabs</div>
+                <div>⚡ RCC Staircases</div>
+                <div>⚡ Safe Load Ratings</div>
             </div>
         </div>
         <div style="flex:1;">
             <div class="visualizer-frame-3d">
-                <img src="https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1000&q=80" alt="Wardrobes 3D">
+                <img src="https://images.unsplash.com/photo-1590381105924-c72589b9ef3f?auto=format&fit=crop&w=1000&q=80" alt="Civil 3D 3">
             </div>
         </div>
     </div>
     """, unsafe_allow_html=True)
-elif "Ceiling" in selected_room:
+elif "Roof" in selected_module:
     st.markdown("""
     <div class="dashboard-card-3d" style="display:flex; gap:35px; align-items:center;">
         <div style="flex:1;">
-            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#F59E0B; text-transform:uppercase;">SIMULATION MODULE 04</div>
-            <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">Architectural False Ceiling & Coves</h2>
+            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#F59E0B; text-transform:uppercase;">CIVIL MODULE 04</div>
+            <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">Roof Slab Casting & Waterproofing</h2>
             <p style="color:#CBD5E1; line-height:1.7; margin-bottom:1.5rem;">
-                Multi-tier gypsum board architectural drops featuring warm concealed cove lighting lines, magnetic track spotlight fixtures, and statement crystal chandelier mounts.
+                Heavy shuttering support, machine-mixed concrete casting with superplasticizers, brick-bat coba slope screeding, and chemical membrane waterproofing.
             </p>
             <div style="display:flex; gap:15px; color:#38BDF8; font-weight:700; font-size:0.9rem;">
-                <div>⚡ Magnetic Tracks</div>
-                <div>⚡ Warm Cove LED</div>
-                <div>⚡ Gypsum Finish</div>
+                <div>⚡ Brick Bat Coba</div>
+                <div>⚡ Polymer Coating</div>
+                <div>⚡ Anti-Seepage</div>
             </div>
         </div>
         <div style="flex:1;">
             <div class="visualizer-frame-3d">
-                <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1000&q=80" alt="Ceiling 3D">
+                <img src="https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1000&q=80" alt="Civil 3D 4">
             </div>
         </div>
     </div>
@@ -1300,20 +1255,20 @@ else:
     st.markdown("""
     <div class="dashboard-card-3d" style="display:flex; gap:35px; align-items:center;">
         <div style="flex:1;">
-            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#F59E0B; text-transform:uppercase;">SIMULATION MODULE 05</div>
-            <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">Imported Italian Marble & Wood Paneling</h2>
+            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#F59E0B; text-transform:uppercase;">CIVIL MODULE 05</div>
+            <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">Concealed Electrical & Plumbing Conduits</h2>
             <p style="color:#CBD5E1; line-height:1.7; margin-bottom:1.5rem;">
-                Mirror-polished large-format Italian marble tiles paired with vertical natural wood veneer wall cladding and brushed brass inlay metal trims.
+                ISI-grade heavy duty conduit pipe laying in walls and roof slabs before concrete pouring, plus pressure-tested supply and drainage piping networks.
             </p>
             <div style="display:flex; gap:15px; color:#38BDF8; font-weight:700; font-size:0.9rem;">
-                <div>⚡ Italian Marble</div>
-                <div>⚡ Brass Inlays</div>
-                <div>⚡ Veneer Finish</div>
+                <div>⚡ ISI Conduit Pipes</div>
+                <div>⚡ Pressure Tested</div>
+                <div>⚡ Distribution Boxes</div>
             </div>
         </div>
         <div style="flex:1;">
             <div class="visualizer-frame-3d">
-                <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1000&q=80" alt="Flooring 3D">
+                <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1000&q=80" alt="Civil 3D 5">
             </div>
         </div>
     </div>
