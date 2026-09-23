@@ -506,7 +506,7 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
         ("Sanitary drainage lines, PVC pipe networks & chamber construction", "JOB", "JOB_LOT", 0.05),
         ("Roof waterproofing treatment (Brick bat coba / Chemical coating)", "SQ. FT", "SQFT", 0.05),
         ("External scaffolding, centering & shuttering materials hire", "JOB", "JOB_LOT", 0.05),
-        ("Site clearance, debris loading & transport charges", "LOT", "JOB_LOT", 0.04]
+        ("Site clearance, debris loading & transport charges", "LOT", "JOB_LOT", 0.04)
     ]
 
     def calculate_civil_quantity(category, total_amount, sqft_val, floor_count):
