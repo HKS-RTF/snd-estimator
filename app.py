@@ -490,7 +490,7 @@ def upload_to_cloud(ref_no, pdf_bytes_standard, pdf_bytes_no_header, filename_st
 
 
 def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total, include_header=True, service_type="Interior Works", extension_details=None):
-    # Rule: Budget < 30 Lakhs -> 1 Page (~10 Particulars). Budget >= 30 Lakhs -> 2 Pages (~20 Particulars)
+    # Rule: Budget < 30 Lakhs -> 1 Page (10 Particulars). Budget >= 30 Lakhs -> 2 Pages (20 Particulars)
     is_single_page = target_total < 3000000.0
 
     INTERIOR_ITEMS_MASTER = [
@@ -576,7 +576,8 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
     filename = f"Estimation_{ref_no}_{clean_customer_name}{'_NoHeader' if not include_header else ''}.pdf"
 
     pdf_buffer = io.BytesIO()
-    # Optimized for maximum vertical space with reduced margins
+    
+    # Narrow edges for maximum printable horizontal and vertical span
     doc = SimpleDocTemplate(pdf_buffer, pagesize=A4, rightMargin=20, leftMargin=20, topMargin=10, bottomMargin=10)
     styles = getSampleStyleSheet()
 
@@ -591,13 +592,34 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
     box_hdr_style = ParagraphStyle("BoxHdr", parent=styles["Normal"], alignment=1, fontSize=11, leading=13, fontName="Helvetica-Bold", textColor=colors.black)
     box_detail_style = ParagraphStyle("BoxDetail", parent=styles["Normal"], alignment=1, fontSize=10, leading=12, fontName="Helvetica-Bold", textColor=colors.black)
     
-    # Compact typography for efficient row fit and flow
-    cell_style = ParagraphStyle("CellCompact", parent=styles["Normal"], alignment=1, fontSize=8.5, leading=10.5, fontName="Helvetica-Bold", textColor=colors.black)
+    # --- Dynamic Adjustments for 1 Page vs 2 Pages ---
+    if is_single_page:
+        # Increase text sizes and padding for single page (10 particulars) to cover ~85% of vertical space
+        cell_fontsize = 10.0
+        cell_leading = 13.0
+        cell_top_pad = 8.0
+        cell_bot_pad = 8.0
+        total_fontsize = 10.5
+        words_fontsize = 10.5
+        terms_fontsize = 8.5
+        spacer_gap = 6.0
+    else:
+        # Compact styling for 2 pages (20 particulars)
+        cell_fontsize = 8.5
+        cell_leading = 10.5
+        cell_top_pad = 2.0
+        cell_bot_pad = 2.0
+        total_fontsize = 9.5
+        words_fontsize = 9.5
+        terms_fontsize = 7.5
+        spacer_gap = 2.0
+
+    cell_style = ParagraphStyle("CellDynamic", parent=styles["Normal"], alignment=1, fontSize=cell_fontsize, leading=cell_leading, fontName="Helvetica-Bold", textColor=colors.black)
     hdr_style = ParagraphStyle("HdrCompact", parent=styles["Normal"], alignment=1, fontSize=9, leading=11, fontName="Helvetica-Bold", textColor=colors.black)
-    total_style = ParagraphStyle("TotalCompact", parent=styles["Normal"], alignment=1, fontSize=9.5, leading=12, fontName="Helvetica-Bold", textColor=colors.black)
-    words_style = ParagraphStyle("WordsCompact", parent=styles["Normal"], alignment=1, fontSize=9.5, leading=12, fontName="Helvetica-Bold", textColor=colors.black)
+    total_style = ParagraphStyle("TotalCompact", parent=styles["Normal"], alignment=1, fontSize=total_fontsize, leading=total_fontsize + 3, fontName="Helvetica-Bold", textColor=colors.black)
+    words_style = ParagraphStyle("WordsCompact", parent=styles["Normal"], alignment=1, fontSize=words_fontsize, leading=words_fontsize + 3, fontName="Helvetica-Bold", textColor=colors.black)
     terms_hdr_style = ParagraphStyle("TermsHdrCompact", parent=styles["Normal"], alignment=1, fontSize=9, leading=11, fontName="Helvetica-Bold", textColor=colors.black)
-    terms_point_style = ParagraphStyle("TermsPtCompact", parent=styles["Normal"], alignment=0, fontSize=7.5, leading=9.5, fontName="Helvetica-Bold", textColor=colors.black)
+    terms_point_style = ParagraphStyle("TermsPtCompact", parent=styles["Normal"], alignment=0, fontSize=terms_fontsize, leading=terms_fontsize + 2, fontName="Helvetica-Bold", textColor=colors.black)
 
     elements = []
 
@@ -620,14 +642,13 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
         else:
             header_text_flowables = [Spacer(1, 8) for _ in range(5)]
             
-        # Total printable width is 555 points (595.27 A4 width - 40 total margins)
         header_table = Table([["", header_text_flowables, d]], colWidths=[50, 455, 50])
         header_table.setStyle(TableStyle([('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('LEFTPADDING', (0,0), (-1,-1), 0), ('RIGHTPADDING', (0,0), (-1,-1), 0)]))
-        return [header_table, Spacer(1, 2)]
+        return [header_table, Spacer(1, spacer_gap)]
 
     elements.extend(create_header_with_qr())
     elements.append(Table([[Paragraph(f"REF NO:-{ref_no}", ref_left_style), Paragraph(f"DATE: {est_date}", ref_right_style)]], colWidths=[275, 280]))
-    elements.append(Spacer(1, 2))
+    elements.append(Spacer(1, spacer_gap))
 
     address_parts = [p.strip() for p in address.split(',')]
     mid_idx = len(address_parts) // 2
@@ -647,11 +668,11 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
     box_content.append([Paragraph(f"OWNER: - {customer_name.upper()}", box_detail_style)])
 
     project_box = Table(box_content, colWidths=[555])
-    project_box.setStyle(TableStyle([('BOX', (0,0), (-1,-1), 1.5, BORDER_BLUE), ('ROUNDEDCORNERS', [6, 6, 6, 6]), ('TOPPADDING', (0,0), (-1,-1), 2), ('BOTTOMPADDING', (0,0), (-1,-1), 2)]))
+    project_box.setStyle(TableStyle([('BOX', (0,0), (-1,-1), 1.5, BORDER_BLUE), ('ROUNDEDCORNERS', [6, 6, 6, 6]), ('TOPPADDING', (0,0), (-1,-1), 3), ('BOTTOMPADDING', (0,0), (-1,-1), 3)]))
     elements.append(project_box)
-    elements.append(Spacer(1, 3))
+    elements.append(Spacer(1, spacer_gap + 1))
 
-    # Unified table data builder with repeatRows to let ReportLab handle page splitting naturally without awkward breaks
+    # Unified table data builder with repeatRows
     table_data = [[Paragraph("SL.NO", hdr_style), Paragraph("Description", hdr_style), Paragraph("Qty", hdr_style), Paragraph("Amount Rs.", hdr_style)]]
     
     for idx in range(total_items_needed):
@@ -666,21 +687,20 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
     table_data.append(["", Paragraph("GST 18%", total_style), "", Paragraph(f"{actual_gst:,}", total_style)])
     table_data.append(["", Paragraph("TOTAL", total_style), "", Paragraph(f"{final_total:,}", total_style)])
 
-    # Full printable width of 555 pt allocated across columns
     unified_table = Table(table_data, colWidths=[45, 290, 100, 120], repeatRows=1)
     unified_table.setStyle(TableStyle([
         ('GRID', (0,0), (-1,-1), 0.5, colors.black), 
         ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), 
-        ('TOPPADDING', (0,0), (-1,-1), 2), 
-        ('BOTTOMPADDING', (0,0), (-1,-1), 2),
+        ('TOPPADDING', (0,0), (-1,-1), cell_top_pad), 
+        ('BOTTOMPADDING', (0,0), (-1,-1), cell_bot_pad),
         ('LEFTPADDING', (0,0), (-1,-1), 4),
         ('RIGHTPADDING', (0,0), (-1,-1), 4)
     ]))
     
     elements.append(unified_table)
-    elements.append(Spacer(1, 4))
+    elements.append(Spacer(1, spacer_gap + 1))
     elements.append(Paragraph(num_to_words_indian_clean(final_total), words_style))
-    elements.append(Spacer(1, 2))
+    elements.append(Spacer(1, spacer_gap))
     elements.append(Paragraph("TERMS AND CONDITIONS:", terms_hdr_style))
     elements.append(Spacer(1, 1))
 
