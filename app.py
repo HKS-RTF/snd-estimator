@@ -14,7 +14,7 @@ from reportlab.graphics.barcode.qr import QrCodeWidget
 
 # --- Page Configuration ---
 st.set_page_config(
-    page_title="SND Interior & Designs | Commercial & Residential Interior Dashboard",
+    page_title="SND Interior & Designs | Commercial & Residential Interior & Civil Dashboard",
     page_icon="⚡",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -488,9 +488,11 @@ def upload_to_cloud(ref_no, pdf_bytes_standard, pdf_bytes_no_header, filename_st
     return url_std, url_no_hdr
 
 
-def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total, include_header=True):
-    is_single_page = target_total < 1500000
-    FIXED_ITEMS_MASTER = [
+def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total, include_header=True, service_type="Interior Works", extension_details=None):
+    # Rule: Budget < 30 Lakhs -> 1 Page (10 Particulars). Budget >= 30 Lakhs -> 2 Pages (20 Particulars)
+    is_single_page = target_total < 3000000.0
+
+    INTERIOR_ITEMS_MASTER = [
         ("Replacing sanitary fittings inside the toilets", "SETS", "SETS_UNITS", 0.08),
         ("3 course of oil bond distemper (Inside repaint)", "SQ. FT", "SQFT", 0.07),
         ("Providing & casting bathroom glazed tiles fixing etc.", "SQ. FT", "SQFT", 0.05),
@@ -505,24 +507,54 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
         ("2 course of snow cem paint (Outside repaint)", "SQ. FT", "SQFT", 0.04),
         ("Replacing sanitary fittings inside the kitchen", "SET", "SETS_UNITS", 0.05),
         ("Demolition and debris removal", "LOT", "JOB_LOT", 0.06),
-        ("Wall plastering and finishing", "SQ. FT", "SQFT", 0.09)
+        ("Wall plastering and finishing", "SQ. FT", "SQFT", 0.09),
+        ("TV Unit & Entertainment Wall Paneling", "JOB", "JOB_LOT", 0.06),
+        ("Crockery unit & Bar counter setup", "UNIT", "SETS_UNITS", 0.05),
+        ("Main door safety grill & foyer paneling", "SQ. FT", "SQFT", 0.04),
+        ("Study table & home office workstation", "JOB", "JOB_LOT", 0.05),
+        ("Bathroom vanity units & LED mirrors", "SETS", "SETS_UNITS", 0.04)
     ]
 
-    def calculate_quantity(category, total_amount):
-        min_budget, max_budget = 1500000.0, 4500000.0
-        ratio = max(0.0, min(1.0, (total_amount - min_budget) / (max_budget - min_budget)))
-        ratio = max(0.0, min(1.0, ratio + random.uniform(-0.05, 0.05)))
-        if category == "SQFT": return f"{round(650 + ratio * (2500 - 650))} SQ. FT"
+    CIVIL_ITEMS_MASTER = [
+        ("Excavation and earthwork for foundation extension", "CU. FT", "SQFT", 0.05),
+        ("RCC Column footings and foundation casting", "CU. FT", "SQFT", 0.08),
+        ("Columns, beams, and roof slab casting (M25 grade)", "SQ. FT", "SQFT", 0.12),
+        ("External and internal brick masonry work", "SQ. FT", "SQFT", 0.08),
+        ("Internal and external wall plastering (CM 1:6)", "SQ. FT", "SQFT", 0.07),
+        ("Structural steel reinforcement & binding wire", "KG", "JOB_LOT", 0.09),
+        ("Roof waterproofing treatment & chemical coating", "SQ. FT", "SQFT", 0.05),
+        ("Underground and overhead water sump construction", "JOB", "JOB_LOT", 0.05),
+        ("Staircase fabrication and RCC step casting", "R.FT", "SQFT", 0.06),
+        ("Main drainage and sanitary piping network", "JOB", "JOB_LOT", 0.05),
+        ("Door and window concrete frames (Lintels & Chajjas)", "R.FT", "SQFT", 0.04),
+        ("Electrical conduit pipe laying in RCC slab & walls", "JOB", "JOB_LOT", 0.05),
+        ("Balcony parapet wall construction & coping", "R.FT", "SQFT", 0.04),
+        ("Scaffolding, centering, and shuttering materials", "JOB", "JOB_LOT", 0.06),
+        ("Site clearance, debris hauling, and cleaning", "JOB", "JOB_LOT", 0.03),
+        ("Core structural core cutting and core testing", "JOB", "JOB_LOT", 0.03),
+        ("Compound wall extension and masonry pillar work", "R.FT", "SQFT", 0.05),
+        ("Sump tank slab casting and inlet/outlet connections", "JOB", "JOB_LOT", 0.04),
+        ("Anti-termite soil treatment before flooring bed", "SQ. FT", "SQFT", 0.03),
+        ("Parapet coping plastering and weatherproofing", "R.FT", "SQFT", 0.03)
+    ]
+
+    FIXED_ITEMS_MASTER = CIVIL_ITEMS_MASTER if service_type == "Civil Works & Extension" else INTERIOR_ITEMS_MASTER
+
+    def calculate_quantity(category, total_amount, sqft_val):
+        base_sqft = sqft_val if sqft_val > 0 else 1000.0
+        if category == "SQFT": 
+            return f"{round(base_sqft * random.uniform(0.08, 0.22))} SQ. FT"
         elif category == "SETS_UNITS":
-            qty = round(1 + ratio * (5 - 1))
+            qty = round(random.uniform(1, 5))
             return f"{qty} SETS" if qty > 1 else "1 SET"
         elif category == "JOB_LOT":
-            qty = round(1 + ratio * (2 - 1))
-            return f"{qty} JOB" if qty > 1 else "1 JOB"
-        return "1 JOB"
+            return "1 JOB"
+        return "1 LOT"
 
-    total_items_needed = 10 if is_single_page else 15
-    processed_items = [(desc, calculate_quantity(cat, target_total), w) for desc, _, cat, w in FIXED_ITEMS_MASTER]
+    total_items_needed = 10 if is_single_page else 20
+    sqft_input_val = extension_details.get("sqft", 1200.0) if extension_details else 1200.0
+    
+    processed_items = [(desc, calculate_quantity(cat, target_total, sqft_input_val), w) for desc, _, cat, w in FIXED_ITEMS_MASTER]
     random.shuffle(processed_items)
     processed_items = processed_items[:total_items_needed]
 
@@ -543,7 +575,6 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
     filename = f"Estimation_{ref_no}_{clean_customer_name}{'_NoHeader' if not include_header else ''}.pdf"
 
     pdf_buffer = io.BytesIO()
-    # Updated to A4 size
     doc = SimpleDocTemplate(pdf_buffer, pagesize=A4, rightMargin=30, leftMargin=30, topMargin=15, bottomMargin=15)
     styles = getSampleStyleSheet()
 
@@ -555,23 +586,23 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
     gstin_style = ParagraphStyle("GSTIN", parent=styles["Normal"], alignment=1, fontSize=9, leading=12, fontName="Helvetica-Bold", textColor=LIGHT_PINK)
     ref_left_style = ParagraphStyle("RefLeft", parent=styles["Normal"], alignment=0, fontSize=10, leading=12, fontName="Helvetica")
     ref_right_style = ParagraphStyle("RefRight", parent=styles["Normal"], alignment=2, fontSize=10, leading=12, fontName="Helvetica")
-    box_hdr_style = ParagraphStyle("BoxHdr", parent=styles["Normal"], alignment=1, fontSize=14, leading=16, fontName="Helvetica-Bold", textColor=colors.black)
-    box_detail_style = ParagraphStyle("BoxDetail", parent=styles["Normal"], alignment=1, fontSize=12.5, leading=15, fontName="Helvetica-Bold", textColor=colors.black)
+    box_hdr_style = ParagraphStyle("BoxHdr", parent=styles["Normal"], alignment=1, fontSize=13, leading=15, fontName="Helvetica-Bold", textColor=colors.black)
+    box_detail_style = ParagraphStyle("BoxDetail", parent=styles["Normal"], alignment=1, fontSize=11.5, leading=14, fontName="Helvetica-Bold", textColor=colors.black)
     
     if is_single_page:
-        cell_12_bold_center = ParagraphStyle("Cell11BC", parent=styles["Normal"], alignment=1, fontSize=11, leading=13.5, fontName="Helvetica-Bold", textColor=colors.black)
-        hdr_12_bold_center = ParagraphStyle("Hdr11BC", parent=styles["Normal"], alignment=1, fontSize=11, leading=13.5, fontName="Helvetica-Bold", textColor=colors.black)
-        total_14_bold = ParagraphStyle("Total12B", parent=styles["Normal"], alignment=1, fontSize=12, leading=14.5, fontName="Helvetica-Bold", textColor=colors.black)
-        words_13_bold_center = ParagraphStyle("Words11.5BC", parent=styles["Normal"], alignment=1, fontSize=11.5, leading=14, fontName="Helvetica-Bold", textColor=colors.black)
+        cell_12_bold_center = ParagraphStyle("Cell11BC", parent=styles["Normal"], alignment=1, fontSize=10, leading=12, fontName="Helvetica-Bold", textColor=colors.black)
+        hdr_12_bold_center = ParagraphStyle("Hdr11BC", parent=styles["Normal"], alignment=1, fontSize=10.5, leading=13, fontName="Helvetica-Bold", textColor=colors.black)
+        total_14_bold = ParagraphStyle("Total12B", parent=styles["Normal"], alignment=1, fontSize=11.5, leading=14, fontName="Helvetica-Bold", textColor=colors.black)
+        words_13_bold_center = ParagraphStyle("Words11.5BC", parent=styles["Normal"], alignment=1, fontSize=11, leading=13, fontName="Helvetica-Bold", textColor=colors.black)
         terms_hdr_center = ParagraphStyle("TermsHdr9.5", parent=styles["Normal"], alignment=1, fontSize=9.5, leading=12, fontName="Helvetica-Bold", textColor=colors.black)
-        terms_point_size_8 = ParagraphStyle("TermsPt8.5", parent=styles["Normal"], alignment=0, fontSize=8.5, leading=10.5, fontName="Helvetica-Bold", textColor=colors.black)
+        terms_point_size_8 = ParagraphStyle("TermsPt8.5", parent=styles["Normal"], alignment=0, fontSize=8, leading=10, fontName="Helvetica-Bold", textColor=colors.black)
     else:
-        cell_12_bold_center = ParagraphStyle("Cell12BC", parent=styles["Normal"], alignment=1, fontSize=12, leading=14, fontName="Helvetica-Bold", textColor=colors.black)
-        hdr_12_bold_center = ParagraphStyle("Hdr12BC", parent=styles["Normal"], alignment=1, fontSize=12, leading=14, fontName="Helvetica-Bold", textColor=colors.black)
-        total_14_bold = ParagraphStyle("Total14B", parent=styles["Normal"], alignment=1, fontSize=14, leading=16, fontName="Helvetica-Bold", textColor=colors.black)
-        words_13_bold_center = ParagraphStyle("Words13BC", parent=styles["Normal"], alignment=1, fontSize=13, leading=16, fontName="Helvetica-Bold", textColor=colors.black)
-        terms_hdr_center = ParagraphStyle("TermsHdr10", parent=styles["Normal"], alignment=1, fontSize=10, leading=14, fontName="Helvetica-Bold", textColor=colors.black)
-        terms_point_size_8 = ParagraphStyle("TermsPt8", parent=styles["Normal"], alignment=0, fontSize=8, leading=11, fontName="Helvetica-Bold", textColor=colors.black)
+        cell_12_bold_center = ParagraphStyle("Cell12BC", parent=styles["Normal"], alignment=1, fontSize=9.5, leading=11.5, fontName="Helvetica-Bold", textColor=colors.black)
+        hdr_12_bold_center = ParagraphStyle("Hdr12BC", parent=styles["Normal"], alignment=1, fontSize=10.5, leading=13, fontName="Helvetica-Bold", textColor=colors.black)
+        total_14_bold = ParagraphStyle("Total14B", parent=styles["Normal"], alignment=1, fontSize=12, leading=14, fontName="Helvetica-Bold", textColor=colors.black)
+        words_13_bold_center = ParagraphStyle("Words13BC", parent=styles["Normal"], alignment=1, fontSize=11.5, leading=14, fontName="Helvetica-Bold", textColor=colors.black)
+        terms_hdr_center = ParagraphStyle("TermsHdr10", parent=styles["Normal"], alignment=1, fontSize=9.5, leading=12, fontName="Helvetica-Bold", textColor=colors.black)
+        terms_point_size_8 = ParagraphStyle("TermsPt8", parent=styles["Normal"], alignment=0, fontSize=7.5, leading=9.5, fontName="Helvetica-Bold", textColor=colors.black)
 
     elements = []
 
@@ -586,7 +617,7 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
         if include_header:
             header_text_flowables = [
                 Paragraph("SND INTERIOR & DESIGNS", title_style), Spacer(1, 2),
-                Paragraph("INTERIOR WORKS, DESIGN ESTIMATE, FLOOR VALUATIONS, BUILDING PLANS", sub_style),
+                Paragraph("INTERIOR WORKS, DESIGN ESTIMATE, FLOOR VALUATIONS, CIVIL EXTENSIONS", sub_style),
                 Paragraph("#15, E BLOCK, SAHAKHAR NAGAR, BANGALORE-560092", sub_style),
                 Paragraph("EMAIL: contact@sndinteriors.com", contact_style),
                 Paragraph("GSTIN: 29ABCDE1234F1Z5", gstin_style),
@@ -595,7 +626,6 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
             header_text_flowables = [
                 Spacer(1, 10), Spacer(1, 10), Spacer(1, 10), Spacer(1, 10), Spacer(1, 10)
             ]
-        # Adjusted table width for A4 (width ~ 535 printable area with margins)
         header_table = Table([["", header_text_flowables, d]], colWidths=[65, 405, 65])
         header_table.setStyle(TableStyle([('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('LEFTPADDING', (0,0), (-1,-1), 0), ('RIGHTPADDING', (0,0), (-1,-1), 0)]))
         return [header_table, Spacer(1, 4)]
@@ -609,7 +639,15 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
     addr_line_1 = ", ".join(address_parts[:mid_idx]) if mid_idx > 0 else address
     addr_line_2 = ", ".join(address_parts[mid_idx:]) if mid_idx > 0 else ""
 
-    box_content = [[Paragraph("ESTIMATION FOR RENOVATION & INTERIOR DESIGN WORK AT", box_hdr_style)], [Paragraph("RESIDENTIAL FLAT AT", box_hdr_style)], [Paragraph(addr_line_1.upper(), box_detail_style)]]
+    service_title_str = f"ESTIMATION FOR {service_type.upper()}"
+    if service_type == "Civil Works & Extension" and extension_details:
+        service_title_str += f" ({extension_details.get('floors', '2nd & 3rd Floor')} | {extension_details.get('sqft', 0)} SQ.FT)"
+
+    box_content = [
+        [Paragraph(service_title_str, box_hdr_style)], 
+        [Paragraph("RESIDENTIAL PROPERTY AT", box_hdr_style)], 
+        [Paragraph(addr_line_1.upper(), box_detail_style)]
+    ]
     if addr_line_2: box_content.append([Paragraph(addr_line_2.upper(), box_detail_style)])
     box_content.append([Paragraph(f"OWNER: - {customer_name.upper()}", box_detail_style)])
 
@@ -627,26 +665,26 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
         p_table_data.append(["", Paragraph("TOTAL", total_14_bold), "", Paragraph(f"{final_total:,}", total_14_bold)])
 
         t1 = Table(p_table_data, colWidths=[45, 270, 100, 120])
-        t1.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('TOPPADDING', (0,0), (-1,-1), 6.5), ('BOTTOMPADDING', (0,0), (-1,-1), 6.5)]))
+        t1.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('TOPPADDING', (0,0), (-1,-1), 5), ('BOTTOMPADDING', (0,0), (-1,-1), 5)]))
         elements.append(t1)
     else:
+        # 2-Page format for >= 30 Lakhs with 20 items (10 on page 1, 10 on page 2)
         p1_table_data = [[Paragraph("SL.NO", hdr_12_bold_center), Paragraph("Description", hdr_12_bold_center), Paragraph("Qty", hdr_12_bold_center), Paragraph("Amount Rs.", hdr_12_bold_center)]]
-        for idx in range(9):
+        for idx in range(10):
             item = processed_items[idx]
             p1_table_data.append([Paragraph(f"{idx+1}.", cell_12_bold_center), Paragraph(item[0], cell_12_bold_center), Paragraph(item[1], cell_12_bold_center), Paragraph(f"{item_amounts[idx]:,}", cell_12_bold_center)])
         
         t1 = Table(p1_table_data, colWidths=[45, 270, 100, 120])
-        t1.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('TOPPADDING', (0,0), (-1,-1), 16), ('BOTTOMPADDING', (0,0), (-1,-1), 16)]))
+        t1.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('TOPPADDING', (0,0), (-1,-1), 8), ('BOTTOMPADDING', (0,0), (-1,-1), 8)]))
         elements.append(t1)
 
         elements.append(PageBreak())
         elements.extend(create_header_with_qr())
-        # Added exact mirror positioning for Ref No and Date on page 2
         elements.append(Table([[Paragraph(f"REF NO:-{ref_no}", ref_left_style), Paragraph(f"DATE: {est_date}", ref_right_style)]], colWidths=[265, 270]))
         elements.append(Spacer(1, 4))
 
         p2_table_data = [[Paragraph("SL.NO", hdr_12_bold_center), Paragraph("Description", hdr_12_bold_center), Paragraph("Qty", hdr_12_bold_center), Paragraph("Amount Rs.", hdr_12_bold_center)]]
-        for idx in range(9, 15):
+        for idx in range(10, 20):
             item = processed_items[idx]
             p2_table_data.append([Paragraph(f"{idx+1}.", cell_12_bold_center), Paragraph(item[0], cell_12_bold_center), Paragraph(item[1], cell_12_bold_center), Paragraph(f"{item_amounts[idx]:,}", cell_12_bold_center)])
 
@@ -654,14 +692,14 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
         p2_table_data.append(["", Paragraph("TOTAL", total_14_bold), "", Paragraph(f"{final_total:,}", total_14_bold)])
 
         t2 = Table(p2_table_data, colWidths=[45, 270, 100, 120])
-        t2.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('TOPPADDING', (0,0), (-1,-1), 16), ('BOTTOMPADDING', (0,0), (-1,-1), 16)]))
+        t2.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('TOPPADDING', (0,0), (-1,-1), 8), ('BOTTOMPADDING', (0,0), (-1,-1), 8)]))
         elements.append(t2)
 
     elements.append(Spacer(1, 6))
     elements.append(Paragraph(num_to_words_indian_clean(final_total), words_13_bold_center))
-    elements.append(Spacer(1, 5))
+    elements.append(Spacer(1, 4))
     elements.append(Paragraph("TERMS AND CONDITIONS:", terms_hdr_center))
-    elements.append(Spacer(1, 3))
+    elements.append(Spacer(1, 2))
 
     terms_points = [
         "1. This Is A Preliminary Estimate And Not A Final Invoice",
@@ -673,7 +711,7 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
     ]
     for point in terms_points:
         elements.append(Paragraph(point, terms_point_size_8))
-        elements.append(Spacer(1, 2))
+        elements.append(Spacer(1, 1.5))
 
     doc.build(elements)
     pdf_bytes = pdf_buffer.getvalue()
@@ -705,7 +743,29 @@ def show_quotation_dialog():
             user_email = st.text_input("Email ID *", value="", placeholder="Enter email")
 
         st.markdown("---")
-        st.subheader("🏠 Property Details")
+        st.subheader("🏗️ Service Selection & Property Details")
+        
+        service_type = st.selectbox(
+            "Select Service Scope *",
+            ["Interior Works & Furnishing", "Civil Works & Extension"]
+        )
+
+        extension_details = {}
+        if service_type == "Civil Works & Extension":
+            col_ex1, col_ex2, col_ex3 = st.columns(3)
+            with col_ex1:
+                target_floors = st.selectbox("Floors to Add", ["2nd Floor", "3rd Floor", "2nd & 3rd Floor", "Ground + 1st & 2nd Floor", "Other Extension"])
+            with col_ex2:
+                target_sqft = st.number_input("Build-up Area (SQ. FT)", min_value=100.0, max_value=10000.0, value=1200.0, step=50.0)
+            with col_ex3:
+                floor_selection = st.selectbox("Which Floor Option", ["Roof Slab Extension", "Full Floor Addition", "Staircase & Balcony Extension", "Structural Pillars & Slab"])
+            
+            extension_details = {
+                "floors": target_floors,
+                "sqft": target_sqft,
+                "option": floor_selection
+            }
+
         col_c1, col_c2 = st.columns(2)
         with col_c1:
             customer_name = st.text_input("Customer Full Name *", value="", placeholder="Customer name")
@@ -714,7 +774,7 @@ def show_quotation_dialog():
             pass
 
         address_input = st.text_area(
-            "Site / Flat Address  *", 
+            "Site / Property Address  *", 
             value="",
             placeholder="Enter complete address"
         )
@@ -726,14 +786,15 @@ def show_quotation_dialog():
             "✏️ Enter Total Estimated Budget (INR ₹):",
             min_value=50000.0,
             max_value=10000000.0,
-            value=1499000.0,
+            value=2500000.0,
             step=25000.0,
             format="%.2f"
         )
 
         subtotal_est = round(amount_input / 1.18)
         gst_est = amount_input - subtotal_est
-        st.info(f"📊 **Base Estimate:** ₹ {subtotal_est:,.2f} | **GST (18%):** ₹ {gst_est:,.2f} | **Total Final Payable:** ₹ {amount_input:,.2f}")
+        page_mode_hint = "📄 1 Page (10 Particulars)" if amount_input < 3000000.0 else "📄 2 Pages (20 Particulars)"
+        st.info(f"📊 **Base Estimate:** ₹ {subtotal_est:,.2f} | **GST (18%):** ₹ {gst_est:,.2f} | **Total Final Payable:** ₹ {amount_input:,.2f} | **Format:** {page_mode_hint}")
 
         submitted = st.form_submit_button("⚡ GENERATE YOUR QUATATION", type="primary", use_container_width=True)
 
@@ -745,10 +806,10 @@ def show_quotation_dialog():
         with st.spinner('Generating PDF copies and syncing securely with cloud storage...'):
             try:
                 pdf_bytes_std, filename_std, generated_ref, final_total = generate_estimation_pdf_bytes(
-                    customer_name, address_input, date_input, float(amount_input), include_header=True
+                    customer_name, address_input, date_input, float(amount_input), include_header=True, service_type=service_type, extension_details=extension_details
                 )
                 pdf_bytes_no_hdr, filename_no_hdr, _, _ = generate_estimation_pdf_bytes(
-                    customer_name, address_input, date_input, float(amount_input), include_header=False
+                    customer_name, address_input, date_input, float(amount_input), include_header=False, service_type=service_type, extension_details=extension_details
                 )
                 
                 if supabase:
@@ -876,11 +937,11 @@ with col_hero1:
     st.markdown("""
     <div class="dashboard-card-3d" style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.85) 100%); padding: 3rem 2.5rem; height: 100%;">
         <div style="font-family:'Space Grotesk', sans-serif; font-weight: 800; font-size: 0.85rem; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 12px;">
-            <span class="gradient-text-gold">✦ ENTERPRISE EXTERIOR & INTERIOR </span>
+            <span class="gradient-text-gold">✦ ENTERPRISE CIVIL & INTERIOR SOLUTIONS </span>
         </div>
         <h1 class="hero-title-3d" style="font-size: 3rem;">SND INTERIOR & DESIGNS</h1>
         <p style="color: #CBD5E1; font-size: 1.1rem; line-height: 1.7; margin-bottom: 2rem;">
-            Commercial-grade Materials and Raw Materials, GST quotations, and turnkey interior manufacturing engineered for elite residential developments across Bengaluru.
+            Commercial-grade civil extensions, roof slab casting, floor additions, structural brickwork, and turnkey interior manufacturing engineered for elite residential developments across Bengaluru.
         </p>
     </div>
     """, unsafe_allow_html=True)
@@ -951,7 +1012,7 @@ with col_hero2:
 # --- STATIC & FIXED 10 IMAGES GALLERY SHOWCASE ---
 st.markdown("<br>", unsafe_allow_html=True)
 st.markdown("### 🏛️ Portfolio Master Collection (10 Fixed Showcase Galleries)")
-st.markdown("<p style='color:#94A3B8; font-size:0.95rem; margin-bottom:1rem;'>Explore our curated permanent catalog of architectural finishes, structural modules, and luxury interior spaces.</p>", unsafe_allow_html=True)
+st.markdown("<p style='color:#94A3B8; font-size:0.95rem; margin-bottom:1.0rem;'>Explore our curated permanent catalog of architectural finishes, structural modules, and luxury interior spaces.</p>", unsafe_allow_html=True)
 
 st.markdown("""
 <div class="static-gallery-grid">
