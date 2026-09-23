@@ -1,4 +1,4 @@
-name=app. MAIN BACK 1.py
+name=app.
 import os
 import random
 import io
