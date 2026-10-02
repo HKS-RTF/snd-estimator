@@ -879,7 +879,7 @@ with col_hero1:
         </div>
         <h1 class="hero-title-3d" style="font-size: 3rem;">ARCK INTERIORS AND DESIGNS</h1>
         <p style="color: #CBD5E1; font-size: 1.1rem; line-height: 1.7; margin-bottom: 2rem;">
-            Commercial-grade Materials and Raw Materials, Udyam estimations, and turnkey interior manufacturing engineered for elite residential developments across Bengaluru.
+            Commercial-grade Materials and Raw Materials, INTERIOR ESTIMATIONs, and turnkey interior manufacturing engineered for elite residential developments across Bengaluru.
         </p>
     </div>
     """, unsafe_allow_html=True)
@@ -949,7 +949,7 @@ with col_hero2:
 
 # --- STATIC & FIXED 10 IMAGES GALLERY SHOWCASE ---
 st.markdown("<br>", unsafe_allow_html=True)
-st.markdown("### 🏛️ Portfolio Master Collection (10 Fixed Showcase Galleries)")
+st.markdown("### 🏛️ Portfolio Master Collection .")
 st.markdown("<p style='color:#94A3B8; font-size:0.95rem; margin-bottom:1rem;'>Explore our curated permanent catalog of architectural finishes, structural modules, and luxury interior spaces.</p>", unsafe_allow_html=True)
 
 st.markdown("""
@@ -1000,7 +1000,7 @@ st.markdown("""
 
 # --- FULL-SIZE VERTICAL SCROLLING SHOWCASE (10 FULL SIZE IMAGES) ---
 st.markdown("<br>", unsafe_allow_html=True)
-st.markdown("### 📸 10 Full-Size Vertical Architectural Showcase")
+st.markdown("### 📸 . Vertical Architectural Showcase")
 st.markdown("<p style='color:#94A3B8; font-size:0.95rem; margin-bottom:1.5rem;'>Scroll down through our 10 full-width, high-definition architectural project features.</p>", unsafe_allow_html=True)
 
 st.markdown("""
