@@ -543,16 +543,19 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
     filename = f"Estimation_{ref_no}_{clean_customer_name}{'_NoHeader' if not include_header else ''}.pdf"
 
     pdf_buffer = io.BytesIO()
-    # Updated to A4 size
     doc = SimpleDocTemplate(pdf_buffer, pagesize=A4, rightMargin=30, leftMargin=30, topMargin=15, bottomMargin=15)
     styles = getSampleStyleSheet()
 
-    RED_COLOR, BLUE_COLOR, LIGHT_PINK, BORDER_BLUE = colors.HexColor("#DC2626"), colors.HexColor("#1E40AF"), colors.HexColor("#EC4899"), colors.HexColor("#2563EB")
+    # --- UPDATED PROFESSIONAL HEADER PALETTE ---
+    TITLE_COLOR = colors.HexColor("#1E293B")       # Professional Slate Navy
+    SUB_HEADER_COLOR = colors.HexColor("#334155")  # Deep Steel Blue
+    UDYAM_COLOR = colors.HexColor("#0F766E")       # Muted Professional Teal
+    BORDER_ACCENT = colors.HexColor("#1D4ED8")     # Subtle Corporate Navy Accent
 
-    title_style = ParagraphStyle("Title", parent=styles["Heading1"], alignment=1, fontSize=24, leading=28, fontName="Helvetica-Bold", textColor=RED_COLOR)
-    sub_style = ParagraphStyle("Sub", parent=styles["Normal"], alignment=1, fontSize=9, leading=12, fontName="Helvetica-Bold", textColor=BLUE_COLOR)
-    contact_style = ParagraphStyle("Contact", parent=styles["Normal"], alignment=1, fontSize=8.5, leading=11, fontName="Helvetica-Bold", textColor=BLUE_COLOR)
-    udyam_style = ParagraphStyle("UDYAM", parent=styles["Normal"], alignment=1, fontSize=9, leading=12, fontName="Helvetica-Bold", textColor=LIGHT_PINK)
+    title_style = ParagraphStyle("Title", parent=styles["Heading1"], alignment=1, fontSize=24, leading=28, fontName="Helvetica-Bold", textColor=TITLE_COLOR)
+    sub_style = ParagraphStyle("Sub", parent=styles["Normal"], alignment=1, fontSize=9, leading=12, fontName="Helvetica-Bold", textColor=SUB_HEADER_COLOR)
+    contact_style = ParagraphStyle("Contact", parent=styles["Normal"], alignment=1, fontSize=8.5, leading=11, fontName="Helvetica-Bold", textColor=SUB_HEADER_COLOR)
+    udyam_style = ParagraphStyle("UDYAM", parent=styles["Normal"], alignment=1, fontSize=9, leading=12, fontName="Helvetica-Bold", textColor=UDYAM_COLOR)
     ref_left_style = ParagraphStyle("RefLeft", parent=styles["Normal"], alignment=0, fontSize=10, leading=12, fontName="Helvetica")
     ref_right_style = ParagraphStyle("RefRight", parent=styles["Normal"], alignment=2, fontSize=10, leading=12, fontName="Helvetica")
     box_hdr_style = ParagraphStyle("BoxHdr", parent=styles["Normal"], alignment=1, fontSize=14, leading=16, fontName="Helvetica-Bold", textColor=colors.black)
@@ -594,7 +597,6 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
             header_text_flowables = [
                 Spacer(1, 10), Spacer(1, 10), Spacer(1, 10), Spacer(1, 10), Spacer(1, 10)
             ]
-        # Adjusted table width for A4 (width ~ 535 printable area with margins)
         header_table = Table([["", header_text_flowables, d]], colWidths=[65, 405, 65])
         header_table.setStyle(TableStyle([('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('LEFTPADDING', (0,0), (-1,-1), 0), ('RIGHTPADDING', (0,0), (-1,-1), 0)]))
         return [header_table, Spacer(1, 4)]
@@ -613,7 +615,7 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
     box_content.append([Paragraph(f"OWNER: - {customer_name.upper()}", box_detail_style)])
 
     project_box = Table(box_content, colWidths=[535])
-    project_box.setStyle(TableStyle([('BOX', (0,0), (-1,-1), 2, BORDER_BLUE), ('ROUNDEDCORNERS', [8, 8, 8, 8]), ('TOPPADDING', (0,0), (-1,-1), 3), ('BOTTOMPADDING', (0,0), (-1,-1), 3)]))
+    project_box.setStyle(TableStyle([('BOX', (0,0), (-1,-1), 2, BORDER_ACCENT), ('ROUNDEDCORNERS', [8, 8, 8, 8]), ('TOPPADDING', (0,0), (-1,-1), 3), ('BOTTOMPADDING', (0,0), (-1,-1), 3)]))
     elements.append(project_box)
     elements.append(Spacer(1, 6))
 
@@ -640,7 +642,6 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
 
         elements.append(PageBreak())
         elements.extend(create_header_with_qr())
-        # Added exact mirror positioning for Ref No and Date on page 2
         elements.append(Table([[Paragraph(f"REF NO:-{ref_no}", ref_left_style), Paragraph(f"DATE: {est_date}", ref_right_style)]], colWidths=[265, 270]))
         elements.append(Spacer(1, 4))
 
@@ -1138,7 +1139,7 @@ st.markdown("<p style='color:#94A3B8; font-size:0.95rem; margin-bottom:1.5rem;'>
 
 selected_room = st.radio(
     "Select Simulation Zone:",
-    ["🍳 Modular Kitchen (Island & U-Shape)", "🛋️ Luxury Living & Media Lounge", "🛏️️ Designer Wardrobes & Bedroom", "💡 Architectural False Ceiling", "🪵 Italian Flooring & Paneling"],
+    ["🍳 Modular Kitchen (Island & U-Shape)", "🛋️ Luxury Living & Media Lounge", "🛏 Designer Wardrobes & Bedroom", "💡 Architectural False Ceiling", "🪵 Italian Flooring & Paneling"],
     horizontal=True,
     label_visibility="collapsed"
 )
