@@ -14,7 +14,7 @@ from reportlab.graphics.barcode.qr import QrCodeWidget
 
 # --- Page Configuration ---
 st.set_page_config(
-    page_title="ARCK INTERIORS AND DESIGNS | Commercial & Residential Interior Dashboard",
+    page_title="SND INTERIOR & DESIGNS | Commercial & Residential Interior Dashboard",
     page_icon="⚡",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -585,7 +585,7 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
         
         if include_header:
             header_text_flowables = [
-                Paragraph("ARCK INTERIORS AND DESIGNS", title_style), Spacer(1, 2),
+                Paragraph("SND INTERIOR & DESIGNS", title_style), Spacer(1, 2),
                 Paragraph("INTERIOR WORKS, DESIGN ESTIMATE, FLOOR VALUATIONS, BUILDING PLANS", sub_style),
                 Paragraph("14/A, SRI LAKSHMIVENKATESWARA NILYA, 4TH MAIN ROAD, TINDLU, BANGALORE - 560097", sub_style),
                 Paragraph("MSME REG:UDYAM-KR-03-0767446", udyam_style),
@@ -877,7 +877,7 @@ with col_hero1:
         <div style="font-family:'Space Grotesk', sans-serif; font-weight: 800; font-size: 0.85rem; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 12px;">
             <span class="gradient-text-gold">✦ ENTERPRISE EXTERIOR & INTERIOR </span>
         </div>
-        <h1 class="hero-title-3d" style="font-size: 3rem;">ARCK INTERIORS AND DESIGNS</h1>
+        <h1 class="hero-title-3d" style="font-size: 3rem;">SND INTERIOR & DESIGNS</h1>
         <p style="color: #CBD5E1; font-size: 1.1rem; line-height: 1.7; margin-bottom: 2rem;">
             Commercial-grade Materials and Raw Materials, INTERIOR ESTIMATIONs, and turnkey interior manufacturing engineered for elite residential developments across Bengaluru.
         </p>
@@ -924,7 +924,7 @@ with col_hero2:
             <div class="carousel-caption">09 - Multi-Tier False Ceiling & Cove Lighting</div>
         </div>
         <div class="carousel-slide">
-            <img src="https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=1000&q=80" alt="Open Dining">
+            <img src="https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1000&q=80" alt="Open Dining">
             <div class="carousel-caption">10 - Premium Open-Concept Dining Architecture</div>
         </div>
         <div class="carousel-slide">
@@ -949,7 +949,7 @@ with col_hero2:
 
 # --- STATIC & FIXED 10 IMAGES GALLERY SHOWCASE ---
 st.markdown("<br>", unsafe_allow_html=True)
-st.markdown("### 🏛️️ Portfolio Master Collection .")
+st.markdown("### 🏛 Portfolio Master Collection .")
 st.markdown("<p style='color:#94A3B8; font-size:0.95rem; margin-bottom:1rem;'>Explore our curated permanent catalog of architectural finishes, structural modules, and luxury interior spaces.</p>", unsafe_allow_html=True)
 
 st.markdown("""
@@ -1138,7 +1138,7 @@ st.markdown("<p style='color:#94A3B8; font-size:0.95rem; margin-bottom:1.5rem;'>
 
 selected_room = st.radio(
     "Select Simulation Zone:",
-    ["🍳 Modular Kitchen (Island & U-Shape)", "🛋️ Luxury Living & Media Lounge", "🛏 Designer Wardrobes & Bedroom", "💡 Architectural False Ceiling", "🪵 Italian Flooring & Paneling"],
+    ["🍳 Modular Kitchen (Island & U-Shape)", "🛋️️ Luxury Living & Media Lounge", "🛏 Designer Wardrobes & Bedroom", "💡 Architectural False Ceiling", "🪵 Italian Flooring & Paneling"],
     horizontal=True,
     label_visibility="collapsed"
 )
