@@ -543,56 +543,40 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
     filename = f"Estimation_{ref_no}_{clean_customer_name}{'_NoHeader' if not include_header else ''}.pdf"
 
     pdf_buffer = io.BytesIO()
+    # Updated to A4 size
     doc = SimpleDocTemplate(pdf_buffer, pagesize=A4, rightMargin=30, leftMargin=30, topMargin=15, bottomMargin=15)
     styles = getSampleStyleSheet()
 
-    # --- HIGH-CONTRAST VIBRANT COLOR PALETTE ---
-    PRIMARY_NAVY = colors.HexColor("#1E3A8A")       # Deep Blue Header Title
-    SUB_CYAN = colors.HexColor("#0F766E")           # Dark Teal Subheaders
-    MSME_CRIMSON = colors.HexColor("#991B1B")       # Crimson Accent for Registration
-    BORDER_BLUE = colors.HexColor("#2563EB")        # Royal Blue Framing
-    BOX_BG = colors.HexColor("#EFF6FF")             # Light Blue Accent Background
-    
-    TABLE_HEADER_BG = colors.HexColor("#4338CA")    # Indigo Header Background
-    TABLE_HEADER_TXT = colors.white                 # White Table Header
-    ROW_EVEN = colors.HexColor("#FFFFFF")            # Crisp White Even Row
-    ROW_ODD = colors.HexColor("#F1F5F9")             # Light Slate Odd Row
-    CELL_TEXT = colors.HexColor("#1E1B4B")           # Dark Indigo Cell Text
-    
-    TOTAL_BG = colors.HexColor("#047857")            # Vibrant Emerald Total Banner
-    TOTAL_TXT = colors.white                         # White Total Text
-    TERMS_HDR_COLOR = colors.HexColor("#92400E")     # Deep Amber Terms Header
-    TERMS_TXT_COLOR = colors.HexColor("#334155")     # Slate Terms Body
+    RED_COLOR, BLUE_COLOR, LIGHT_PINK, BORDER_BLUE = colors.HexColor("#DC2626"), colors.HexColor("#1E40AF"), colors.HexColor("#EC4899"), colors.HexColor("#2563EB")
 
-    title_style = ParagraphStyle("Title", parent=styles["Heading1"], alignment=1, fontSize=24, leading=28, fontName="Helvetica-Bold", textColor=PRIMARY_NAVY)
-    sub_style = ParagraphStyle("Sub", parent=styles["Normal"], alignment=1, fontSize=9, leading=12, fontName="Helvetica-Bold", textColor=SUB_CYAN)
-    contact_style = ParagraphStyle("Contact", parent=styles["Normal"], alignment=1, fontSize=8.5, leading=11, fontName="Helvetica-Bold", textColor=SUB_CYAN)
-    udyam_style = ParagraphStyle("UDYAM", parent=styles["Normal"], alignment=1, fontSize=9, leading=12, fontName="Helvetica-Bold", textColor=MSME_CRIMSON)
-    ref_left_style = ParagraphStyle("RefLeft", parent=styles["Normal"], alignment=0, fontSize=10, leading=12, fontName="Helvetica-Bold", textColor=PRIMARY_NAVY)
-    ref_right_style = ParagraphStyle("RefRight", parent=styles["Normal"], alignment=2, fontSize=10, leading=12, fontName="Helvetica-Bold", textColor=PRIMARY_NAVY)
-    
-    box_hdr_style = ParagraphStyle("BoxHdr", parent=styles["Normal"], alignment=1, fontSize=13, leading=15, fontName="Helvetica-Bold", textColor=PRIMARY_NAVY)
-    box_detail_style = ParagraphStyle("BoxDetail", parent=styles["Normal"], alignment=1, fontSize=12, leading=15, fontName="Helvetica-Bold", textColor=CELL_TEXT)
+    title_style = ParagraphStyle("Title", parent=styles["Heading1"], alignment=1, fontSize=24, leading=28, fontName="Helvetica-Bold", textColor=RED_COLOR)
+    sub_style = ParagraphStyle("Sub", parent=styles["Normal"], alignment=1, fontSize=9, leading=12, fontName="Helvetica-Bold", textColor=BLUE_COLOR)
+    contact_style = ParagraphStyle("Contact", parent=styles["Normal"], alignment=1, fontSize=8.5, leading=11, fontName="Helvetica-Bold", textColor=BLUE_COLOR)
+    udyam_style = ParagraphStyle("UDYAM", parent=styles["Normal"], alignment=1, fontSize=9, leading=12, fontName="Helvetica-Bold", textColor=LIGHT_PINK)
+    ref_left_style = ParagraphStyle("RefLeft", parent=styles["Normal"], alignment=0, fontSize=10, leading=12, fontName="Helvetica")
+    ref_right_style = ParagraphStyle("RefRight", parent=styles["Normal"], alignment=2, fontSize=10, leading=12, fontName="Helvetica")
+    box_hdr_style = ParagraphStyle("BoxHdr", parent=styles["Normal"], alignment=1, fontSize=14, leading=16, fontName="Helvetica-Bold", textColor=colors.black)
+    box_detail_style = ParagraphStyle("BoxDetail", parent=styles["Normal"], alignment=1, fontSize=12.5, leading=15, fontName="Helvetica-Bold", textColor=colors.black)
     
     if is_single_page:
-        cell_center = ParagraphStyle("CellC", parent=styles["Normal"], alignment=1, fontSize=10.5, leading=13, fontName="Helvetica-Bold", textColor=CELL_TEXT)
-        hdr_center = ParagraphStyle("HdrC", parent=styles["Normal"], alignment=1, fontSize=11, leading=13.5, fontName="Helvetica-Bold", textColor=TABLE_HEADER_TXT)
-        total_bold = ParagraphStyle("TotalB", parent=styles["Normal"], alignment=1, fontSize=12, leading=14.5, fontName="Helvetica-Bold", textColor=TOTAL_TXT)
-        words_bold_center = ParagraphStyle("WordsBC", parent=styles["Normal"], alignment=1, fontSize=11.5, leading=14, fontName="Helvetica-Bold", textColor=PRIMARY_NAVY)
-        terms_hdr_center = ParagraphStyle("TermsHdr", parent=styles["Normal"], alignment=1, fontSize=9.5, leading=12, fontName="Helvetica-Bold", textColor=TERMS_HDR_COLOR)
-        terms_point_style = ParagraphStyle("TermsPt", parent=styles["Normal"], alignment=0, fontSize=8.5, leading=10.5, fontName="Helvetica-Bold", textColor=TERMS_TXT_COLOR)
+        cell_12_bold_center = ParagraphStyle("Cell11BC", parent=styles["Normal"], alignment=1, fontSize=11, leading=13.5, fontName="Helvetica-Bold", textColor=colors.black)
+        hdr_12_bold_center = ParagraphStyle("Hdr11BC", parent=styles["Normal"], alignment=1, fontSize=11, leading=13.5, fontName="Helvetica-Bold", textColor=colors.black)
+        total_14_bold = ParagraphStyle("Total12B", parent=styles["Normal"], alignment=1, fontSize=12, leading=14.5, fontName="Helvetica-Bold", textColor=colors.black)
+        words_13_bold_center = ParagraphStyle("Words11.5BC", parent=styles["Normal"], alignment=1, fontSize=11.5, leading=14, fontName="Helvetica-Bold", textColor=colors.black)
+        terms_hdr_center = ParagraphStyle("TermsHdr9.5", parent=styles["Normal"], alignment=1, fontSize=9.5, leading=12, fontName="Helvetica-Bold", textColor=colors.black)
+        terms_point_size_8 = ParagraphStyle("TermsPt8.5", parent=styles["Normal"], alignment=0, fontSize=8.5, leading=10.5, fontName="Helvetica-Bold", textColor=colors.black)
     else:
-        cell_center = ParagraphStyle("CellC", parent=styles["Normal"], alignment=1, fontSize=11.5, leading=14, fontName="Helvetica-Bold", textColor=CELL_TEXT)
-        hdr_center = ParagraphStyle("HdrC", parent=styles["Normal"], alignment=1, fontSize=12, leading=14, fontName="Helvetica-Bold", textColor=TABLE_HEADER_TXT)
-        total_bold = ParagraphStyle("TotalB", parent=styles["Normal"], alignment=1, fontSize=13, leading=15, fontName="Helvetica-Bold", textColor=TOTAL_TXT)
-        words_bold_center = ParagraphStyle("WordsBC", parent=styles["Normal"], alignment=1, fontSize=12.5, leading=15, fontName="Helvetica-Bold", textColor=PRIMARY_NAVY)
-        terms_hdr_center = ParagraphStyle("TermsHdr", parent=styles["Normal"], alignment=1, fontSize=10, leading=14, fontName="Helvetica-Bold", textColor=TERMS_HDR_COLOR)
-        terms_point_style = ParagraphStyle("TermsPt", parent=styles["Normal"], alignment=0, fontSize=8, leading=11, fontName="Helvetica-Bold", textColor=TERMS_TXT_COLOR)
+        cell_12_bold_center = ParagraphStyle("Cell12BC", parent=styles["Normal"], alignment=1, fontSize=12, leading=14, fontName="Helvetica-Bold", textColor=colors.black)
+        hdr_12_bold_center = ParagraphStyle("Hdr12BC", parent=styles["Normal"], alignment=1, fontSize=12, leading=14, fontName="Helvetica-Bold", textColor=colors.black)
+        total_14_bold = ParagraphStyle("Total14B", parent=styles["Normal"], alignment=1, fontSize=14, leading=16, fontName="Helvetica-Bold", textColor=colors.black)
+        words_13_bold_center = ParagraphStyle("Words13BC", parent=styles["Normal"], alignment=1, fontSize=13, leading=16, fontName="Helvetica-Bold", textColor=colors.black)
+        terms_hdr_center = ParagraphStyle("TermsHdr10", parent=styles["Normal"], alignment=1, fontSize=10, leading=14, fontName="Helvetica-Bold", textColor=colors.black)
+        terms_point_size_8 = ParagraphStyle("TermsPt8", parent=styles["Normal"], alignment=0, fontSize=8, leading=11, fontName="Helvetica-Bold", textColor=colors.black)
 
     elements = []
 
     def create_header_with_qr():
-        qr_data = f"CUSTOMER NAME: {customer_name.upper()}\nADDRESS: {address.upper()}\nREF NO: {ref_no}\nDATE: {est_date}\nESTIMATION AMOUNT: Rs. {final_total:,}\nMSME REG:UDYAM-KR-03-0767446"
+        qr_data = f"CUSTOMER NAME: {customer_name.upper()}\nADDRESS: {address.upper()}\nREF NO: {ref_no}\nDATE: {est_date}\nESTIMATION AMOUNT: Rs. {final_total:,}\nMSME REG:UDYAM-KR-03-0767446  "
         qr = QrCodeWidget(qr_data)
         qr_bounds = qr.getBounds()
         w, h = qr_bounds[2] - qr_bounds[0], qr_bounds[3] - qr_bounds[1]
@@ -604,18 +588,19 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
                 Paragraph("ARCK INTERIORS AND DESIGNS", title_style), Spacer(1, 2),
                 Paragraph("INTERIOR WORKS, DESIGN ESTIMATE, FLOOR VALUATIONS, BUILDING PLANS", sub_style),
                 Paragraph("14/A, SRI LAKSHMIVENKATESWARA NILYA, 4TH MAIN ROAD, TINDLU, BANGALORE - 560097", sub_style),
-                Paragraph("MSME REG: UDYAM-KR-03-0767446", udyam_style),
+                Paragraph("MSME REG:UDYAM-KR-03-0767446", udyam_style),
             ]
         else:
             header_text_flowables = [
                 Spacer(1, 10), Spacer(1, 10), Spacer(1, 10), Spacer(1, 10), Spacer(1, 10)
             ]
+        # Adjusted table width for A4 (width ~ 535 printable area with margins)
         header_table = Table([["", header_text_flowables, d]], colWidths=[65, 405, 65])
         header_table.setStyle(TableStyle([('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('LEFTPADDING', (0,0), (-1,-1), 0), ('RIGHTPADDING', (0,0), (-1,-1), 0)]))
         return [header_table, Spacer(1, 4)]
 
     elements.extend(create_header_with_qr())
-    elements.append(Table([[Paragraph(f"REF NO: {ref_no}", ref_left_style), Paragraph(f"DATE: {est_date}", ref_right_style)]], colWidths=[265, 270]))
+    elements.append(Table([[Paragraph(f"REF NO:-{ref_no}", ref_left_style), Paragraph(f"DATE: {est_date}", ref_right_style)]], colWidths=[265, 270]))
     elements.append(Spacer(1, 4))
 
     address_parts = [p.strip() for p in address.split(',')]
@@ -628,92 +613,51 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
     box_content.append([Paragraph(f"OWNER: - {customer_name.upper()}", box_detail_style)])
 
     project_box = Table(box_content, colWidths=[535])
-    project_box.setStyle(TableStyle([
-        ('BOX', (0,0), (-1,-1), 1.5, BORDER_BLUE),
-        ('BACKGROUND', (0,0), (-1,-1), BOX_BG),
-        ('ROUNDEDCORNERS', [6, 6, 6, 6]),
-        ('TOPPADDING', (0,0), (-1,-1), 3),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 3)
-    ]))
+    project_box.setStyle(TableStyle([('BOX', (0,0), (-1,-1), 2, BORDER_BLUE), ('ROUNDEDCORNERS', [8, 8, 8, 8]), ('TOPPADDING', (0,0), (-1,-1), 3), ('BOTTOMPADDING', (0,0), (-1,-1), 3)]))
     elements.append(project_box)
     elements.append(Spacer(1, 6))
 
     if is_single_page:
-        p_table_data = [[Paragraph("SL.NO", hdr_center), Paragraph("Description", hdr_center), Paragraph("Qty", hdr_center), Paragraph("Amount Rs.", hdr_center)]]
+        p_table_data = [[Paragraph("SL.NO", hdr_12_bold_center), Paragraph("Description", hdr_12_bold_center), Paragraph("Qty", hdr_12_bold_center), Paragraph("Amount Rs.", hdr_12_bold_center)]]
         for idx in range(10):
             item = processed_items[idx]
-            p_table_data.append([Paragraph(f"{idx+1}.", cell_center), Paragraph(item[0], cell_center), Paragraph(item[1], cell_center), Paragraph(f"{item_amounts[idx]:,}", cell_center)])
-        p_table_data.append(["", Paragraph("GST 18%", total_bold), "", Paragraph(f"{actual_gst:,}", total_bold)])
-        p_table_data.append(["", Paragraph("TOTAL", total_bold), "", Paragraph(f"{final_total:,}", total_bold)])
+            p_table_data.append([Paragraph(f"{idx+1}.", cell_12_bold_center), Paragraph(item[0], cell_12_bold_center), Paragraph(item[1], cell_12_bold_center), Paragraph(f"{item_amounts[idx]:,}", cell_12_bold_center)])
+        p_table_data.append(["", Paragraph("GST 18%", total_14_bold), "", Paragraph(f"{actual_gst:,}", total_14_bold)])
+        p_table_data.append(["", Paragraph("TOTAL", total_14_bold), "", Paragraph(f"{final_total:,}", total_14_bold)])
 
         t1 = Table(p_table_data, colWidths=[45, 270, 100, 120])
-        
-        table_style_list = [
-            ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor("#CBD5E1")),
-            ('BACKGROUND', (0,0), (-1,0), TABLE_HEADER_BG),
-            ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
-            ('TOPPADDING', (0,0), (-1,-1), 5.5),
-            ('BOTTOMPADDING', (0,0), (-1,-1), 5.5),
-            ('BACKGROUND', (0,-2), (-1,-1), TOTAL_BG)
-        ]
-        for r_idx in range(1, 11):
-            bg_col = ROW_EVEN if r_idx % 2 == 0 else ROW_ODD
-            table_style_list.append(('BACKGROUND', (0, r_idx), (-1, r_idx), bg_col))
-            
-        t1.setStyle(TableStyle(table_style_list))
+        t1.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('TOPPADDING', (0,0), (-1,-1), 6.5), ('BOTTOMPADDING', (0,0), (-1,-1), 6.5)]))
         elements.append(t1)
     else:
-        p1_table_data = [[Paragraph("SL.NO", hdr_center), Paragraph("Description", hdr_center), Paragraph("Qty", hdr_center), Paragraph("Amount Rs.", hdr_center)]]
+        p1_table_data = [[Paragraph("SL.NO", hdr_12_bold_center), Paragraph("Description", hdr_12_bold_center), Paragraph("Qty", hdr_12_bold_center), Paragraph("Amount Rs.", hdr_12_bold_center)]]
         for idx in range(9):
             item = processed_items[idx]
-            p1_table_data.append([Paragraph(f"{idx+1}.", cell_center), Paragraph(item[0], cell_center), Paragraph(item[1], cell_center), Paragraph(f"{item_amounts[idx]:,}", cell_center)])
+            p1_table_data.append([Paragraph(f"{idx+1}.", cell_12_bold_center), Paragraph(item[0], cell_12_bold_center), Paragraph(item[1], cell_12_bold_center), Paragraph(f"{item_amounts[idx]:,}", cell_12_bold_center)])
         
         t1 = Table(p1_table_data, colWidths=[45, 270, 100, 120])
-        t1_styles = [
-            ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor("#CBD5E1")),
-            ('BACKGROUND', (0,0), (-1,0), TABLE_HEADER_BG),
-            ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
-            ('TOPPADDING', (0,0), (-1,-1), 14),
-            ('BOTTOMPADDING', (0,0), (-1,-1), 14)
-        ]
-        for r_idx in range(1, 10):
-            bg_col = ROW_EVEN if r_idx % 2 == 0 else ROW_ODD
-            t1_styles.append(('BACKGROUND', (0, r_idx), (-1, r_idx), bg_col))
-            
-        t1.setStyle(TableStyle(t1_styles))
+        t1.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('TOPPADDING', (0,0), (-1,-1), 16), ('BOTTOMPADDING', (0,0), (-1,-1), 16)]))
         elements.append(t1)
 
         elements.append(PageBreak())
         elements.extend(create_header_with_qr())
-        elements.append(Table([[Paragraph(f"REF NO: {ref_no}", ref_left_style), Paragraph(f"DATE: {est_date}", ref_right_style)]], colWidths=[265, 270]))
+        # Added exact mirror positioning for Ref No and Date on page 2
+        elements.append(Table([[Paragraph(f"REF NO:-{ref_no}", ref_left_style), Paragraph(f"DATE: {est_date}", ref_right_style)]], colWidths=[265, 270]))
         elements.append(Spacer(1, 4))
 
-        p2_table_data = [[Paragraph("SL.NO", hdr_center), Paragraph("Description", hdr_center), Paragraph("Qty", hdr_center), Paragraph("Amount Rs.", hdr_center)]]
+        p2_table_data = [[Paragraph("SL.NO", hdr_12_bold_center), Paragraph("Description", hdr_12_bold_center), Paragraph("Qty", hdr_12_bold_center), Paragraph("Amount Rs.", hdr_12_bold_center)]]
         for idx in range(9, 15):
             item = processed_items[idx]
-            p2_table_data.append([Paragraph(f"{idx+1}.", cell_center), Paragraph(item[0], cell_center), Paragraph(item[1], cell_center), Paragraph(f"{item_amounts[idx]:,}", cell_center)])
+            p2_table_data.append([Paragraph(f"{idx+1}.", cell_12_bold_center), Paragraph(item[0], cell_12_bold_center), Paragraph(item[1], cell_12_bold_center), Paragraph(f"{item_amounts[idx]:,}", cell_12_bold_center)])
 
-        p2_table_data.append(["", Paragraph("GST 18%", total_bold), "", Paragraph(f"{actual_gst:,}", total_bold)])
-        p2_table_data.append(["", Paragraph("TOTAL", total_bold), "", Paragraph(f"{final_total:,}", total_bold)])
+        p2_table_data.append(["", Paragraph("GST 18%", total_14_bold), "", Paragraph(f"{actual_gst:,}", total_14_bold)])
+        p2_table_data.append(["", Paragraph("TOTAL", total_14_bold), "", Paragraph(f"{final_total:,}", total_14_bold)])
 
         t2 = Table(p2_table_data, colWidths=[45, 270, 100, 120])
-        t2_styles = [
-            ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor("#CBD5E1")),
-            ('BACKGROUND', (0,0), (-1,0), TABLE_HEADER_BG),
-            ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
-            ('TOPPADDING', (0,0), (-1,-1), 14),
-            ('BOTTOMPADDING', (0,0), (-1,-1), 14),
-            ('BACKGROUND', (0,-2), (-1,-1), TOTAL_BG)
-        ]
-        for r_idx in range(1, 7):
-            bg_col = ROW_EVEN if r_idx % 2 == 0 else ROW_ODD
-            t2_styles.append(('BACKGROUND', (0, r_idx), (-1, r_idx), bg_col))
-
-        t2.setStyle(TableStyle(t2_styles))
+        t2.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.black), ('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('TOPPADDING', (0,0), (-1,-1), 16), ('BOTTOMPADDING', (0,0), (-1,-1), 16)]))
         elements.append(t2)
 
     elements.append(Spacer(1, 6))
-    elements.append(Paragraph(num_to_words_indian_clean(final_total), words_bold_center))
+    elements.append(Paragraph(num_to_words_indian_clean(final_total), words_13_bold_center))
     elements.append(Spacer(1, 5))
     elements.append(Paragraph("TERMS AND CONDITIONS:", terms_hdr_center))
     elements.append(Spacer(1, 3))
@@ -727,7 +671,7 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
         "6. Project Duration: Estimated Project Completion Time Is 90 Working Days From Advance."
     ]
     for point in terms_points:
-        elements.append(Paragraph(point, terms_point_style))
+        elements.append(Paragraph(point, terms_point_size_8))
         elements.append(Spacer(1, 2))
 
     doc.build(elements)
@@ -790,7 +734,7 @@ def show_quotation_dialog():
         gst_est = amount_input - subtotal_est
         st.info(f"📊 **Base Estimate:** ₹ {subtotal_est:,.2f} | **GST (18%):** ₹ {gst_est:,.2f} | **Total Final Payable:** ₹ {amount_input:,.2f}")
 
-        submitted = st.form_submit_button("⚡ GENERATE YOUR QUOTATION", type="primary", use_container_width=True)
+        submitted = st.form_submit_button("⚡ GENERATE YOUR QUATATION", type="primary", use_container_width=True)
 
     if submitted:
         if not user_name.strip() or not user_mobile.strip() or not user_email.strip() or not customer_name.strip() or not address_input.strip():
@@ -1194,7 +1138,7 @@ st.markdown("<p style='color:#94A3B8; font-size:0.95rem; margin-bottom:1.5rem;'>
 
 selected_room = st.radio(
     "Select Simulation Zone:",
-    ["🍳 Modular Kitchen (Island & U-Shape)", "🛋️ Luxury Living & Media Lounge", "🛏 Designer Wardrobes & Bedroom", "💡 Architectural False Ceiling", "🪵 Italian Flooring & Paneling"],
+    ["🍳 Modular Kitchen (Island & U-Shape)", "🛋️ Luxury Living & Media Lounge", "🛏️️ Designer Wardrobes & Bedroom", "💡 Architectural False Ceiling", "🪵 Italian Flooring & Paneling"],
     horizontal=True,
     label_visibility="collapsed"
 )
