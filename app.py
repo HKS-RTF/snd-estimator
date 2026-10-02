@@ -543,16 +543,21 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
     filename = f"Estimation_{ref_no}_{clean_customer_name}{'_NoHeader' if not include_header else ''}.pdf"
 
     pdf_buffer = io.BytesIO()
-    # Updated to A4 size
     doc = SimpleDocTemplate(pdf_buffer, pagesize=A4, rightMargin=30, leftMargin=30, topMargin=15, bottomMargin=15)
     styles = getSampleStyleSheet()
 
-    RED_COLOR, BLUE_COLOR, LIGHT_PINK, BORDER_BLUE = colors.HexColor("#DC2626"), colors.HexColor("#1E40AF"), colors.HexColor("#EC4899"), colors.HexColor("#2563EB")
+    # Enhanced professional header palette
+    NAVY_PRIMARY = colors.HexColor("#0F172A")
+    TEAL_SECONDARY = colors.HexColor("#0D9488")
+    SLATE_DARK = colors.HexColor("#334155")
+    CRIMSON_ACCENT = colors.HexColor("#991B1B")
+    BORDER_BLUE = colors.HexColor("#2563EB")
 
-    title_style = ParagraphStyle("Title", parent=styles["Heading1"], alignment=1, fontSize=24, leading=28, fontName="Helvetica-Bold", textColor=RED_COLOR)
-    sub_style = ParagraphStyle("Sub", parent=styles["Normal"], alignment=1, fontSize=9, leading=12, fontName="Helvetica-Bold", textColor=BLUE_COLOR)
-    contact_style = ParagraphStyle("Contact", parent=styles["Normal"], alignment=1, fontSize=8.5, leading=11, fontName="Helvetica-Bold", textColor=BLUE_COLOR)
-    udyam_style = ParagraphStyle("UDYAM", parent=styles["Normal"], alignment=1, fontSize=9, leading=12, fontName="Helvetica-Bold", textColor=LIGHT_PINK)
+    title_style = ParagraphStyle("Title", parent=styles["Heading1"], alignment=1, fontSize=22, leading=26, fontName="Helvetica-Bold", textColor=NAVY_PRIMARY)
+    sub_style = ParagraphStyle("Sub", parent=styles["Normal"], alignment=1, fontSize=8.5, leading=11, fontName="Helvetica-Bold", textColor=TEAL_SECONDARY)
+    address_style = ParagraphStyle("Address", parent=styles["Normal"], alignment=1, fontSize=8, leading=10.5, fontName="Helvetica-Bold", textColor=SLATE_DARK)
+    gst_udyam_style = ParagraphStyle("GstUdyam", parent=styles["Normal"], alignment=1, fontSize=8.5, leading=11, fontName="Helvetica-Bold", textColor=CRIMSON_ACCENT)
+    
     ref_left_style = ParagraphStyle("RefLeft", parent=styles["Normal"], alignment=0, fontSize=10, leading=12, fontName="Helvetica")
     ref_right_style = ParagraphStyle("RefRight", parent=styles["Normal"], alignment=2, fontSize=10, leading=12, fontName="Helvetica")
     box_hdr_style = ParagraphStyle("BoxHdr", parent=styles["Normal"], alignment=1, fontSize=14, leading=16, fontName="Helvetica-Bold", textColor=colors.black)
@@ -576,7 +581,7 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
     elements = []
 
     def create_header_with_qr():
-        qr_data = f"CUSTOMER NAME: {customer_name.upper()}\nADDRESS: {address.upper()}\nREF NO: {ref_no}\nDATE: {est_date}\nESTIMATION AMOUNT: Rs. {final_total:,}\nUDYAM: UDYAM-KR-03-0767446"
+        qr_data = f"CUSTOMER NAME: {customer_name.upper()}\nADDRESS: {address.upper()}\nREF NO: {ref_no}\nDATE: {est_date}\nESTIMATION AMOUNT: Rs. {final_total:,}\nGSTIN: 29AAMCA8159F1Z3\nUDYAM: UDYAM-KR-03-0767446"
         qr = QrCodeWidget(qr_data)
         qr_bounds = qr.getBounds()
         w, h = qr_bounds[2] - qr_bounds[0], qr_bounds[3] - qr_bounds[1]
@@ -586,15 +591,14 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
         if include_header:
             header_text_flowables = [
                 Paragraph("ARCK INTERIORS AND DESIGNS", title_style), Spacer(1, 2),
-                Paragraph("INTERIOR WORKS, DESIGN ESTIMATE, FLOOR VALUATIONS, BUILDING PLANS", sub_style),
-                Paragraph("14/A, SRI LAKSHMIVENKATESWARA NILYA, 4TH MAIN ROAD, TINDLU, BANGALORE - 560097", sub_style),
-                Paragraph("UDYAM REG. NO: UDYAM-KR-03-0767446", udyam_style),
+                Paragraph("INTERIOR WORKS, DESIGN ESTIMATE, FLOOR VALUATIONS, BUILDING PLANS", sub_style), Spacer(1, 1),
+                Paragraph("14/A, SRI LAKSHMIVENKATESWARA NILYA, 4TH MAIN ROAD, TINDLU, BANGALORE - 560097", address_style), Spacer(1, 2),
+                Paragraph("GSTIN: 29AAMCA8159F1Z3 &nbsp;|&nbsp; LICENCE / UDYAM REG. NO: UDYAM-KR-03-0767446", gst_udyam_style),
             ]
         else:
             header_text_flowables = [
                 Spacer(1, 10), Spacer(1, 10), Spacer(1, 10), Spacer(1, 10), Spacer(1, 10)
             ]
-        # Adjusted table width for A4 (width ~ 535 printable area with margins)
         header_table = Table([["", header_text_flowables, d]], colWidths=[65, 405, 65])
         header_table.setStyle(TableStyle([('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('LEFTPADDING', (0,0), (-1,-1), 0), ('RIGHTPADDING', (0,0), (-1,-1), 0)]))
         return [header_table, Spacer(1, 4)]
@@ -640,7 +644,6 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
 
         elements.append(PageBreak())
         elements.extend(create_header_with_qr())
-        # Added exact mirror positioning for Ref No and Date on page 2
         elements.append(Table([[Paragraph(f"REF NO:-{ref_no}", ref_left_style), Paragraph(f"DATE: {est_date}", ref_right_style)]], colWidths=[265, 270]))
         elements.append(Spacer(1, 4))
 
@@ -688,7 +691,7 @@ def show_quotation_dialog():
     <div class="commercial-auth-banner">
         <div style="font-size:2.2rem;">🔐</div>
         <div>
-            <div style="color:#818CF8; font-weight:700; font-size:0.85rem; letter-spacing:1px;">SECURE SSL GATEWAY • UDYAM REGISTERED ESTIMATION</div>
+            <div style="color:#818CF8; font-weight:700; font-size:0.85rem; letter-spacing:1px;">SECURE SSL GATEWAY • GST & UDYAM REGISTERED ESTIMATION</div>
             <div style="color:#FFFFFF; font-size:0.8rem;">Generate encrypted PDF estimates with dynamic QR code authentication for Bengaluru projects.</div>
         </div>
     </div>
@@ -734,7 +737,7 @@ def show_quotation_dialog():
         gst_est = amount_input - subtotal_est
         st.info(f"📊 **Base Estimate:** ₹ {subtotal_est:,.2f} | **GST (18%):** ₹ {gst_est:,.2f} | **Total Final Payable:** ₹ {amount_input:,.2f}")
 
-        submitted = st.form_submit_button("⚡ GENERATE YOUR QUATATION", type="primary", use_container_width=True)
+        submitted = st.form_submit_button("⚡ GENERATE YOUR QUOTATION", type="primary", use_container_width=True)
 
     if submitted:
         if not user_name.strip() or not user_mobile.strip() or not user_email.strip() or not customer_name.strip() or not address_input.strip():
@@ -753,511 +756,14 @@ def show_quotation_dialog():
                 if supabase:
                     upload_to_cloud(
                         generated_ref, pdf_bytes_std, pdf_bytes_no_hdr, 
-                        filename_std, filename_no_hdr, user_name, user_mobile, user_email, 
-                        customer_name, date_input, final_total
+                        filename_std, filename_no_hdr, user_name, user_mobile, user_email, customer_name, date_input, final_total
                     )
-                
-                st.balloons()
-                st.success("🎉 **Quotation Generated & Synced Successfully!**")
-                
-                st.markdown(f"""
-                <div style="background: rgba(245, 158, 11, 0.15); border: 1px solid #F59E0B; padding: 20px; border-radius: 14px; margin: 15px 0;">
-                    <h3 style="color: #F59E0B; margin-top: 0;">REF NO: {generated_ref}</h3>
-                    <p style="font-size: 1.05rem; color: #F8FAFC; line-height: 1.6;">
-                        <b>Your request has been accepted. Please wait some time; you will receive it via mail or WhatsApp.</b>
-                    </p>
-                </div>
-                """, unsafe_allow_html=True)
-
+                st.success("✅ Quotation Generated Successfully!")
+                st.download_button(
+                    label="📄 Download Official PDF (With Header)",
+                    data=pdf_bytes_std,
+                    file_name=filename_std,
+                    mime="application/pdf"
+                )
             except Exception as e:
-                st.error(f"An error occurred: {e}")
-
-
-# --- ADMIN MODAL POPUP DIALOG ---
-@st.dialog("🔐 ENTERPRISE ADMIN PORTAL", width="large")
-def show_admin_dialog():
-    if not st.session_state.is_admin_logged_in:
-        with st.form("admin_login_form"):
-            st.markdown("<p style='color:#94A3B8;'>Authenticate with enterprise credentials to access live quotation databases and audit logs.</p>", unsafe_allow_html=True)
-            login_user = st.text_input("Username", value="")
-            login_pass = st.text_input("Password", type="password", value="")
-            login_submit = st.form_submit_button("🔑 Authorize Access", type="primary")
-
-        if login_submit:
-            if login_user == "HARI1109" and login_pass == "73384@Hks":
-                st.session_state.is_admin_logged_in = True
-                st.success("🎉 Authorization successful!")
-                st.rerun()
-            else:
-                st.error("❌ Invalid enterprise credentials.")
-    else:
-        st.success("🔓 Authenticated as Administrator (HARI1109)")
-        if st.button("🔒 Terminate Session"):
-            st.session_state.is_admin_logged_in = False
-            st.rerun()
-
-        st.markdown("---")
-        tab_history, tab_lookup = st.tabs(["📊 Live Estimation Records", "🔍 Document Cloud Lookup"])
-
-        with tab_history:
-            st.markdown("#### 📋 Recent Quotations Ledger")
-            if not supabase:
-                st.warning("⚠️ Supabase connection inactive.")
-            else:
-                try:
-                    res = supabase.table("estimation_logs").select("*").order("est_date", desc=True).limit(20).execute()
-                    data = res.data
-                    if data:
-                        st.dataframe(data, use_container_width=True)
-                    else:
-                        st.info("No records found.")
-                except Exception as e:
-                    st.error(f"Database error: {e}")
-
-        with tab_lookup:
-            st.markdown("#### 🔎 Reference Code Cloud Search")
-            search_ref = st.text_input("Enter Reference Number:", placeholder="e.g. 104502082026")
-            if st.button("Query Cloud Database", type="primary"):
-                if not supabase:
-                    st.warning("⚠️ Supabase connection inactive.")
-                else:
-                    try:
-                        response = supabase.table("estimation_logs").select("*").eq("ref_no", search_ref.strip()).execute()
-                        records = response.data
-                        if records:
-                            rec = records[0]
-                            st.success(f"✅ **Record Verified!** Customer: **{rec.get('customer_name')}** | Agent: {rec.get('user_name', 'N/A')} | Date: {rec.get('est_date')} | Total: ₹ {rec.get('amount'):,.2f}")
-                            
-                            url_std = rec.get('pdf_url')
-                            url_no_hdr = rec.get('pdf_url_no_header')
-                            if url_std and "|| NO_HEADER::" in url_std:
-                                parts = url_std.split("|| NO_HEADER::")
-                                url_std = parts[0]
-                                url_no_hdr = parts[1] if len(parts) > 1 else None
-
-                            sc1, sc2 = st.columns(2)
-                            with sc1:
-                                if url_std: st.markdown(f"[📥 Download Standard PDF (Cloud)]({url_std})")
-                            with sc2:
-                                if url_no_hdr: st.markdown(f"[📥 Download Clean PDF (Cloud)]({url_no_hdr})")
-                        else:
-                            st.error(f"❌ No records matched reference: `{search_ref}`")
-                    except Exception as e:
-                        st.error(f"Query execution failed: {e}")
-
-
-# --- COMMERCIAL TICKER STATUS BAR WITH LOGIN ICON BUTTON ---
-col_tick1, col_tick2 = st.columns([10, 1])
-with col_tick1:
-    st.markdown("""
-    <div class="commercial-ticker" style="margin-bottom:0;">
-        <div><span class="live-dot"></span>LIVE COMMERCIAL HUB: BENGALURU (TINDLU | SAHAKARNAGAR | HSR | WHITEFIELD)</div>
-        <div>SUPPORT HOTLINE: +91 98765 43210 &nbsp;|&nbsp; SLA: 99.9% UPTIME</div>
-    </div>
-    """, unsafe_allow_html=True)
-with col_tick2:
-    if st.button("🔐", help="Enterprise Admin Portal Login"):
-        show_admin_dialog()
-
-# --- TOP GET YOUR QUOTATION NOW BUTTON ---
-col_top_btn1, col_top_btn2, col_top_btn3 = st.columns([2, 2, 2])
-with col_top_btn2:
-    if st.button("⚡ GET YOUR QUOTATION NOW ", type="primary", use_container_width=True):
-        show_quotation_dialog()
-
-st.markdown("<br>", unsafe_allow_html=True)
-
-
-# --- 3D GRADIENT HERO SECTION WITH CAROUSEL ---
-col_hero1, col_hero2 = st.columns([1.2, 1])
-
-with col_hero1:
-    st.markdown("""
-    <div class="dashboard-card-3d" style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.85) 100%); padding: 3rem 2.5rem; height: 100%;">
-        <div style="font-family:'Space Grotesk', sans-serif; font-weight: 800; font-size: 0.85rem; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 12px;">
-            <span class="gradient-text-gold">✦ ENTERPRISE EXTERIOR & INTERIOR </span>
-        </div>
-        <h1 class="hero-title-3d" style="font-size: 3rem;">ARCK INTERIORS AND DESIGNS</h1>
-        <p style="color: #CBD5E1; font-size: 1.1rem; line-height: 1.7; margin-bottom: 2rem;">
-            Commercial-grade Materials and Raw Materials, Udyam estimations, and turnkey interior manufacturing engineered for elite residential developments across Bengaluru.
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
-
-with col_hero2:
-    st.markdown("""
-    <div class="slider-box" id="interiorCarousel">
-        <div class="carousel-slide active">
-            <img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1000&q=80" alt="Luxury Living Room">
-            <div class="carousel-caption">01 - Luxury Living Room & Entertainment Lounge</div>
-        </div>
-        <div class="carousel-slide">
-            <img src="https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1000&q=80" alt="Modular German Kitchen">
-            <div class="carousel-caption">02 - Modular German Acrylic Kitchen</div>
-        </div>
-        <div class="carousel-slide">
-            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80" alt="Acoustic Fluted Panels">
-            <div class="carousel-caption">03 - Acoustic Fluted Panel Wall Decor</div>
-        </div>
-        <div class="carousel-slide">
-            <img src="https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1000&q=80" alt="Glass Wardrobes">
-            <div class="carousel-caption">04 - Floor-to-Ceiling Tinted Glass Wardrobes</div>
-        </div>
-        <div class="carousel-slide">
-            <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1000&q=80" alt="Italian Marble">
-            <div class="carousel-caption">05 - Imported Italian Marble & Wood Paneling</div>
-        </div>
-        <div class="carousel-slide">
-            <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1000&q=80" alt="Minimalist Bedroom">
-            <div class="carousel-caption">06 - Contemporary Minimalist Bedroom Interior</div>
-        </div>
-        <div class="carousel-slide">
-            <img src="https://images.unsplash.com/photo-1616046229478-9901c5536a45?auto=format&fit=crop&w=1000&q=80" alt="Home Office">
-            <div class="carousel-caption">07 - Executive Home Office & Study Suite</div>
-        </div>
-        <div class="carousel-slide">
-            <img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=1000&q=80" alt="Bathroom Vanity">
-            <div class="carousel-caption">08 - Designer Bathroom Vanity & LED Mirrors</div>
-        </div>
-        <div class="carousel-slide">
-            <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1000&q=80" alt="False Ceiling">
-            <div class="carousel-caption">09 - Multi-Tier False Ceiling & Cove Lighting</div>
-        </div>
-        <div class="carousel-slide">
-            <img src="https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=1000&q=80" alt="Open Dining">
-            <div class="carousel-caption">10 - Premium Open-Concept Dining Architecture</div>
-        </div>
-        <div class="carousel-slide">
-            <img src="https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1000&q=80" alt="Balcony Decking">
-            <div class="carousel-caption">11 - Luxury Penthouse Balcony & Decking Design</div>
-        </div>
-    </div>
-
-    <script>
-        let slideIndex = 0;
-        const allSlides = document.querySelectorAll('#interiorCarousel .carousel-slide');
-        function cycleSlides() {
-            if(allSlides.length === 0) return;
-            allSlides[slideIndex].classList.remove('active');
-            slideIndex = (slideIndex + 1) % allSlides.length;
-            allSlides[slideIndex].classList.add('active');
-        }
-        setInterval(cycleSlides, 3500);
-    </script>
-    """, unsafe_allow_html=True)
-
-
-# --- STATIC & FIXED 10 IMAGES GALLERY SHOWCASE ---
-st.markdown("<br>", unsafe_allow_html=True)
-st.markdown("### 🏛️ Portfolio Master Collection (10 Fixed Showcase Galleries)")
-st.markdown("<p style='color:#94A3B8; font-size:0.95rem; margin-bottom:1rem;'>Explore our curated permanent catalog of architectural finishes, structural modules, and luxury interior spaces.</p>", unsafe_allow_html=True)
-
-st.markdown("""
-<div class="static-gallery-grid">
-    <div class="static-gallery-item">
-        <img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=600&q=80" alt="Living Room">
-        <div class="static-gallery-label">01. Living Lounge</div>
-    </div>
-    <div class="static-gallery-item">
-        <img src="https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=600&q=80" alt="Kitchen">
-        <div class="static-gallery-label">02. Modular Kitchen</div>
-    </div>
-    <div class="static-gallery-item">
-        <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80" alt="Fluted Panels">
-        <div class="static-gallery-label">03. Fluted Panels</div>
-    </div>
-    <div class="static-gallery-item">
-        <img src="https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=600&q=80" alt="Glass Wardrobes">
-        <div class="static-gallery-label">04. Glass Wardrobes</div>
-    </div>
-    <div class="static-gallery-item">
-        <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=600&q=80" alt="Italian Marble">
-        <div class="static-gallery-label">05. Italian Marble</div>
-    </div>
-    <div class="static-gallery-item">
-        <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=600&q=80" alt="Minimalist Bedroom">
-        <div class="static-gallery-label">06. Minimalist Bed</div>
-    </div>
-    <div class="static-gallery-item">
-        <img src="https://images.unsplash.com/photo-1616046229478-9901c5536a45?auto=format&fit=crop&w=600&q=80" alt="Home Office">
-        <div class="static-gallery-label">07. Study Suite</div>
-    </div>
-    <div class="static-gallery-item">
-        <img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=600&q=80" alt="Bathroom Vanity">
-        <div class="static-gallery-label">08. Luxury Vanity</div>
-    </div>
-    <div class="static-gallery-item">
-        <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=600&q=80" alt="False Ceiling">
-        <div class="static-gallery-label">09. Cove Lighting</div>
-    </div>
-    <div class="static-gallery-item">
-        <img src="https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=600&q=80" alt="Balcony Decking">
-        <div class="static-gallery-label">10. Balcony Decking</div>
-    </div>
-</div>
-""", unsafe_allow_html=True)
-
-
-# --- FULL-SIZE VERTICAL SCROLLING SHOWCASE (10 FULL SIZE IMAGES) ---
-st.markdown("<br>", unsafe_allow_html=True)
-st.markdown("### 📸 10 Full-Size Vertical Architectural Showcase")
-st.markdown("<p style='color:#94A3B8; font-size:0.95rem; margin-bottom:1.5rem;'>Scroll down through our 10 full-width, high-definition architectural project features.</p>", unsafe_allow_html=True)
-
-st.markdown("""
-<div class="vertical-gallery-container">
-    <!-- 01 -->
-    <div class="vertical-gallery-card">
-        <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=80" alt="Architectural Living Room">
-        <div class="vertical-card-overlay">
-            <span class="vertical-card-badge">Full Size Feature • 01</span>
-            <div class="vertical-card-title">Architectural Grand Living Lounge & Media Suite</div>
-            <div class="vertical-card-desc">Double-height ceiling, acoustic timber louvers, integrated ambient profile LED lighting, and Italian marble accents.</div>
-        </div>
-    </div>
-    <!-- 02 -->
-    <div class="vertical-gallery-card">
-        <img src="https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1600&q=80" alt="Modular German Kitchen">
-        <div class="vertical-card-overlay">
-            <span class="vertical-card-badge">Full Size Feature • 02</span>
-            <div class="vertical-card-title">Ultra-Modern Modular German Island Kitchen</div>
-            <div class="vertical-card-desc">Handleless acrylic cabinetry, waterfall quartz island, fully integrated Blum motorized hardware, and smart appliances.</div>
-        </div>
-    </div>
-    <!-- 03 -->
-    <div class="vertical-gallery-card">
-        <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1600&q=80" alt="Master Penthouse Suite">
-        <div class="vertical-card-overlay">
-            <span class="vertical-card-badge">Full Size Feature • 03</span>
-            <div class="vertical-card-title">Executive Master Bedroom & Penthouse Lounge</div>
-            <div class="vertical-card-desc">Upholstered headboard backdrop, warm cove architectural lighting, floor-to-ceiling glass paneling, and engineered hardwood flooring.</div>
-        </div>
-    </div>
-    <!-- 04 -->
-    <div class="vertical-gallery-card">
-        <img src="https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1600&q=80" alt="Walk-in Glass Wardrobe">
-        <div class="vertical-card-overlay">
-            <span class="vertical-card-badge">Full Size Feature • 04</span>
-            <div class="vertical-card-title">Luxury Tinted Glass Walk-in Wardrobe System</div>
-            <div class="vertical-card-desc">Custom aluminum-framed glass wardrobe doors, motion-sensor interior illumination, velvet jewelry trays, and hidden biometric vault space.</div>
-        </div>
-    </div>
-    <!-- 05 -->
-    <div class="vertical-gallery-card">
-        <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1600&q=80" alt="Italian Marble Foyer">
-        <div class="vertical-card-overlay">
-            <span class="vertical-card-badge">Full Size Feature • 05</span>
-            <div class="vertical-card-title">Imported Italian Marble Foyer & Wall Cladding</div>
-            <div class="vertical-card-desc">High-gloss Statuario marble flooring, custom brass inlay geometric patterns, and vertical natural veneer wall paneling.</div>
-        </div>
-    </div>
-    <!-- 06 -->
-    <div class="vertical-gallery-card">
-        <img src="https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=1600&q=80" alt="Contemporary Dining">
-        <div class="vertical-card-overlay">
-            <span class="vertical-card-badge">Full Size Feature • 06</span>
-            <div class="vertical-card-title">Open-Concept Contemporary Dining Architecture</div>
-            <div class="vertical-card-desc">Custom 10-seater monolith stone dining table, designer crystal drop chandelier, and seamless connection to outdoor green terrace.</div>
-        </div>
-    </div>
-    <!-- 07 -->
-    <div class="vertical-gallery-card">
-        <img src="https://images.unsplash.com/photo-1616046229478-9901c5536a45?auto=format&fit=crop&w=1600&q=80" alt="Executive Home Office">
-        <div class="vertical-card-overlay">
-            <span class="vertical-card-badge">Full Size Feature • 07</span>
-            <div class="vertical-card-title">Bespoke Executive Home Office & Library Suite</div>
-            <div class="vertical-card-desc">Ergonomic acoustic wall paneling, custom floating bookshelves with backlighting, cable management channels, and leather seating.</div>
-        </div>
-    </div>
-    <!-- 08 -->
-    <div class="vertical-gallery-card">
-        <img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=1600&q=80" alt="Luxury Spa Bathroom">
-        <div class="vertical-card-overlay">
-            <span class="vertical-card-badge">Full Size Feature • 08</span>
-            <div class="vertical-card-title">Designer Spa Bathroom & Floating Vanity</div>
-            <div class="vertical-card-desc">Large-format porcelain tiles, backlit anti-fog smart LED mirrors, ceiling-mounted rain shower system, and concealed Kohler fittings.</div>
-        </div>
-    </div>
-    <!-- 09 -->
-    <div class="vertical-gallery-card">
-        <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1600&q=80" alt="Architectural Ceiling">
-        <div class="vertical-card-overlay">
-            <span class="vertical-card-badge">Full Size Feature • 09</span>
-            <div class="vertical-card-title">Multi-Tier Architectural False Ceiling & Coves</div>
-            <div class="vertical-card-desc">Seamless Gyproc false ceiling, rimless magnetic track spotlighting, ambient warm perimeter LEDs, and hidden AC diffuser grilles.</div>
-        </div>
-    </div>
-    <!-- 10 -->
-    <div class="vertical-gallery-card">
-        <img src="https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1600&q=80" alt="Sky Penthouse Balcony">
-        <div class="vertical-card-overlay">
-            <span class="vertical-card-badge">Full Size Feature • 10</span>
-            <div class="vertical-card-title">Sky Penthouse Balcony & Exterior Lounge Decking</div>
-            <div class="vertical-card-desc">Weatherproof composite WPC wooden decking, frameless glass railings, vertical garden green wall, and exterior warm illumination.</div>
-        </div>
-    </div>
-</div>
-""", unsafe_allow_html=True)
-
-
-# --- Commercial Metrics Grid ---
-col_m1, col_m2, col_m3, col_m4 = st.columns(4)
-with col_m1:
-    st.markdown("""
-    <div class="stat-box-commercial">
-        <div style="font-size: 1.8rem; font-weight: 800;" class="gradient-text-gold">500+</div>
-        <div style="font-size: 0.8rem; color: #94A3B8; font-weight: 700; text-transform: uppercase; margin-top: 5px;">Active Projects</div>
-    </div>
-    """, unsafe_allow_html=True)
-with col_m2:
-    st.markdown("""
-    <div class="stat-box-commercial">
-        <div style="font-size: 1.8rem; font-weight: 800;" class="gradient-text-cyan">10 YRS</div>
-        <div style="font-size: 0.8rem; color: #94A3B8; font-weight: 700; text-transform: uppercase; margin-top: 5px;">Structural Warranty</div>
-    </div>
-    """, unsafe_allow_html=True)
-with col_m3:
-    st.markdown("""
-    <div class="stat-box-commercial">
-        <div style="font-size: 1.8rem; font-weight: 800;" class="gradient-text-gold">45 DAYS</div>
-        <div style="font-size: 0.8rem; color: #94A3B8; font-weight: 700; text-transform: uppercase; margin-top: 5px;">Guaranteed Handover</div>
-    </div>
-    """, unsafe_allow_html=True)
-with col_m4:
-    st.markdown("""
-    <div class="stat-box-commercial">
-        <div style="font-size: 1.8rem; font-weight: 800;" class="gradient-text-cyan">100%</div>
-        <div style="font-size: 0.8rem; color: #94A3B8; font-weight: 700; text-transform: uppercase; margin-top: 5px;">Encrypted Sync</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-
-# --- INTERACTIVE 3D ANIMATED / GIF VISUALIZER ---
-st.markdown("<br>", unsafe_allow_html=True)
-st.markdown("### 🌀 Interactive Content")
-st.markdown("<p style='color:#94A3B8; font-size:0.95rem; margin-bottom:1.5rem;'>Select a commercial zone to inspect real-time spatial physics, lighting loops, and modular material simulations.</p>", unsafe_allow_html=True)
-
-selected_room = st.radio(
-    "Select Simulation Zone:",
-    ["🍳 Modular Kitchen (Island & U-Shape)", "🛋️ Luxury Living & Media Lounge", "🛏️️ Designer Wardrobes & Bedroom", "💡 Architectural False Ceiling", "🪵 Italian Flooring & Paneling"],
-    horizontal=True,
-    label_visibility="collapsed"
-)
-
-if "Kitchen" in selected_room:
-    st.markdown("""
-    <div class="dashboard-card-3d" style="display:flex; gap:35px; align-items:center;">
-        <div style="flex:1;">
-            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#F59E0B; text-transform:uppercase;">SIMULATION MODULE 01</div>
-            <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">German Soft-Close Acrylic Kitchen</h2>
-            <p style="color:#CBD5E1; line-height:1.7; margin-bottom:1.5rem;">
-                Engineered with Blum tandem box mechanisms, scratch-resistant quartz stone counters, integrated LED profile strip lighting, and water-resistant BWP marine-grade plywood cores.
-            </p>
-            <div style="display:flex; gap:15px; color:#38BDF8; font-weight:700; font-size:0.9rem;">
-                <div>⚡ Blum Hardware</div>
-                <div>⚡ Quartz Stone</div>
-                <div>⚡ 10-Yr Warranty</div>
-            </div>
-        </div>
-        <div style="flex:1;">
-            <div class="visualizer-frame-3d">
-                <img src="https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1000&q=80" alt="Kitchen 3D">
-            </div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-elif "Living" in selected_room:
-    st.markdown("""
-    <div class="dashboard-card-3d" style="display:flex; gap:35px; align-items:center;">
-        <div style="flex:1;">
-            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#F59E0B; text-transform:uppercase;">SIMULATION MODULE 02</div>
-            <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">Grand Living & Media Lounge</h2>
-            <p style="color:#CBD5E1; line-height:1.7; margin-bottom:1.5rem;">
-                Featuring custom acoustic fluted panels, sintered stone TV media backdrops, motorized smart curtains, and concealed wiring channels for high-end home theater setups.
-            </p>
-            <div style="display:flex; gap:15px; color:#38BDF8; font-weight:700; font-size:0.9rem;">
-                <div>⚡ Fluted Panels</div>
-                <div>⚡ Acoustic Wall</div>
-                <div>⚡ Smart Motorized</div>
-            </div>
-        </div>
-        <div style="flex:1;">
-            <div class="visualizer-frame-3d">
-                <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80" alt="Living 3D">
-            </div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-elif "Wardrobes" in selected_room:
-    st.markdown("""
-    <div class="dashboard-card-3d" style="display:flex; gap:35px; align-items:center;">
-        <div style="flex:1;">
-            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#F59E0B; text-transform:uppercase;">SIMULATION MODULE 03</div>
-            <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">Floor-to-Ceiling Glass Wardrobes</h2>
-            <p style="color:#CBD5E1; line-height:1.7; margin-bottom:1.5rem;">
-                Bronze tinted safety glass sliding doors equipped with motion-activated LED hanging rails, velvet-lined pull-out organizer trays, and soft-closing dampeners.
-            </p>
-            <div style="display:flex; gap:15px; color:#38BDF8; font-weight:700; font-size:0.9rem;">
-                <div>⚡ Sensor Lighting</div>
-                <div>⚡ Velvet Trays</div>
-                <div>⚡ Tinted Glass</div>
-            </div>
-        </div>
-        <div style="flex:1;">
-            <div class="visualizer-frame-3d">
-                <img src="https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1000&q=80" alt="Wardrobes 3D">
-            </div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-elif "Ceiling" in selected_room:
-    st.markdown("""
-    <div class="dashboard-card-3d" style="display:flex; gap:35px; align-items:center;">
-        <div style="flex:1;">
-            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#F59E0B; text-transform:uppercase;">SIMULATION MODULE 04</div>
-            <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">Architectural False Ceiling & Coves</h2>
-            <p style="color:#CBD5E1; line-height:1.7; margin-bottom:1.5rem;">
-                Multi-tier gypsum board architectural drops featuring warm concealed cove lighting lines, magnetic track spotlight fixtures, and statement crystal chandelier mounts.
-            </p>
-            <div style="display:flex; gap:15px; color:#38BDF8; font-weight:700; font-size:0.9rem;">
-                <div>⚡ Magnetic Tracks</div>
-                <div>⚡ Warm Cove LED</div>
-                <div>⚡ Gypsum Finish</div>
-            </div>
-        </div>
-        <div style="flex:1;">
-            <div class="visualizer-frame-3d">
-                <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1000&q=80" alt="Ceiling 3D">
-            </div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-else:
-    st.markdown("""
-    <div class="dashboard-card-3d" style="display:flex; gap:35px; align-items:center;">
-        <div style="flex:1;">
-            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#F59E0B; text-transform:uppercase;">SIMULATION MODULE 05</div>
-            <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">Imported Italian Marble & Wood Paneling</h2>
-            <p style="color:#CBD5E1; line-height:1.7; margin-bottom:1.5rem;">
-                Mirror-polished large-format Italian marble tiles paired with vertical natural wood veneer wall cladding and brushed brass inlay metal trims.
-            </p>
-            <div style="display:flex; gap:15px; color:#38BDF8; font-weight:700; font-size:0.9rem;">
-                <div>⚡ Italian Marble</div>
-                <div>⚡ Brass Inlays</div>
-                <div>⚡ Veneer Finish</div>
-            </div>
-        </div>
-        <div style="flex:1;">
-            <div class="visualizer-frame-3d">
-                <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1000&q=80" alt="Flooring 3D">
-            </div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-
-# --- MAIN ACTION BUTTON ---
-st.markdown("<br>", unsafe_allow_html=True)
-col_cta1, col_cta2, col_cta3 = st.columns([1, 2, 1])
-with col_cta2:
-    if st.button("⚡ GET YOUR QUOTATION ", type="primary", use_container_width=True):
-        show_quotation_dialog()
+                st.error(f"Error generating quotation: {str(e)}")
