@@ -576,7 +576,7 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
     elements = []
 
     def create_header_with_qr():
-        qr_data = f"CUSTOMER NAME: {customer_name.upper()}\nADDRESS: {address.upper()}\nREF NO: {ref_no}\nDATE: {est_date}\nESTIMATION AMOUNT: Rs. {final_total:,}\nMSME Reg:UDYAM-KR-03-0767446  "
+        qr_data = f"CUSTOMER NAME: {customer_name.upper()}\nADDRESS: {address.upper()}\nREF NO: {ref_no}\nDATE: {est_date}\nESTIMATION AMOUNT: Rs. {final_total:,}\nMSME REG:UDYAM-KR-03-0767446  "
         qr = QrCodeWidget(qr_data)
         qr_bounds = qr.getBounds()
         w, h = qr_bounds[2] - qr_bounds[0], qr_bounds[3] - qr_bounds[1]
@@ -588,7 +588,7 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
                 Paragraph("ARCK INTERIORS AND DESIGNS", title_style), Spacer(1, 2),
                 Paragraph("INTERIOR WORKS, DESIGN ESTIMATE, FLOOR VALUATIONS, BUILDING PLANS", sub_style),
                 Paragraph("14/A, SRI LAKSHMIVENKATESWARA NILYA, 4TH MAIN ROAD, TINDLU, BANGALORE - 560097", sub_style),
-                Paragraph("MSME Reg:UDYAM-KR-03-0767446", udyam_style),
+                Paragraph("MSME REG:UDYAM-KR-03-0767446", udyam_style),
             ]
         else:
             header_text_flowables = [
