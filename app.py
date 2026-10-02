@@ -1147,7 +1147,7 @@ if "Kitchen" in selected_room:
     st.markdown("""
     <div class="dashboard-card-3d" style="display:flex; gap:35px; align-items:center;">
         <div style="flex:1;">
-            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#F59E0B; text-transform:uppercase;">SIMULATION MODULE 01</div>
+            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#F59E0B; text-transform:uppercase;"></div>
             <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">German Soft-Close Acrylic Kitchen</h2>
             <p style="color:#CBD5E1; line-height:1.7; margin-bottom:1.5rem;">
                 Engineered with Blum tandem box mechanisms, scratch-resistant quartz stone counters, integrated LED profile strip lighting, and water-resistant BWP marine-grade plywood cores.
