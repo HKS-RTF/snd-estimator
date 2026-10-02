@@ -14,7 +14,7 @@ from reportlab.graphics.barcode.qr import QrCodeWidget
 
 # --- Page Configuration ---
 st.set_page_config(
-    page_title="SND Interior & Designs | Commercial & Residential Interior Dashboard",
+    page_title="ARCK INTERIORS AND DESIGNS | Commercial & Residential Interior Dashboard",
     page_icon="⚡",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -549,10 +549,10 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
 
     RED_COLOR, BLUE_COLOR, LIGHT_PINK, BORDER_BLUE = colors.HexColor("#DC2626"), colors.HexColor("#1E40AF"), colors.HexColor("#EC4899"), colors.HexColor("#2563EB")
 
-    title_style = ParagraphStyle("Title", parent=styles["Heading1"], alignment=1, fontSize=28, leading=32, fontName="Helvetica-Bold", textColor=RED_COLOR)
+    title_style = ParagraphStyle("Title", parent=styles["Heading1"], alignment=1, fontSize=24, leading=28, fontName="Helvetica-Bold", textColor=RED_COLOR)
     sub_style = ParagraphStyle("Sub", parent=styles["Normal"], alignment=1, fontSize=9, leading=12, fontName="Helvetica-Bold", textColor=BLUE_COLOR)
     contact_style = ParagraphStyle("Contact", parent=styles["Normal"], alignment=1, fontSize=8.5, leading=11, fontName="Helvetica-Bold", textColor=BLUE_COLOR)
-    gstin_style = ParagraphStyle("GSTIN", parent=styles["Normal"], alignment=1, fontSize=9, leading=12, fontName="Helvetica-Bold", textColor=LIGHT_PINK)
+    udyam_style = ParagraphStyle("UDYAM", parent=styles["Normal"], alignment=1, fontSize=9, leading=12, fontName="Helvetica-Bold", textColor=LIGHT_PINK)
     ref_left_style = ParagraphStyle("RefLeft", parent=styles["Normal"], alignment=0, fontSize=10, leading=12, fontName="Helvetica")
     ref_right_style = ParagraphStyle("RefRight", parent=styles["Normal"], alignment=2, fontSize=10, leading=12, fontName="Helvetica")
     box_hdr_style = ParagraphStyle("BoxHdr", parent=styles["Normal"], alignment=1, fontSize=14, leading=16, fontName="Helvetica-Bold", textColor=colors.black)
@@ -576,7 +576,7 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
     elements = []
 
     def create_header_with_qr():
-        qr_data = f"CUSTOMER NAME: {customer_name.upper()}\nADDRESS: {address.upper()}\nREF NO: {ref_no}\nDATE: {est_date}\nESTIMATION AMOUNT: Rs. {final_total:,}\nEMAIL: contact@sndinteriors.com"
+        qr_data = f"CUSTOMER NAME: {customer_name.upper()}\nADDRESS: {address.upper()}\nREF NO: {ref_no}\nDATE: {est_date}\nESTIMATION AMOUNT: Rs. {final_total:,}\nUDYAM: UDYAM-KR-03-0767446"
         qr = QrCodeWidget(qr_data)
         qr_bounds = qr.getBounds()
         w, h = qr_bounds[2] - qr_bounds[0], qr_bounds[3] - qr_bounds[1]
@@ -585,11 +585,10 @@ def generate_estimation_pdf_bytes(customer_name, address, est_date, target_total
         
         if include_header:
             header_text_flowables = [
-                Paragraph("SND INTERIOR & DESIGNS", title_style), Spacer(1, 2),
+                Paragraph("ARCK INTERIORS AND DESIGNS", title_style), Spacer(1, 2),
                 Paragraph("INTERIOR WORKS, DESIGN ESTIMATE, FLOOR VALUATIONS, BUILDING PLANS", sub_style),
-                Paragraph("#15, E BLOCK, SAHAKHAR NAGAR, BANGALORE-560092", sub_style),
-                Paragraph("EMAIL: contact@sndinteriors.com", contact_style),
-                Paragraph("GSTIN: 29ABCDE1234F1Z5", gstin_style),
+                Paragraph("14/A, SRI LAKSHMIVENKATESWARA NILYA, 4TH MAIN ROAD, TINDLU, BANGALORE - 560097", sub_style),
+                Paragraph("UDYAM REG. NO: UDYAM-KR-03-0767446", udyam_style),
             ]
         else:
             header_text_flowables = [
@@ -689,7 +688,7 @@ def show_quotation_dialog():
     <div class="commercial-auth-banner">
         <div style="font-size:2.2rem;">🔐</div>
         <div>
-            <div style="color:#818CF8; font-weight:700; font-size:0.85rem; letter-spacing:1px;">SECURE SSL GATEWAY • COMMERCIAL GST INVOICING</div>
+            <div style="color:#818CF8; font-weight:700; font-size:0.85rem; letter-spacing:1px;">SECURE SSL GATEWAY • UDYAM REGISTERED ESTIMATION</div>
             <div style="color:#FFFFFF; font-size:0.8rem;">Generate encrypted PDF estimates with dynamic QR code authentication for Bengaluru projects.</div>
         </div>
     </div>
@@ -852,7 +851,7 @@ col_tick1, col_tick2 = st.columns([10, 1])
 with col_tick1:
     st.markdown("""
     <div class="commercial-ticker" style="margin-bottom:0;">
-        <div><span class="live-dot"></span>LIVE COMMERCIAL HUB: BENGALURU (SAHAKARNAGAR | HSR | WHITEFIELD)</div>
+        <div><span class="live-dot"></span>LIVE COMMERCIAL HUB: BENGALURU (TINDLU | SAHAKARNAGAR | HSR | WHITEFIELD)</div>
         <div>SUPPORT HOTLINE: +91 98765 43210 &nbsp;|&nbsp; SLA: 99.9% UPTIME</div>
     </div>
     """, unsafe_allow_html=True)
@@ -878,9 +877,9 @@ with col_hero1:
         <div style="font-family:'Space Grotesk', sans-serif; font-weight: 800; font-size: 0.85rem; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 12px;">
             <span class="gradient-text-gold">✦ ENTERPRISE EXTERIOR & INTERIOR </span>
         </div>
-        <h1 class="hero-title-3d" style="font-size: 3rem;">SND INTERIOR & DESIGNS</h1>
+        <h1 class="hero-title-3d" style="font-size: 3rem;">ARCK INTERIORS AND DESIGNS</h1>
         <p style="color: #CBD5E1; font-size: 1.1rem; line-height: 1.7; margin-bottom: 2rem;">
-            Commercial-grade Materials and Raw Materials, GST quotations, and turnkey interior manufacturing engineered for elite residential developments across Bengaluru.
+            Commercial-grade Materials and Raw Materials, Udyam estimations, and turnkey interior manufacturing engineered for elite residential developments across Bengaluru.
         </p>
     </div>
     """, unsafe_allow_html=True)
@@ -1139,7 +1138,7 @@ st.markdown("<p style='color:#94A3B8; font-size:0.95rem; margin-bottom:1.5rem;'>
 
 selected_room = st.radio(
     "Select Simulation Zone:",
-    ["🍳 Modular Kitchen (Island & U-Shape)", "🛋️ Luxury Living & Media Lounge", "🛏️ Designer Wardrobes & Bedroom", "💡 Architectural False Ceiling", "🪵 Italian Flooring & Paneling"],
+    ["🍳 Modular Kitchen (Island & U-Shape)", "🛋️ Luxury Living & Media Lounge", "🛏️️ Designer Wardrobes & Bedroom", "💡 Architectural False Ceiling", "🪵 Italian Flooring & Paneling"],
     horizontal=True,
     label_visibility="collapsed"
 )
