@@ -38,7 +38,7 @@ st.markdown("""
         left: -10%;
         width: 50vw;
         height: 50vw;
-        background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+        background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 70%);
         z-index: 0;
         pointer-events: none;
         animation: pulseGlow 8s ease-in-out infinite alternate;
@@ -66,7 +66,7 @@ st.markdown("""
         font-family: 'Outfit', sans-serif;
         font-weight: 900;
         font-size: 3.5rem;
-        background: linear-gradient(135deg, #FFFFFF 20%, #94A3B8 50%, #F59E0B 100%);
+        background: linear-gradient(135deg, #FFFFFF 0%, #34D399 50%, #10B981 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         text-shadow: 0 20px 40px rgba(0,0,0,0.8);
@@ -81,7 +81,7 @@ st.markdown("""
     }
 
     .gradient-text-cyan {
-        background: linear-gradient(135deg, #67E8F9 0%, #38BDF8 50%, #6366F1 100%);
+        background: linear-gradient(135deg, #6EE7B7 0%, #10B981 50%, #059669 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }
@@ -136,16 +136,16 @@ st.markdown("""
 
     .dashboard-card-3d:hover {
         transform: translateY(-6px);
-        border-color: rgba(245, 158, 11, 0.4);
-        box-shadow: 0 40px 80px rgba(245, 158, 11, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+        border-color: rgba(16, 185, 129, 0.4);
+        box-shadow: 0 40px 80px rgba(16, 185, 129, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.25);
     }
 
     /* Interactive 3D Visualizer Frame Container */
     .visualizer-frame-3d {
         border-radius: 20px;
         overflow: hidden;
-        border: 2px solid rgba(245, 158, 11, 0.3);
-        box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 30px rgba(245, 158, 11, 0.2);
+        border: 2px solid rgba(16, 185, 129, 0.3);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 30px rgba(16, 185, 129, 0.2);
         position: relative;
         background: #000;
     }
@@ -174,40 +174,40 @@ st.markdown("""
     }
 
     .stat-box-commercial:hover {
-        border-color: #38BDF8;
+        border-color: #10B981;
         transform: translateY(-4px);
     }
 
     /* Primary Action Buttons */
     .stButton > button {
-        background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
-        color: #030712;
+        background: linear-gradient(135deg, #10B981 0%, #047857 100%);
+        color: #FFFFFF;
         font-family: 'Space Grotesk', sans-serif;
         font-weight: 700;
         border-radius: 14px;
         padding: 0.85rem 2rem;
         border: none;
-        box-shadow: 0 10px 30px rgba(217, 119, 6, 0.4);
+        box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
         transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
     }
 
     .stButton > button:hover {
-        background: linear-gradient(135deg, #FBBF24 0%, #D97706 100%);
-        box-shadow: 0 15px 40px rgba(245, 158, 11, 0.6);
+        background: linear-gradient(135deg, #34D399 0%, #059669 100%);
+        box-shadow: 0 15px 40px rgba(16, 185, 129, 0.5);
         transform: translateY(-3px);
     }
 
     /* Auth & Security Banner */
     .commercial-auth-banner {
-        background: linear-gradient(135deg, rgba(30, 27, 75, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
-        border: 1px solid rgba(99, 102, 241, 0.4);
+        background: linear-gradient(135deg, rgba(6, 78, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
+        border: 1px solid rgba(16, 185, 129, 0.4);
         border-radius: 20px;
         padding: 1.5rem;
         display: flex;
         align-items: center;
         gap: 20px;
         margin-bottom: 2rem;
-        box-shadow: 0 15px 35px rgba(99, 102, 241, 0.2);
+        box-shadow: 0 15px 35px rgba(16, 185, 129, 0.2);
     }
 
     /* Robust Direct IMG Carousel Styles */
@@ -217,7 +217,7 @@ st.markdown("""
         height: 380px;
         border-radius: 24px;
         overflow: hidden;
-        box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 30px rgba(99, 102, 241, 0.2);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 30px rgba(16, 185, 129, 0.2);
         border: 1px solid rgba(255, 255, 255, 0.1);
         background: #0b0f19;
     }
@@ -277,8 +277,8 @@ st.markdown("""
 
     .static-gallery-item:hover {
         transform: translateY(-5px);
-        border-color: rgba(245, 158, 11, 0.5);
-        box-shadow: 0 15px 35px rgba(245, 158, 11, 0.2);
+        border-color: rgba(16, 185, 129, 0.5);
+        box-shadow: 0 15px 35px rgba(16, 185, 129, 0.2);
     }
 
     .static-gallery-item img {
@@ -321,8 +321,8 @@ st.markdown("""
 
     .vertical-gallery-card:hover {
         transform: translateY(-6px);
-        border-color: rgba(245, 158, 11, 0.5);
-        box-shadow: 0 35px 70px rgba(245, 158, 11, 0.25);
+        border-color: rgba(16, 185, 129, 0.5);
+        box-shadow: 0 35px 70px rgba(16, 185, 129, 0.25);
     }
 
     .vertical-gallery-card img {
@@ -351,9 +351,9 @@ st.markdown("""
     .vertical-card-badge {
         display: inline-block;
         padding: 6px 14px;
-        background: rgba(245, 158, 11, 0.2);
-        border: 1px solid rgba(245, 158, 11, 0.5);
-        color: #FBBF24;
+        background: rgba(16, 185, 129, 0.2);
+        border: 1px solid rgba(16, 185, 129, 0.5);
+        color: #34D399;
         font-size: 0.75rem;
         font-weight: 800;
         letter-spacing: 1.5px;
@@ -688,7 +688,7 @@ def show_quotation_dialog():
     <div class="commercial-auth-banner">
         <div style="font-size:2.2rem;">🔐</div>
         <div>
-            <div style="color:#818CF8; font-weight:700; font-size:0.85rem; letter-spacing:1px;">SECURE SSL GATEWAY • INTERIOR</div>
+            <div style="color:#34D399; font-weight:700; font-size:0.85rem; letter-spacing:1px;">SECURE SSL GATEWAY • INTERIOR</div>
             <div style="color:#FFFFFF; font-size:0.8rem;">Generate encrypted PDF estimates with dynamic QR code authentication for Bengaluru projects.</div>
         </div>
     </div>
@@ -761,8 +761,8 @@ def show_quotation_dialog():
                 st.success("🎉 **Quotation Generated & Synced Successfully!**")
                 
                 st.markdown(f"""
-                <div style="background: rgba(245, 158, 11, 0.15); border: 1px solid #F59E0B; padding: 20px; border-radius: 14px; margin: 15px 0;">
-                    <h3 style="color: #F59E0B; margin-top: 0;">REF NO: {generated_ref}</h3>
+                <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid #10B981; padding: 20px; border-radius: 14px; margin: 15px 0;">
+                    <h3 style="color: #34D399; margin-top: 0;">REF NO: {generated_ref}</h3>
                     <p style="font-size: 1.05rem; color: #F8FAFC; line-height: 1.6;">
                         <b>Your request has been accepted. Please wait some time; you will receive it via mail or WhatsApp.</b>
                     </p>
@@ -949,7 +949,7 @@ with col_hero2:
 
 # --- STATIC & FIXED 10 IMAGES GALLERY SHOWCASE ---
 st.markdown("<br>", unsafe_allow_html=True)
-st.markdown("### 🏛️ Portfolio Master Collection .")
+st.markdown("### 🏛️️ Portfolio Master Collection .")
 st.markdown("<p style='color:#94A3B8; font-size:0.95rem; margin-bottom:1rem;'>Explore our curated permanent catalog of architectural finishes, structural modules, and luxury interior spaces.</p>", unsafe_allow_html=True)
 
 st.markdown("""
@@ -1138,7 +1138,7 @@ st.markdown("<p style='color:#94A3B8; font-size:0.95rem; margin-bottom:1.5rem;'>
 
 selected_room = st.radio(
     "Select Simulation Zone:",
-    ["🍳 Modular Kitchen (Island & U-Shape)", "🛋️ Luxury Living & Media Lounge", "🛏️️ Designer Wardrobes & Bedroom", "💡 Architectural False Ceiling", "🪵 Italian Flooring & Paneling"],
+    ["🍳 Modular Kitchen (Island & U-Shape)", "🛋️ Luxury Living & Media Lounge", "🛏 Designer Wardrobes & Bedroom", "💡 Architectural False Ceiling", "🪵 Italian Flooring & Paneling"],
     horizontal=True,
     label_visibility="collapsed"
 )
@@ -1147,12 +1147,12 @@ if "Kitchen" in selected_room:
     st.markdown("""
     <div class="dashboard-card-3d" style="display:flex; gap:35px; align-items:center;">
         <div style="flex:1;">
-            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#F59E0B; text-transform:uppercase;"></div>
+            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#10B981; text-transform:uppercase;">SIMULATION MODULE 01</div>
             <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">German Soft-Close Acrylic Kitchen</h2>
             <p style="color:#CBD5E1; line-height:1.7; margin-bottom:1.5rem;">
                 Engineered with Blum tandem box mechanisms, scratch-resistant quartz stone counters, integrated LED profile strip lighting, and water-resistant BWP marine-grade plywood cores.
             </p>
-            <div style="display:flex; gap:15px; color:#38BDF8; font-weight:700; font-size:0.9rem;">
+            <div style="display:flex; gap:15px; color:#34D399; font-weight:700; font-size:0.9rem;">
                 <div>⚡ Blum Hardware</div>
                 <div>⚡ Quartz Stone</div>
                 <div>⚡ 10-Yr Warranty</div>
@@ -1169,12 +1169,12 @@ elif "Living" in selected_room:
     st.markdown("""
     <div class="dashboard-card-3d" style="display:flex; gap:35px; align-items:center;">
         <div style="flex:1;">
-            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#F59E0B; text-transform:uppercase;">SIMULATION MODULE 02</div>
+            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#10B981; text-transform:uppercase;">SIMULATION MODULE 02</div>
             <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">Grand Living & Media Lounge</h2>
             <p style="color:#CBD5E1; line-height:1.7; margin-bottom:1.5rem;">
                 Featuring custom acoustic fluted panels, sintered stone TV media backdrops, motorized smart curtains, and concealed wiring channels for high-end home theater setups.
             </p>
-            <div style="display:flex; gap:15px; color:#38BDF8; font-weight:700; font-size:0.9rem;">
+            <div style="display:flex; gap:15px; color:#34D399; font-weight:700; font-size:0.9rem;">
                 <div>⚡ Fluted Panels</div>
                 <div>⚡ Acoustic Wall</div>
                 <div>⚡ Smart Motorized</div>
@@ -1191,12 +1191,12 @@ elif "Wardrobes" in selected_room:
     st.markdown("""
     <div class="dashboard-card-3d" style="display:flex; gap:35px; align-items:center;">
         <div style="flex:1;">
-            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#F59E0B; text-transform:uppercase;">SIMULATION MODULE 03</div>
+            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#10B981; text-transform:uppercase;">SIMULATION MODULE 03</div>
             <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">Floor-to-Ceiling Glass Wardrobes</h2>
             <p style="color:#CBD5E1; line-height:1.7; margin-bottom:1.5rem;">
                 Bronze tinted safety glass sliding doors equipped with motion-activated LED hanging rails, velvet-lined pull-out organizer trays, and soft-closing dampeners.
             </p>
-            <div style="display:flex; gap:15px; color:#38BDF8; font-weight:700; font-size:0.9rem;">
+            <div style="display:flex; gap:15px; color:#34D399; font-weight:700; font-size:0.9rem;">
                 <div>⚡ Sensor Lighting</div>
                 <div>⚡ Velvet Trays</div>
                 <div>⚡ Tinted Glass</div>
@@ -1213,12 +1213,12 @@ elif "Ceiling" in selected_room:
     st.markdown("""
     <div class="dashboard-card-3d" style="display:flex; gap:35px; align-items:center;">
         <div style="flex:1;">
-            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#F59E0B; text-transform:uppercase;">SIMULATION MODULE 04</div>
+            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#10B981; text-transform:uppercase;">SIMULATION MODULE 04</div>
             <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">Architectural False Ceiling & Coves</h2>
             <p style="color:#CBD5E1; line-height:1.7; margin-bottom:1.5rem;">
                 Multi-tier gypsum board architectural drops featuring warm concealed cove lighting lines, magnetic track spotlight fixtures, and statement crystal chandelier mounts.
             </p>
-            <div style="display:flex; gap:15px; color:#38BDF8; font-weight:700; font-size:0.9rem;">
+            <div style="display:flex; gap:15px; color:#34D399; font-weight:700; font-size:0.9rem;">
                 <div>⚡ Magnetic Tracks</div>
                 <div>⚡ Warm Cove LED</div>
                 <div>⚡ Gypsum Finish</div>
@@ -1235,12 +1235,12 @@ else:
     st.markdown("""
     <div class="dashboard-card-3d" style="display:flex; gap:35px; align-items:center;">
         <div style="flex:1;">
-            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#F59E0B; text-transform:uppercase;">SIMULATION MODULE 05</div>
+            <div style="font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:0.8rem; letter-spacing:2px; color:#10B981; text-transform:uppercase;">SIMULATION MODULE 05</div>
             <h2 style="font-family:'Outfit', sans-serif; font-size:2.2rem; font-weight:800; color:#FFF; margin:10px 0 15px 0;">Imported Italian Marble & Wood Paneling</h2>
             <p style="color:#CBD5E1; line-height:1.7; margin-bottom:1.5rem;">
                 Mirror-polished large-format Italian marble tiles paired with vertical natural wood veneer wall cladding and brushed brass inlay metal trims.
             </p>
-            <div style="display:flex; gap:15px; color:#38BDF8; font-weight:700; font-size:0.9rem;">
+            <div style="display:flex; gap:15px; color:#34D399; font-weight:700; font-size:0.9rem;">
                 <div>⚡ Italian Marble</div>
                 <div>⚡ Brass Inlays</div>
                 <div>⚡ Veneer Finish</div>
