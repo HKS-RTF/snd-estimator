@@ -688,7 +688,7 @@ def show_quotation_dialog():
     <div class="commercial-auth-banner">
         <div style="font-size:2.2rem;">🔐</div>
         <div>
-            <div style="color:#818CF8; font-weight:700; font-size:0.85rem; letter-spacing:1px;">SECURE SSL GATEWAY • UDYAM REGISTERED ESTIMATION</div>
+            <div style="color:#818CF8; font-weight:700; font-size:0.85rem; letter-spacing:1px;">SECURE SSL GATEWAY • INTERIOR</div>
             <div style="color:#FFFFFF; font-size:0.8rem;">Generate encrypted PDF estimates with dynamic QR code authentication for Bengaluru projects.</div>
         </div>
     </div>
